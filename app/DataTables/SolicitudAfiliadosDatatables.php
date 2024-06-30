@@ -7,6 +7,7 @@ use App\Models\CartasAfiliadosDatatable;
 use App\Models\SolicitudAfiliados;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -26,13 +27,17 @@ class SolicitudAfiliadosDatatables extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
-                $ButtonGroup = '
-                <div class="btn-group">
-                    <a href="' . route('editar-solicitud-afiliado', $query->id_solicitudAfiliados) . '" class="btn btn-default btn-xs">
-                        <i class="glyphicon glyphicon-edit"></i>
+                if (Auth::user()->id_rol == 1) {
+                    $ButtonGroup = '
+                    <div class="btn-group">
+                    <a href="' . route(config('rol')[Auth::user()->id_rol] . '.editar-solicitud-afiliado', $query->id_solicitudAfiliados) . '" class="btn btn-default btn-xs">
+                    <i class="glyphicon glyphicon-edit"></i>
                     </a>
-                </div>
-        ';
+                    </div>
+                    ';
+                } else {
+                    $ButtonGroup = 'No editable';
+                }
 
                 return $ButtonGroup;
             })
@@ -86,7 +91,7 @@ class SolicitudAfiliadosDatatables extends DataTable
                     ['extend' => 'reload', 'className' => 'btn btn-default btn-sm no-corner',],
                 ],
                 'language' => [
-                    'url' => url('https://cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json')
+                    'url' => url('vendor/datatables/es-ES.json')
                 ],
             ]);
     }

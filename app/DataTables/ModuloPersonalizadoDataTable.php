@@ -87,7 +87,7 @@ class ModuloPersonalizadoDataTable extends DataTable
                     ['extend' => 'reload', 'className' => 'btn btn-default btn-sm no-corner',],
                 ],
                 'language' => [
-                    'url' => url('https://cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json')
+                    'url' => url('vendor/datatables/es-ES.json')
                 ],
             ]);
     }

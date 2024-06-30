@@ -6,6 +6,7 @@ use App\Models\Factura;
 use App\Models\Pago;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
@@ -35,13 +36,17 @@ class PagosDataTable extends DataTable
                 }
             })
             ->addColumn('action', function ($query) {
-                $ButtonGroup = '
-                <div class="btn-group">
-                    <a href="' . route('editar-pago', $query->id_pago) . '" class="btn btn-default btn-xs">
-                        <i class="glyphicon glyphicon-edit"></i>
+                if (Auth::user()->id_rol == 1) {
+                    $ButtonGroup = '
+                    <div class="btn-group">
+                    <a href="' . route(config('rol')[Auth::user()->id_rol] . '.editar-pago', $query->id_pago) . '" class="btn btn-default btn-xs">
+                    <i class="glyphicon glyphicon-edit"></i>
                     </a>
-                </div>
-                ';
+                    </div>
+                    ';
+                } else {
+                    $ButtonGroup = 'No editable';
+                }
 
                 return $ButtonGroup;
             })
@@ -96,7 +101,7 @@ class PagosDataTable extends DataTable
                     ['extend' => 'reload', 'className' => 'btn btn-default btn-sm no-corner',],
                 ],
                 'language' => [
-                    'url' => url('https://cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json')
+                    'url' => url('vendor/datatables/es-ES.json')
                 ],
             ]);
     }

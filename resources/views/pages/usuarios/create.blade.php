@@ -19,361 +19,89 @@
                     </div>
                     <!-- /.box-header -->
                     <!-- form start -->
-                    <form role="form">
+                    <form role="form" action="{{ route(config('rol')[Auth::user()->id_rol] . '.store-usuario') }}"
+                        method="post" enctype="multipart/form-data">
+                        @csrf
                         <div class="box-body">
 
                             <div class="row">
-                                <!-- Name Field -->
-                                <div class="form-group col-sm-6 ">
-                                    <label for="NombreUsuario">Nombre de usuario:</label>
-                                    <input class="form-control" name="NombreUsuario" type="text" id="NombreUsuario">
 
+                                <!-- Nombres Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('Nombres') ? 'has-error' : '' }}">
+                                    <label for="Nombres">Nombres:</label>
+                                    <input class="form-control" name="Nombres" type="text" id="Nombres"
+                                        value="{{ old('Nombres') }}">
                                 </div>
 
+                                <!-- Apellidos Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('Apellidos') ? 'has-error' : '' }}">
+                                    <label for="Apellidos">Apellidos:</label>
+                                    <input class="form-control" name="Apellidos" type="text" id="Apellidos"
+                                        value="{{ old('Apellidos') }}">
+                                </div>
+
+                                <!-- NombreUsuario Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('NombreUsuario') ? 'has-error' : '' }}">
+                                    <label for="NombreUsuario">Nombre de usuario:</label>
+                                    <input class="form-control" name="NombreUsuario" type="text" id="NombreUsuario"
+                                        value="{{ old('NombreUsuario') }}">
+                                </div>
 
                                 <!-- Email Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('email') ? 'has-error' : '' }}">
                                     <label for="email">Email:</label>
-                                    <input class="form-control" name="email" type="email" id="email">
+                                    <input class="form-control" name="email" type="email" id="email"
+                                        value="{{ old('email') }}">
                                 </div>
 
-
-                                <!-- Username Field -->
-                                <div class="form-group col-sm-6 ">
+                                <!-- Password Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('password') ? 'has-error' : '' }}">
                                     <label for="password">Contraseña:</label>
-                                    <input class="form-control" name="password" type="text" id="password">
-
+                                    <input class="form-control" name="password" type="text" id="password"
+                                        value="{{ old('password') }}">
                                 </div>
 
-                                <div class="form-group col-sm-6 ">
-                                    <label for="status">Rol:</label>
-                                    <select class="form-control" id="status" name="status">
-                                        <option value="1">SuperAdmin</option>
-                                        <option value="2">Administrador</option>
-                                        <option value="3">Usuario</option>
+                                <!-- Password confirmation Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('password') ? 'has-error' : '' }}">
+                                    <label for="password_confirmation">Confirmar contraseña:</label>
+                                    <input class="form-control" name="password_confirmation" type="text"
+                                        id="password_confirmation" value="{{ old('password') }}">
+                                </div>
+
+                                <!-- id_rol Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('id_rol') ? 'has-error' : '' }}">
+                                    <label for="id_rol">Rol:</label>
+                                    <select class="form-control id_rol" id="id_rol" name="id_rol">`
+                                        @php
+                                            $Roles = \App\Models\Rol::all();
+                                        @endphp
+                                        @foreach ($Roles as $Rol)
+                                            <option value="{{ $Rol->id_rol }}">
+                                                {{ $Rol->Rol }}</option>
+                                        @endforeach
                                     </select>
 
                                 </div>
 
-                            </div>
-                        </div>
-                        <!-- /.box-body -->
-                        <div class="box-body">
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    <div class="row">
-                                        <div class="col-sm-2">
-                                            <label class="control-label">Usuarios</label><br>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="create users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Crear
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="read users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Visualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="update users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Actualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="delete users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Eliminar
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <label class="control-label">Facturas</label><br>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="create tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Crear
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="read tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Visualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="update tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Actualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="delete tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Eliminar
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <label class="control-label">Pagos</label><br>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="create documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Crear
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="read documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Visualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="update documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Actualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="delete documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Eliminar
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <label class="control-label">Notas de crédito</label><br>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="create users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Crear
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="read users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Visualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="update users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Actualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="delete users"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Eliminar
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <label class="control-label">Solicitud afiliación</label><br>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="create tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Crear
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="read tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Visualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="update tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Actualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label>
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="delete tags"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Eliminar
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div class="col-sm-2">
-                                            <label class="control-label">Retenciones</label><br>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="create documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Crear
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="read documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Visualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="update documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Actualizar
-                                                </label>
-                                            </div>
-                                            <div class="form-group">
-                                                <label class="">
-                                                    <div class="icheckbox_square-blue" style="position: relative;"><input
-                                                            name="global_permissions[]" type="checkbox"
-                                                            class="iCheck-helper" value="delete documents"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"><ins
-                                                            class="iCheck-helper"
-                                                            style="position: absolute; top: -20%; left: -20%; display: block; width: 140%; height: 140%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins>
-                                                    </div>
-                                                    &nbsp;Eliminar
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <!-- Image confirmation Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('image') ? 'has-error' : '' }}">
+                                    <label for="image">Foto de perfil:</label>
+                                    <input class="form-control" name="image" type="file" id="image">
                                 </div>
                             </div>
+                            @if ($errors->any())
+                                <div class="alert alert-light">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li class="text-danger">{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
                         </div>
+
                         <div class="box-footer">
-                            <button type="submit" class="btn btn-primary">Crear</button>
+                            <button type="submit" class="btn btn-primary" id="form-submit">Crear</button>
                         </div>
                     </form>
                 </div>
@@ -386,3 +114,41 @@
         </div>
     </div>
 @endsection
+
+{{-- @push('scripts')
+    <script>
+        $(document).ready(function() {
+            $('#create-user-form').on('submit', function(e) {
+                e.preventDefault();
+                let data = $(this).serialize();
+                $.ajax({
+                    url: "{{ route('store-usuario') }}",
+                    method: 'POST',
+                    data: data,
+                    beforeSend: function() {
+                        $('#form-submit').text('Creando..');
+                        $('#form-submit').attr('disabled', true);
+                    },
+                    success: function(data) {
+                        if (data.status == 'success') {
+                            alert(data.message)
+                            $('#create-user-form')[0].reset();
+                            $('#form-submit').text('Crear')
+                            $('#form-submit').attr('disabled', false);
+                        }
+                    },
+                    error: function(data) {
+                        let errors = data.responseJSON.errors;
+
+                        $.each(errors, function(key, value) {
+
+                        })
+
+                        $('#form-submit').text('Crear');
+                        $('#form-submit').attr('disabled', false);
+                    }
+                })
+            })
+        })
+    </script>
+@endpush --}}

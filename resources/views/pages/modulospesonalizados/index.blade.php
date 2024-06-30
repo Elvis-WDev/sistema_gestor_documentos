@@ -7,7 +7,7 @@
         <h1 class="pull-left"> Módulos</h1>
         <h1 class="pull-right">
             <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px"
-                href="{{ route('crear-custom-module') }}">
+                href="{{ route(config('rol')[Auth::user()->id_rol] . '.crear-custom-module') }}">
                 <i class="fa fa-plus"></i>
                 Nuevo módulo
             </a>

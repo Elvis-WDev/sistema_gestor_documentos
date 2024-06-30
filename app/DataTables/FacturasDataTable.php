@@ -5,6 +5,7 @@ namespace App\DataTables;
 use App\Models\Factura;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
+use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -24,25 +25,34 @@ class FacturasDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('Estado', function ($query) {
-                $select = '
-                <select class="form-control" id="Estado" name="Estado">
-                    <option value="1" ' . ($query->Estado == "Pagada" ? "selected" : "") . '>Pagada</option>
-                    <option value="2" ' . ($query->Estado == "Anulada" ? "selected" : "") . '>Anulada</option>
-                    <option value="3" ' . ($query->Estado == "Abonada" ? "selected" : "") . '>Abonada</option>
-                </select>
-            ';
+                if (Auth::user()->id_rol == 1) {
+                    $select = '
+                    <select class="form-control" id="Estado" name="Estado">
+                        <option value="1" ' . ($query->Estado == "Pagada" ? "selected" : "") . '>Pagada</option>
+                        <option value="2" ' . ($query->Estado == "Anulada" ? "selected" : "") . '>Anulada</option>
+                        <option value="3" ' . ($query->Estado == "Abonada" ? "selected" : "") . '>Abonada</option>
+                    </select>    
+                    ';
+                } else {
+                    $select = $query->Estado;
+                }
 
                 return $select;
             })
             ->addColumn('action', function ($query) {
-                $ButtonGroup = '
-                 <div class="btn-group">
-                   
-                    <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-xs">
-                        <i class="glyphicon glyphicon-edit"></i>
+                if (Auth::user()->id_rol == 1) {
+
+                    $ButtonGroup = '
+                    <div class="btn-group">
+                    
+                    <a href="' . route('SuperAdmin.editar-factura', $query->id_factura) . '" class="btn btn-default btn-xs">
+                    <i class="glyphicon glyphicon-edit"></i>
                     </a>
-                 </div>
-                ';
+                    </div>
+                    ';
+                } else {
+                    $ButtonGroup = 'No editable';
+                }
 
                 return $ButtonGroup;
             })
@@ -101,7 +111,7 @@ class FacturasDataTable extends DataTable
                     ['extend' => 'reload', 'className' => 'btn btn-default btn-sm no-corner',],
                 ],
                 'language' => [
-                    'url' => url('https://cdn.datatables.net/plug-ins/2.0.8/i18n/es-ES.json')
+                    'url' => url('vendor/datatables/es-ES.json')
                 ],
             ]);
     }

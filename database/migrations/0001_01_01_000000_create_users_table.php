@@ -21,10 +21,13 @@ return new class extends Migration
         // Creación de la tabla usuarios
         Schema::create('users', function (Blueprint $table) {
             $table->id();
+            $table->string('Nombres', 100)->default('');
+            $table->string('Apellidos', 100)->default('');
             $table->string('NombreUsuario', 100)->unique()->default('');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('url_img');
             $table->foreignId('id_rol')->default(1)->constrained('roles', 'id_rol')->onDelete('cascade');
             $table->rememberToken();
             $table->timestamps();

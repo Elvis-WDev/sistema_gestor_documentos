@@ -6,18 +6,19 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="https://pic.onlinewebfonts.com/thumbnails/icons_312847.svg" class="img-circle"
-                    alt="User Image" />
+                <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset(Auth::user()->url_img) }}"
+                    class="img-circle" alt="User Image" />
             </div>
             <div class="pull-left info">
-                <p>Super Admin</p>
+                <p>{{ Auth::user()->NombreUsuario }}</p>
                 {{-- @if (Auth::guest())
                     <p>{{ config('settings.system_title') }}</p>
                 @else
                     <p>{{ Auth::user()->name }}</p>
                 @endif --}}
                 <!-- Status -->
-                <a href="#"><i class="fa fa-circle text-success"></i> Online</a>
+                <a href="{{ route(config('rol')[Auth::user()->id_rol] . '.perfil.edit') }}"><i
+                        class="fa fa-circle text-success"></i> {{ config('rol')[Auth::user()->id_rol] }}</a>
             </div>
         </div>
 

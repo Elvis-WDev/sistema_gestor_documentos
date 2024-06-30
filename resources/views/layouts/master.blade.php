@@ -6,6 +6,7 @@
     <title>
         @yield('title')
     </title>
+    <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
@@ -19,12 +20,12 @@
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-tagsinput/css/bootstrap-tagsinput.css') }}">
     <link rel="stylesheet" href="{{ asset('css/digidocu-custom.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
 
     @yield('css')
 </head>
 
 <body class="skin-blue-light sidebar-mini">
+
     {{-- @if (!Auth::guest()) --}}
     <div class="wrapper">
         <!-- Main Header -->
@@ -56,8 +57,8 @@
                             <!-- Menu Toggle Button -->
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <!-- The user image in the navbar-->
-                                <img src="https://pic.onlinewebfonts.com/thumbnails/icons_312847.svg" class="user-image"
-                                    alt="User Image" />
+                                <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset(Auth::user()->url_img) }}"
+                                    class="user-image" alt="User Image" />
                                 <!-- hidden-xs hides the username on small devices so only the image appears. -->
                                 <span class="hidden-xs">
                                     {!! Auth::user()->NombreUsuario !!}
@@ -66,7 +67,7 @@
                             <ul class="dropdown-menu">
                                 <!-- The user image in the menu -->
                                 <li class="user-header">
-                                    <img src="https://pic.onlinewebfonts.com/thumbnails/icons_312847.svg"
+                                    <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset(Auth::user()->url_img) }}"
                                         class="img-circle" alt="User Image" />
                                     <p>
                                         {!! Auth::user()->NombreUsuario !!}
@@ -81,7 +82,8 @@
                                 <!-- Menu Footer-->
                                 <li class="user-footer">
                                     <div class="pull-left" style="margin:10px">
-                                        <a href="{{ route('perfil.edit') }}" class="btn btn-default btn-flat">Perfil</a>
+                                        <a href="{{ route(config('rol')[Auth::user()->id_rol] . '.perfil.edit') }}"
+                                            class="btn btn-default btn-flat">Perfil</a>
                                     </div>
                                     <div class="pull-right" style="margin:10px">
                                         <a href="{!! url('/logout') !!}" class="btn btn-default btn-flat"
@@ -154,6 +156,7 @@
             </div>
         </div>
     @endif --}}
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -171,9 +174,6 @@
     <script src="{{ asset('js/digidocu-custom.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr@4.6.13/dist/l10n/es.js"></script>
-
-    <script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
-
 
     <script>
         $(function() {
@@ -195,15 +195,28 @@
 
             });
 
-            let myDropzone = Dropzone("#dropzone", {
-                addedfile: file => {
-                    // ONLY DO THIS IF YOU KNOW WHAT YOU'RE DOING!
-                }
-            });
-
         })
     </script>
+
     @yield('scripts')
+
+    <script>
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+    </script>
+
+    @stack('scripts')
+
+    @if ($errors->any())
+        @foreach ($errors->all() as $error)
+            @php
+                notyf()->error($error);
+            @endphp
+        @endforeach
+    @endif
 
 </body>
 
