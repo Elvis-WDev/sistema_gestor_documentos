@@ -25,6 +25,7 @@ class PagosSeeder extends Seeder
                     'id_factura' => $idFactura,
                     'Archivo' => Str::random(10),
                     'Total' => 50,
+                    'TransaccionVenta' => Str::random(10),
                     'Fecha' => Carbon::now()->toDateTimeString(),
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),

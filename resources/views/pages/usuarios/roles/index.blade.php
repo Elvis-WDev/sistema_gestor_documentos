@@ -1,19 +1,16 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Usuarios
+    DigiDocs || Roles
 @endsection
 @section('content')
 
     <section class="content-header">
-        <h1 class="pull-left"> Usuarios</h1>
+        <h1 class="pull-left"> Roles</h1>
         <h1 class="pull-right">
-            @can('crear usuario')
-                <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px"
-                    href="{{ route('crear-usuario') }}">
-                    <i class="fa fa-plus"></i>
-                    Nuevo usuario
-                </a>
-            @endcan
+            <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px" href="{{ route('crear-rol') }}">
+                <i class="fa fa-plus"></i>
+                Nuevos roles
+            </a>
         </h1>
     </section>
     <div class="content">

@@ -6,20 +6,21 @@
     <section class="content-header">
         <h1 class="pull-left"> Facturas</h1>
         <h1 class="pull-right">
-            @if (Auth::user()->id_rol == 1 || Auth::user()->id_rol == 3)
+
+            @can('crear facturas')
                 <a class="btn btn-primary pull-right mx-2" style="margin-top: -10px;margin-bottom: 5px"
-                    href="{{ route(config('rol')[Auth::user()->id_rol] . '.crear-factura') }}">
+                    href="{{ route('crear-factura') }}">
                     <i class="fa fa-plus"></i>
                     Nueva factura
                 </a>
-            @endif
-            @if (Auth::user()->id_rol == 1 || Auth::user()->id_rol == 2)
-                <button type="button" class="btn btn-primary pull-right"
-                    style="margin-top: -10px;margin-bottom: 5px;margin-right:10px" id="reporte_daterange">
-                    <i class="fa fa-plus"></i>
-                    Reportes por fecha
-                </button>
-            @endif
+            @endcan
+
+            <button type="button" class="btn btn-primary pull-right"
+                style="margin-top: -10px;margin-bottom: 5px;margin-right:10px" id="reporte_daterange">
+                <i class="fa fa-plus"></i>
+                Reportes por fecha
+            </button>
+
         </h1>
     </section>
     <div class="content">

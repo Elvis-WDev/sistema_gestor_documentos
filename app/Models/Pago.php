@@ -16,6 +16,7 @@ class Pago extends Model
         'id_factura',
         'Archivo',
         'Monto',
+        'transaccionVenta',
     ];
 
     public function factura()

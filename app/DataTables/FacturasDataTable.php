@@ -25,7 +25,7 @@ class FacturasDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('Estado', function ($query) {
-                if (Auth::user()->id_rol == 1) {
+                if (Auth::user()->can('modificar facturas')) {
                     $select = '
                     <select class="form-control" id="Estado" name="Estado">
                         <option value="1" ' . ($query->Estado == "Pagada" ? "selected" : "") . '>Pagada</option>
@@ -40,24 +40,25 @@ class FacturasDataTable extends DataTable
                 return $select;
             })
             ->addColumn('action', function ($query) {
-                if (Auth::user()->id_rol == 1) {
+                if (Auth::user()->can('modificar facturas')) {
 
                     $ButtonGroup = '
                     <div class="btn-group">
-                    
-                    <a href="' . route('SuperAdmin.editar-factura', $query->id_factura) . '" class="btn btn-default btn-xs">
+                    <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-xs">
                     <i class="glyphicon glyphicon-edit"></i>
                     </a>
                     </div>
                     ';
                 } else {
-                    $ButtonGroup = 'No editable';
+                    $ButtonGroup = 'No permitido';
                 }
 
                 return $ButtonGroup;
             })
-            ->editColumn('Total', '$ {{$Total}}')
             ->editColumn('Abono', '$ {{$Abono}}')
+            ->editColumn('RetencionIva', '$ {{$RetencionIva}}')
+            ->editColumn('RetencionFuente', '$ {{$RetencionFuente}}')
+            ->editColumn('Total', '$ {{$Total}}')
             ->editColumn('FechaEmision', function ($row) {
                 return Carbon::parse($row->FechaEmision)->translatedFormat('d \d\e F \d\e Y');
             })
@@ -129,8 +130,10 @@ class FacturasDataTable extends DataTable
             Column::make('PuntoEmision')->title('P. emisión'),
             Column::make('Secuencial')->title('Secuencial'),
             Column::make('RazonSocial')->title('Raz. social'),
-            Column::make('Total')->title('Total'),
             Column::make('Abono')->title('Abono'),
+            Column::make('RetencionIva')->title('Ret. iva'),
+            Column::make('RetencionFuente')->title('Ret. Fuente'),
+            Column::make('Total')->title('Total'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
             Column::computed('Estado')->title('Estado')->printable(false),

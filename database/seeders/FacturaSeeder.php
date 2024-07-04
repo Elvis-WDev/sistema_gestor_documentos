@@ -33,6 +33,8 @@ class FacturaSeeder extends Seeder
                     'Total' => 50,
                     'Estado' => 1,
                     'Abono' => 0.0,
+                    'RetencionIva' => 0.0,
+                    'RetencionFuente' => 0.0,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),
                 ]

@@ -27,18 +27,18 @@ class SolicitudAfiliadosDatatables extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
-                if (Auth::user()->id_rol == 1) {
+
+                if (Auth::user()->can('modificar SolicitudAfiliado')) {
                     $ButtonGroup = '
                     <div class="btn-group">
-                    <a href="' . route(config('rol')[Auth::user()->id_rol] . '.editar-solicitud-afiliado', $query->id_solicitudAfiliados) . '" class="btn btn-default btn-xs">
+                    <a href="' . route('editar-solicitud-afiliado', $query->id_solicitudAfiliados) . '" class="btn btn-default btn-xs">
                     <i class="glyphicon glyphicon-edit"></i>
                     </a>
                     </div>
                     ';
                 } else {
-                    $ButtonGroup = 'No editable';
+                    $ButtonGroup = 'No permitido';
                 }
-
                 return $ButtonGroup;
             })
             ->editColumn('created_at', function ($row) {

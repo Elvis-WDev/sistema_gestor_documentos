@@ -11,12 +11,6 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // Creación de la tabla roles
-        Schema::create('roles', function (Blueprint $table) {
-            $table->id('id_rol');
-            $table->enum('Rol', ['SuperAdmin', 'Administrador', 'Usuario'])->default('Usuario');
-            $table->timestamps();
-        });
 
         // Creación de la tabla usuarios
         Schema::create('users', function (Blueprint $table) {
@@ -27,8 +21,7 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->string('url_img');
-            $table->foreignId('id_rol')->default(1)->constrained('roles', 'id_rol')->onDelete('cascade');
+            $table->string('url_img')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

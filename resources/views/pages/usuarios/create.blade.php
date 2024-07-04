@@ -19,8 +19,7 @@
                     </div>
                     <!-- /.box-header -->
                     <!-- form start -->
-                    <form role="form" action="{{ route(config('rol')[Auth::user()->id_rol] . '.store-usuario') }}"
-                        method="post" enctype="multipart/form-data">
+                    <form role="form" action="{{ route('store-usuario') }}" method="post" enctype="multipart/form-data">
                         @csrf
                         <div class="box-body">
 
@@ -68,26 +67,26 @@
                                         id="password_confirmation" value="{{ old('password') }}">
                                 </div>
 
-                                <!-- id_rol Field -->
+                                <!-- Roles Field -->
                                 <div class="form-group col-sm-6 {{ $errors->has('id_rol') ? 'has-error' : '' }}">
                                     <label for="id_rol">Rol:</label>
-                                    <select class="form-control id_rol" id="id_rol" name="id_rol">`
+                                    <select class="form-control id_rol" id="id_rol" name="id_rol">
                                         @php
-                                            $Roles = \App\Models\Rol::all();
+                                            $Roles = \Spatie\Permission\Models\Role::all();
                                         @endphp
+
                                         @foreach ($Roles as $Rol)
-                                            <option value="{{ $Rol->id_rol }}">
-                                                {{ $Rol->Rol }}</option>
+                                            <option value="{{ $Rol->id }}">
+                                                {{ $Rol->name }}</option>
                                         @endforeach
                                     </select>
 
                                 </div>
-
                                 <!-- Image confirmation Field -->
-                                <div class="form-group col-sm-6 {{ $errors->has('image') ? 'has-error' : '' }}">
+                                {{-- <div class="form-group col-sm-6 {{ $errors->has('image') ? 'has-error' : '' }}">
                                     <label for="image">Foto de perfil:</label>
                                     <input class="form-control" name="image" type="file" id="image">
-                                </div>
+                                </div> --}}
                             </div>
                             @if ($errors->any())
                                 <div class="alert alert-light">

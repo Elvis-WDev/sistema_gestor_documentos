@@ -6,18 +6,19 @@
     <section class="content-header">
         <h1 class="pull-left"> Pagos</h1>
         <h1 class="pull-right">
-            @if (Auth::user()->id_rol == 1 || Auth::user()->id_rol == 2)
+            @can('crear pagos')
                 <a class="btn btn-primary pull-right" style="margin-top: -10px;margin-bottom: 5px"
-                    href="{{ route(config('rol')[Auth::user()->id_rol] . '.crear-pago') }}">
+                    href="{{ route('crear-pago') }}">
                     <i class="fa fa-plus"></i>
                     Nuevo pago
                 </a>
-                <button type="button" class="btn btn-primary pull-right"
-                    style="margin-top: -10px;margin-bottom: 5px;margin-right:10px" id="reporte_daterange">
-                    <i class="fa fa-plus"></i>
-                    Reportes por fecha
-                </button>
-            @endif
+            @endcan
+            <button type="button" class="btn btn-primary pull-right"
+                style="margin-top: -10px;margin-bottom: 5px;margin-right:10px" id="reporte_daterange">
+                <i class="fa fa-plus"></i>
+                Reportes por fecha
+            </button>
+
         </h1>
     </section>
     <div class="content">

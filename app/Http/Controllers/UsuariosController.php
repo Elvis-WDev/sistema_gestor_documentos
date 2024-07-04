@@ -11,10 +11,12 @@ use File;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Facades\Auth;
 use Flasher\Notyf\Prime\NotyfInterface;
+use Illuminate\Support\Facades\Storage;
+use Spatie\Permission\Traits\HasRoles;
 
 class UsuariosController extends Controller
 {
-    use ImageUploadTrait;
+    use ImageUploadTrait, HasRoles;
     /**
      * Display a listing of the FileType.
      *
@@ -59,10 +61,14 @@ class UsuariosController extends Controller
         $usuario->Apellidos = $request->Apellidos;
         $usuario->email = $request->email;
 
+
         if ($request->hasFile('image')) {
-            if (File::exists(public_path($usuario->image))) {
-                File::delete(public_path($usuario->image));
+            // Eliminar la imagen anterior si existe
+            if ($usuario->url_img && Storage::disk('public')->exists($usuario->url_img)) {
+                Storage::disk('public')->delete($usuario->url_img);
             }
+
+            // Actualizar la imagen usando el método updateImage
             $imagePath = $this->updateImage($request, 'image', 'uploads/usuarios', $usuario->url_img);
             $usuario->url_img = $imagePath;
         }
@@ -75,6 +81,6 @@ class UsuariosController extends Controller
 
         flash('Perfil actualizado correctamente.');
 
-        return redirect()->route(config('rol')[Auth::user()->id_rol] . '.perfil.update');
+        return redirect()->route('perfil.update');
     }
 }

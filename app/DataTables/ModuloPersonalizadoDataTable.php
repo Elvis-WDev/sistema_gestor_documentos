@@ -32,8 +32,7 @@ class ModuloPersonalizadoDataTable extends DataTable
                 <a href="#" class="btn btn-default btn-xs">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>
-             </div>
-            ';
+             </div>';
 
                 return $ButtonGroup;
             })

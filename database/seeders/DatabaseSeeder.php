@@ -4,6 +4,8 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use File;
+use Illuminate\Support\Facades\Storage;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,6 +14,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+
+        $this->call(RolesPermisosSeeder::class);
         $this->call(AdminSeeder::class);
         $this->call(ConfiguracionesGeneralesSeeder::class);
         $this->call([
@@ -21,5 +25,7 @@ class DatabaseSeeder extends Seeder
         $this->call(SolicitudAfiliadoSeeder::class);
         $this->call(NotasCreditoSeeder::class);
         $this->call(RetencionesSeeder::class);
+
+        Storage::disk('public')->deleteDirectory('uploads');
     }
 }

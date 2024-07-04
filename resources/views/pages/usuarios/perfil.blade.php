@@ -17,9 +17,7 @@
                 <div class="box box-primary">
                     <!-- /.box-header -->
                     <!-- form start -->
-                    <form role="form" method="POST"
-                        action="{{ route(config('rol')[Auth::user()->id_rol] . '.perfil.update') }}"
-                        enctype="multipart/form-data">
+                    <form role="form" method="POST" action="{{ route('perfil.update') }}" enctype="multipart/form-data">
                         @csrf
                         @method('PATCH')
                         <div class="box-body">
@@ -30,7 +28,7 @@
 
                                 <!-- Name Field -->
                                 <div class="form-group col-sm-12">
-                                    <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset(Auth::user()->url_img) }}"
+                                    <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset('storage/' . Auth::user()->url_img) }}"
                                         class="img-fluid" alt="..." width="200px">
                                 </div>
 

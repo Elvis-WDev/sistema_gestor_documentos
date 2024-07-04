@@ -25,32 +25,40 @@ class UsuariosDatatables extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+
         return (new EloquentDataTable($query))
 
             ->addColumn('id_rol', function ($query) {
-                $Rol = Rol::where('id_rol', '=', $query->id_rol)->first();
+                // Obtener todos los roles del usuario
+                $roles = $query->roles->pluck('name')->toArray();
 
-                if ($Rol) {
-                    return $Rol->Rol;
+                if (!empty($roles)) {
+                    return implode(', ', $roles); // Si hay múltiples roles, se mostrarán separados por coma
                 } else {
-                    return 'No existe Rol asociado';
+                    return 'No existe rol asociado';
                 }
             })
 
             ->addColumn('action', function ($query) {
 
-                if ($query->id != 1) {
-                    $ButtonGroup = '
-                    <div class="btn-group">
-                        <a href="' . route(config('rol')[Auth::user()->id_rol] . '.editar-usuario', $query->id) . '" class="btn btn-default btn-xs">
-                            <i class="glyphicon glyphicon-edit"></i>
-                        </a>
-                    </div>
-                ';
+                if (Auth::user()->can('modificar usuario')) {
 
-                    return $ButtonGroup;
+                    if ($query->id != 1) {
+                        $ButtonGroup = '
+                        <div class="btn-group">
+                            <a href="' . route('editar-usuario', $query->id) . '" class="btn btn-default btn-xs">
+                                <i class="glyphicon glyphicon-edit"></i>
+                            </a>
+                        </div>
+                    ';
+
+                        return $ButtonGroup;
+                    }
+                    return '';
+                } else {
+                    $ButtonGroup = 'No permitido';
                 }
-                return '';
+                return $ButtonGroup;
             })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');

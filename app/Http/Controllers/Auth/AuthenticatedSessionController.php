@@ -38,15 +38,14 @@ class AuthenticatedSessionController extends Controller
         $user = Auth::user();
 
         // Redirigir según el id_rol del usuario
-        switch ($user->id_rol) {
-            case 1:
-                return redirect()->route('SuperAdmin.dashboard');
-            case 2:
-                return redirect()->route('Administrador.dashboard');
-            case 3:
-                return redirect()->route('Usuario.dashboard');
-            default:
-                return redirect()->route('home'); // Ruta por defecto
+        if ($user->id_rol == 1) {
+            return redirect()->route('dashboard');
+        } elseif ($user->id_rol == 2) {
+            return redirect()->route('dashboard');
+        } elseif ($user->id_rol == 3) {
+            return redirect()->route('dashboard');
+        } else {
+            return redirect('/');
         }
     }
 

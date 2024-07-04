@@ -23,6 +23,8 @@ class Factura extends Model
         'Total',
         'Estado',
         'Abono',
+        'RetencionIva',
+        'RetencionFuente',
     ];
 
     public function pagos()

@@ -24,6 +24,14 @@
 
                             <div class="row">
 
+                                <!-- Archivo Field -->
+                                <div class="form-group col-sm-6">
+
+                                    <label for="Archivo">Archivos:</label>
+                                    <input class="form-control" type="file" name="file" id="dropzone" />
+
+                                </div>
+
                                 <!-- FechaEmision Field -->
                                 <div class="form-group col-sm-6 ">
                                     <label for="FechaEmision">Fecha de emisión:</label>
@@ -54,11 +62,6 @@
                                     <input class="form-control" name="RazonSocial" type="text" id="RazonSocial">
                                 </div>
 
-                                <!-- Total Field -->
-                                <div class="form-group col-sm-6">
-                                    <label for="Total">Total:</label>
-                                    <input class="form-control" name="Total" type="text" id="Total">
-                                </div>
                                 <!-- Estado Field -->
                                 <div class="form-group col-sm-6">
                                     <label for="Estado">Estado:</label>
@@ -69,24 +72,40 @@
                                     </select>
                                 </div>
 
+
                                 <!-- Abono Field -->
                                 <div class="form-group col-sm-6">
                                     <label for="Abono">Abono:</label>
-                                    <input class="form-control" name="Abono" type="text" id="Abono">
+                                    <input class="form-control" name="Abono" type="number" id="Abono" min="0"
+                                        value="0" step="any">
                                 </div>
 
-
-
-                                <!-- Archivo Field -->
-                                <div class="form-group col-sm-12">
-                                    <label for="Archivo">Archivos:</label>
-                                    {{-- <input type="file" class="custom-file-input form-control" id="Archivo" --}}
-
-                                    <input class="form-control" type="file" name="file" id="dropzone" />
-
-
+                                <!-- RetencionIva Field -->
+                                <div class="form-group col-sm-6">
+                                    <label for="RetencionIva">Retencion al iva:</label>
+                                    <input class="form-control" name="RetencionIva" type="number" id="RetencionIva"
+                                        min="0" value="0" step="any">
                                 </div>
 
+                                <!-- RetencionFuente Field -->
+                                <div class="form-group col-sm-6">
+                                    <label for="RetencionFuente">Retencion a la fuente:</label>
+                                    <input class="form-control" name="RetencionFuente" type="number" id="RetencionFuente"
+                                        min="0" value="0" step="any">
+                                </div>
+
+                                <!-- Total Field -->
+                                <div class="form-group col-sm-6">
+                                    <label for="Total">Total:</label>
+                                    <input class="form-control" name="Total" type="number" id="Total" min="0"
+                                        value="0" step="any">
+                                </div>
+
+                                <!-- FechaEmision Field -->
+                                <div class="form-group col-sm-6 ">
+                                    <label for="FechaEmision">Fecha de registro:</label>
+                                    <input class="form-control" name="FechaEmision" type="text" id="created_at" disabled>
+                                </div>
 
                             </div>
                         </div>

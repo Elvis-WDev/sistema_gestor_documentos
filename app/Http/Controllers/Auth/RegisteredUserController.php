@@ -15,6 +15,7 @@ use App\Traits\ImageUploadTrait;
 use File;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Validation\Rule;
+use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
@@ -35,14 +36,12 @@ class RegisteredUserController extends Controller
     public function store(Request $request): RedirectResponse
     {
 
-        // dd(config('rol'));
-
         $request->validate([
             'Nombres' => ['required', 'string', 'max:255'],
             'Apellidos' => ['required', 'string', 'max:255'],
             'NombreUsuario' => ['required', 'string', 'max:255', 'unique:' . User::class],
-            'id_rol' => ['required', 'integer', 'exists:roles,id_rol'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'id_rol' => ['required', 'integer', 'exists:roles,id'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -50,10 +49,13 @@ class RegisteredUserController extends Controller
             'Nombres' => $request->Nombres,
             'Apellidos' => $request->Apellidos,
             'NombreUsuario' => $request->NombreUsuario,
-            'id_rol' => $request->id_rol,
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
+        // Obtener el rol por ID y asignarlo al usuario
+        $role = Role::findById($request->id_rol);
+        $user->assignRole($role);
 
         event(new Registered($user));
 
@@ -61,7 +63,7 @@ class RegisteredUserController extends Controller
 
         flash('Usuario creado correctamente!');
 
-        return redirect()->route('SuperAdmin.usuarios');
+        return redirect()->route('usuarios');
     }
 
     public function update(Request $request): RedirectResponse
@@ -72,7 +74,7 @@ class RegisteredUserController extends Controller
             'Nombres' => ['required', 'string', 'max:255'],
             'Apellidos' => ['required', 'string', 'max:255'],
             'NombreUsuario' => ['required', 'string', 'max:255', Rule::unique('users')->ignore($request->id)],
-            'id_rol' => ['required', 'integer', 'exists:roles,id_rol'],
+            'id_rol' => ['required', 'integer', 'exists:roles,id'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255'],
             'image' => ['nullable', 'image', 'mimes:png,jpg,jpeg', 'max:2048'],
         ]);
@@ -83,7 +85,6 @@ class RegisteredUserController extends Controller
         $usuario->Nombres = $request->Nombres;
         $usuario->Apellidos = $request->Apellidos;
         $usuario->NombreUsuario = $request->NombreUsuario;
-        $usuario->id_rol = $request->id_rol;
         $usuario->email = $request->email;
 
         if ($request->hasFile('image')) {
@@ -100,8 +101,12 @@ class RegisteredUserController extends Controller
 
         $usuario->save();
 
+        // Actualizar rol
+        $role = Role::findById($request->id_rol);
+        $usuario->syncRoles([$role->name]);
+
         flash('Usuario actualizado correctamente!');
 
-        return redirect()->route('SuperAdmin.usuarios');
+        return redirect()->route('usuarios');
     }
 }

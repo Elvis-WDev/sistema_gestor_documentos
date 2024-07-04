@@ -36,18 +36,19 @@ class PagosDataTable extends DataTable
                 }
             })
             ->addColumn('action', function ($query) {
-                if (Auth::user()->id_rol == 1) {
+
+                if (Auth::user()->can('modificar pagos')) {
+
                     $ButtonGroup = '
                     <div class="btn-group">
-                    <a href="' . route(config('rol')[Auth::user()->id_rol] . '.editar-pago', $query->id_pago) . '" class="btn btn-default btn-xs">
+                    <a href="' . route('editar-pago', $query->id_pago) . '" class="btn btn-default btn-xs">
                     <i class="glyphicon glyphicon-edit"></i>
                     </a>
                     </div>
                     ';
                 } else {
-                    $ButtonGroup = 'No editable';
+                    $ButtonGroup = 'No permitido';
                 }
-
                 return $ButtonGroup;
             })
             ->editColumn('Total', '$ {{$Total}}')

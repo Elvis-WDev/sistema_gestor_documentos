@@ -17,8 +17,10 @@ return new class extends Migration
             $table->string('Secuencial', 50);
             $table->string('RazonSocial', 100);
             $table->decimal('Total', 10, 2);
-            $table->enum('Estado', ['Pagada', 'Anulada', 'Abonada'])->default('Pagada');
             $table->decimal('Abono', 10, 2)->default(0);
+            $table->decimal('RetencionIva', 10, 2)->default(0);
+            $table->decimal('RetencionFuente', 10, 2)->default(0);
+            $table->enum('Estado', ['Pagada', 'Anulada', 'Abonada'])->default('Pagada');
             $table->timestamps();
         });
     }

@@ -26,14 +26,18 @@ class RetencionesDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
-                $ButtonGroup = '
-            <div class="btn-group">
-                <a href="' . route(config('rol')[Auth::user()->id_rol] . '.editar-retencion', $query->id) . '" class="btn btn-default btn-xs">
-                    <i class="glyphicon glyphicon-edit"></i>
-                </a>
-            </div>
-            ';
 
+                if (Auth::user()->can('modificar retenciones')) {
+                    $ButtonGroup = '
+                    <div class="btn-group">
+                        <a href="' . route('editar-retencion', $query->id) . '" class="btn btn-default btn-xs">
+                            <i class="glyphicon glyphicon-edit"></i>
+                        </a>
+                    </div>
+                    ';
+                } else {
+                    $ButtonGroup = 'No permitido';
+                }
                 return $ButtonGroup;
             })
             ->editColumn('Total', '$ {{$Total}}')

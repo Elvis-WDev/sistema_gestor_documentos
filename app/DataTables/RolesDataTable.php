@@ -2,11 +2,10 @@
 
 namespace App\DataTables;
 
-use App\Models\configuraciones_generales;
-use App\Models\ConfiguracionesGeneralesDatatable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Models\Role;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
@@ -15,7 +14,7 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class ConfiguracionesGeneralesDatatables extends DataTable
+class RolesDataTable extends DataTable
 {
     /**
      * Build the DataTable class.
@@ -25,19 +24,23 @@ class ConfiguracionesGeneralesDatatables extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->editColumn('tamano_maximo_permitido', '{{$tamano_maximo_permitido}} MB')
-            ->editColumn('cantidad_permitidos', '{{$cantidad_permitidos}}  archivos')
             ->addColumn('action', function ($query) {
-                $ButtonGroup = '
-                     <div class="btn-group">
-                        <a href="' . route('editar-configuracion', $query->id) . '" class="btn btn-default btn-xs">
+
+                if (Auth::user()->can('modificar usuario')) {
+
+                    $ButtonGroup = '
+                    <div class="btn-group">
+                        <a href="' . route('editar-rol', $query->id) . '" class="btn btn-default btn-xs">
                             <i class="glyphicon glyphicon-edit"></i>
                         </a>
-                     </div>
+                    </div>
                     ';
-
+                } else {
+                    $ButtonGroup = 'No permitido';
+                }
                 return $ButtonGroup;
             })
+            ->setRowId('id')
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
             })
@@ -51,7 +54,7 @@ class ConfiguracionesGeneralesDatatables extends DataTable
     /**
      * Get the query source of dataTable.
      */
-    public function query(configuraciones_generales $model): QueryBuilder
+    public function query(Role $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -62,7 +65,7 @@ class ConfiguracionesGeneralesDatatables extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('configuracionesgeneralesdatatables-table')
+            ->setTableId('roles-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
             //->dom('Bfrtip')
@@ -101,13 +104,13 @@ class ConfiguracionesGeneralesDatatables extends DataTable
         return [
 
             Column::make('id')->title('#'),
-            Column::make('nombre')->title('Nombre'),
-            Column::make('archivos_permitidos')->title('Archivos permitidos'),
-            Column::make('cantidad_permitidos')->title('Cantidad. max'),
-            Column::make('tamano_maximo_permitido')->title('Tamaño. max'),
+            Column::make('name')->title('Nombre'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::make('action')->title('Acción')->printable(false),
+            Column::computed('action')
+                ->exportable(false)
+                ->printable(false)
+                ->addClass('text-center'),
         ];
     }
 
@@ -116,6 +119,6 @@ class ConfiguracionesGeneralesDatatables extends DataTable
      */
     protected function filename(): string
     {
-        return 'ConfiguracionesGeneralesDatatables_' . date('YmdHis');
+        return 'Roles_' . date('YmdHis');
     }
 }

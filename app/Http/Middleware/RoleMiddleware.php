@@ -16,10 +16,10 @@ class RoleMiddleware
      * @param  int $role
      */
 
-    public function handle(Request $request, Closure $next, $role)
+    public function handle(Request $request, Closure $next, ...$roles)
     {
-        if (!Auth::check() || Auth::user()->id_rol != $role) {
-            abort(403, 'Unauthorized action.');
+        if (!Auth::check() || !in_array(Auth::user()->id_rol, $roles)) {
+            abort(403, 'Sin autorización.');
         }
         return $next($request);
     }

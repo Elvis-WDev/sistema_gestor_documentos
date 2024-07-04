@@ -19,8 +19,7 @@
                     </div>
                     <!-- /.box-header -->
                     <!-- form start -->
-                    <form role="form" action="{{ route(config('rol')[Auth::user()->id_rol] . '.update-usuario') }}"
-                        method="POST">
+                    <form role="form" action="{{ route('update-usuario') }}" method="POST">
                         @csrf
                         @method('PUT')
                         <div class="box-body">
@@ -69,14 +68,14 @@
                                 <!-- id_rol Field -->
                                 <div class="form-group col-sm-6">
                                     <label for="id_rol">Rol:</label>
-                                    <select class="form-control id_rol" id="id_rol" name="id_rol">`
+                                    <select class="form-control id_rol" id="id_rol" name="id_rol">
                                         @php
-                                            $Roles = \App\Models\Rol::all();
+                                            $Roles = \Spatie\Permission\Models\Role::all();
                                         @endphp
+
                                         @foreach ($Roles as $Rol)
-                                            <option value="{{ $Rol->id_rol }}"
-                                                {{ $Rol->id_rol == $Usuario->id_rol ? 'selected' : '' }}>
-                                                {{ $Rol->Rol }}</option>
+                                            <option value="{{ $Rol->id }}">
+                                                {{ $Rol->name }}</option>
                                         @endforeach
                                     </select>
 

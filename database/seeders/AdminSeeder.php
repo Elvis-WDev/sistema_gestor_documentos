@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\DB;
 
 class AdminSeeder extends Seeder
@@ -14,53 +14,19 @@ class AdminSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('roles')->insert([
-            [
-                'Rol' => 1,
-            ],
-            [
-                'Rol' => 2,
-            ],
-            [
-                'Rol' => 3,
-            ],
+
+        $superAdmin = User::create([
+
+            'Nombres' => 'Andrea',
+            'Apellidos' => 'Live',
+            'NombreUsuario' => 'SuperAdmin',
+            'email' => 'super@gmail.com',
+            'password' => bcrypt('password'),
+            'url_img' => '',
+
         ]);
 
-        DB::table('permisos')->insert([
-            [
-                'id_rol' => 1,
-                'Permiso_facturas' => '[]',
-                'Permiso_pagos' => '[]',
-                'Permiso_NotasCredito' => '[]',
-                'Permiso_CartasAfiliacion' => '[]',
-                'Permiso_Retenciones' => '[]',
-            ],
-            [
-                'id_rol' => 2,
-                'Permiso_facturas' => '[]',
-                'Permiso_pagos' => '[]',
-                'Permiso_NotasCredito' => '[]',
-                'Permiso_CartasAfiliacion' => '[]',
-                'Permiso_Retenciones' => '[]',
-            ],
-            [
-                'id_rol' => 3,
-                'Permiso_facturas' => '[]',
-                'Permiso_pagos' => '[]',
-                'Permiso_NotasCredito' => '[]',
-                'Permiso_CartasAfiliacion' => '[]',
-                'Permiso_Retenciones' => '[]',
-            ],
-        ]);
-
-        DB::table('users')->insert([
-            [
-                'NombreUsuario' => 'SuperAdmin',
-                'email' => 'super@gmail.com',
-                'password' => bcrypt('password'),
-                'url_img' => '',
-                'id_rol' => 1,
-            ],
-        ]);
+        // Asignar el rol SuperAdmin al usuario
+        $superAdmin->assignRole('SuperAdmin');
     }
 }

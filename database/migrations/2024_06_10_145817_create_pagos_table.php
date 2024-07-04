@@ -12,6 +12,7 @@ return new class extends Migration
             $table->id('id_pago');
             $table->string('Archivo', 255);
             $table->decimal('Total', 10, 2);
+            $table->string('TransaccionVenta')->unique()->desault(0);
             $table->date('Fecha');
             $table->timestamps();
             $table->foreignId('id_factura')->constrained('facturas', 'id_factura')->onDelete('cascade');
