@@ -20,10 +20,14 @@
                     </div>
                     <!-- /.box-header -->
                     <!-- form start -->
-                    <form role="form">
+                    <form role="form" action="{{ route('update-configuracion') }}" method="POST">
+                        @csrf
+                        @method('PUT')
                         <div class="box-body">
 
                             <div class="row">
+
+                                <input type="hidden" name="id" value="{{ $Config_generales->id }}">
 
                                 <!-- nombre Field -->
                                 <div class="form-group col-sm-6 ">
@@ -33,11 +37,11 @@
                                 </div>
 
                                 <!-- archivos_permitidos Field -->
-                                <div class="form-group col-sm-6 ">
+                                {{-- <div class="form-group col-sm-6 ">
                                     <label for="archivos_permitidos">Archivos permitidos:</label>
                                     <input class="form-control" name="archivos_permitidos" type="text"
                                         id="archivos_permitidos" value="{{ $Config_generales->archivos_permitidos }}">
-                                </div>
+                                </div> --}}
 
                                 <!-- cantidad_permitidos Field -->
                                 <div class="form-group col-sm-6 ">
@@ -52,10 +56,28 @@
                                     <label for="tamano_maximo_permitido">Tamaño máximo permitido (MB):</label>
                                     <input class="form-control" name="tamano_maximo_permitido" type="number"
                                         id="tamano_maximo_permitido"
-                                        value="{{ $Config_generales->tamano_maximo_permitido }}" min="1"
-                                        max="5">
+                                        value="{{ $Config_generales->tamano_maximo_permitido }}" min="1">
                                 </div>
 
+                                @php
+                                    $allowedFilesArray = explode(',', $Config_generales->archivos_permitidos);
+                                @endphp
+                                <div class="form-group col-sm-6">
+                                    <label>Archivos permitidos</label>
+                                    <select class="form-control select2" style="width: 100%;" name="archivos_permitidos[]"
+                                        multiple>
+                                        @foreach (config('config_general')['mimes'] as $categoria => $extensiones)
+                                            <optgroup label="{{ $categoria }}">
+                                                @foreach ($extensiones as $extension)
+                                                    <option value="{{ $extension }}"
+                                                        {{ in_array($extension, $allowedFilesArray) ? 'selected' : '' }}>
+                                                        {{ $extension }}
+                                                    </option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <!-- /.box-body -->

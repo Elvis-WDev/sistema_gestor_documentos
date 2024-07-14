@@ -14,6 +14,7 @@ use Illuminate\View\View;
 use App\Traits\ImageUploadTrait;
 use File;
 use Flasher\Prime\FlasherInterface;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
 
@@ -57,9 +58,9 @@ class RegisteredUserController extends Controller
         $role = Role::findById($request->id_rol);
         $user->assignRole($role);
 
-        event(new Registered($user));
+        // event(new Registered($user));
 
-        Auth::login($user);
+        // Auth::login($user);
 
         flash('Usuario creado correctamente!');
 
@@ -88,9 +89,12 @@ class RegisteredUserController extends Controller
         $usuario->email = $request->email;
 
         if ($request->hasFile('image')) {
-            if (File::exists(public_path($usuario->image))) {
-                File::delete(public_path($usuario->image));
+            // Eliminar la imagen anterior si existe
+            if ($usuario->url_img && Storage::disk('public')->exists($usuario->url_img)) {
+                Storage::disk('public')->delete($usuario->url_img);
             }
+
+            // Actualizar la imagen usando el método updateImage
             $imagePath = $this->updateImage($request, 'image', 'uploads/usuarios', $usuario->url_img);
             $usuario->url_img = $imagePath;
         }

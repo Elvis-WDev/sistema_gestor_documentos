@@ -30,7 +30,7 @@ class NotasCreditoDataTable extends DataTable
 
                     $ButtonGroup = '
                     <div class="btn-group">
-                        <a href="' . route('editar-nota-credito', $query->id) . '" class="btn btn-default btn-xs">
+                        <a href="' . route('editar-nota-credito', $query->id) . '" class="btn btn-default btn-sm">
                             <i class="glyphicon glyphicon-edit"></i>
                         </a>
                     </div>
@@ -116,7 +116,7 @@ class NotasCreditoDataTable extends DataTable
             Column::make('Total')->title('Total'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)
+            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
 
         ];
     }

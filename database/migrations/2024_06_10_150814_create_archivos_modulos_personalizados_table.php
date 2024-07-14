@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('archivos_modulos_personalizados', function (Blueprint $table) {
             $table->id('id_archivo');
-            $table->foreignId('id_modulo')->constrained('modulos_personalizados', 'id_modulo')->onDelete('cascade');
+            $table->foreignId('id_modulo')->constrained('modulos_personalizados', 'id_modulo')->onDelete('restrict');
             $table->string('Archivo', 255);
             $table->date('Fecha');
             $table->string('TipoArchivo', 50);

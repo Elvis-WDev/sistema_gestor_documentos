@@ -27,7 +27,7 @@
                                 <input type="hidden" name="id" value="{{ $role->id }}">
 
                                 <!-- Nombres Field -->
-                                <div class="form-group col-sm-12 {{ $errors->has('Nombres') ? 'has-error' : '' }}">
+                                <div class="form-group col-sm-12 {{ $errors->has('name') ? 'has-error' : '' }}">
                                     <label for="name">Nombre de rol:</label>
                                     <input class="form-control" name="name" type="text" id="name"
                                         value="{{ $role->name }}">
@@ -51,7 +51,7 @@
                                 <div class="col-sm-12">
                                     <div class="row">
                                         @foreach ($permissions as $permission)
-                                            <div class="col-sm-4">
+                                            <div class="col-xs-6 col-sm-6 col-md-4 col-lg-3 col-xl-3 col-xxl-3">
                                                 <div class="form-group">
                                                     <label>
                                                         <div class="icheckbox_square-blue" style="position: relative;">

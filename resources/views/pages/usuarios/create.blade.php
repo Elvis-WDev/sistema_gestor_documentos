@@ -56,14 +56,14 @@
                                 <!-- Password Field -->
                                 <div class="form-group col-sm-6 {{ $errors->has('password') ? 'has-error' : '' }}">
                                     <label for="password">Contraseña:</label>
-                                    <input class="form-control" name="password" type="text" id="password"
+                                    <input class="form-control" name="password" type="password" id="password"
                                         value="{{ old('password') }}">
                                 </div>
 
                                 <!-- Password confirmation Field -->
                                 <div class="form-group col-sm-6 {{ $errors->has('password') ? 'has-error' : '' }}">
                                     <label for="password_confirmation">Confirmar contraseña:</label>
-                                    <input class="form-control" name="password_confirmation" type="text"
+                                    <input class="form-control" name="password_confirmation" type="password"
                                         id="password_confirmation" value="{{ old('password') }}">
                                 </div>
 
@@ -82,11 +82,6 @@
                                     </select>
 
                                 </div>
-                                <!-- Image confirmation Field -->
-                                {{-- <div class="form-group col-sm-6 {{ $errors->has('image') ? 'has-error' : '' }}">
-                                    <label for="image">Foto de perfil:</label>
-                                    <input class="form-control" name="image" type="file" id="image">
-                                </div> --}}
                             </div>
                             @if ($errors->any())
                                 <div class="alert alert-light">

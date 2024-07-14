@@ -24,7 +24,7 @@ class FacturaSeeder extends Seeder
             DB::table('facturas')->insert([
                 [
                     'id_factura' => $idFacturaIncremental,
-                    'Archivo' => Str::random(10),
+                    'Archivos' => Str::random(10),
                     'FechaEmision' => date('Y-m-d'),
                     'Establecimiento' => Str::random(10),
                     'PuntoEmision' => Str::random(10),
@@ -32,9 +32,6 @@ class FacturaSeeder extends Seeder
                     'RazonSocial' => Str::random(10),
                     'Total' => 50,
                     'Estado' => 1,
-                    'Abono' => 0.0,
-                    'RetencionIva' => 0.0,
-                    'RetencionFuente' => 0.0,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),
                 ]

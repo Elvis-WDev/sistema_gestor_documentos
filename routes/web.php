@@ -3,19 +3,24 @@
 use App\DataTables\RolesDataTable;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
+    AbonosController,
     Auth\RegisteredUserController,
     ConfiguracionesGeneralesController,
+    CuentasPorCobrarController,
     DashboardController,
+    EstablecimientosController,
     FacturasController,
     ModulosPersonalizadoController,
     NotasCreditoController,
     PagosController,
     ProfileController,
+    PuntosEmisionController,
     RetencionesController,
     RolesController,
     SolicitudAfiliadosController,
     UsuariosController
 };
+use App\Models\Abonos;
 
 require __DIR__ . '/auth.php';
 
@@ -37,6 +42,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('lista-configuraciones', [ConfiguracionesGeneralesController::class, 'index'])->name('configuraciones');
 
     Route::get('editar-configuracion/{id}', [ConfiguracionesGeneralesController::class, 'edit'])->name('editar-configuracion');
+
+    Route::put('update-configuracion', [ConfiguracionesGeneralesController::class, 'update'])->name('update-configuracion');
 });
 
 //USUARIOS Y ROLES
@@ -62,17 +69,70 @@ Route::group(['middleware' => ['can:modificar usuario']], function () {
 
     Route::put('update-rol', [RolesController::class, 'update'])->name('update-rol');
 });
+Route::group(['middleware' => ['can:eliminar usuario']], function () {
+    Route::delete('eliminar-usuario/{id}', [UsuariosController::class, 'destroy'])->name('destroy-usuario');
+    Route::delete('eliminar-rol/{id}', [RolesController::class, 'destroy'])->name('destroy-rol');
+});
 
 //FACTURAS
 Route::group(['middleware' => ['can:ver facturas']], function () {
+    Route::get('lista-facturas-pagadas', [FacturasController::class, 'FacturasPagadas_index'])->name('facturas-pagadas');
+    Route::get('lista-facturas-abonadas', [FacturasController::class, 'FacturasAbonada_index'])->name('facturas-abonadas');
+    Route::get('lista-facturas-anuladas', [FacturasController::class, 'FacturasAnulada_index'])->name('facturas-anuladas');
+    Route::get('lista-facturas-reportes', [FacturasController::class, 'reportes'])->name('facturas-reportes');
     Route::get('lista-facturas', [FacturasController::class, 'index'])->name('facturas');
+    Route::get('lista-cuentas', [CuentasPorCobrarController::class, 'index'])->name('cuentas');
 });
 Route::group(['middleware' => ['can:crear facturas']], function () {
     Route::get('crear-factura', [FacturasController::class, 'create'])->name('crear-factura');
+    Route::post('store-factura', [FacturasController::class, 'store'])->name('store-factura');
+    Route::post('store-abono', [AbonosController::class, 'store'])->name('store-abono');
+    Route::get('get-punto_emision', [FacturasController::class, 'get_punto_emision'])->name('get-punto_emision');
+    Route::post('generar-reporte', [FacturasController::class, 'generar_reportes'])->name('generar-reporte');
 });
 Route::group(['middleware' => ['can:modificar facturas']], function () {
     Route::get('editar-factura/{id_factura}', [FacturasController::class, 'edit'])->name('editar-factura');
+    Route::put('update-factura', [FacturasController::class, 'update'])->name('update-factura');
+    Route::get('editar-cuentas/{id}', [CuentasPorCobrarController::class, 'edit'])->name('editar-cuentas');
+    Route::get('abonos/{id}', [AbonosController::class, 'edit'])->name('abonos');
+    Route::put('update-cuentas', [CuentasPorCobrarController::class, 'update'])->name('update-cuentas');
 });
+Route::group(['middleware' => ['can:eliminar facturas']], function () {
+    Route::delete('anular-factura/{id}', [FacturasController::class, 'anular_factura'])->name('anular-factura');
+    Route::delete('eliminar-factura/{id}', [FacturasController::class, 'destroy'])->name('destroy-factura');
+    // Route::delete('eliminar-abono/{id}', [AbonosController::class, 'destroy'])->name('destroy-abono');
+});
+//FACTURAS ---- establecimiento
+Route::group(['middleware' => ['can:ver establecimiento']], function () {
+    Route::get('lista-establecimientos', [EstablecimientosController::class, 'index'])->name('establecimientos');
+});
+Route::group(['middleware' => ['can:crear establecimiento']], function () {
+    Route::get('crear-establecimiento', [EstablecimientosController::class, 'create'])->name('crear-establecimiento');
+    Route::post('store-establecimiento', [EstablecimientosController::class, 'store'])->name('store-establecimiento');
+});
+Route::group(['middleware' => ['can:modificar establecimiento']], function () {
+    Route::get('editar-establecimiento/{id}', [EstablecimientosController::class, 'edit'])->name('editar-establecimiento');
+    Route::put('update-establecimiento', [EstablecimientosController::class, 'update'])->name('update-establecimiento');
+});
+Route::group(['middleware' => ['can:eliminar establecimiento']], function () {
+    Route::delete('eliminar-establecimiento/{id}', [EstablecimientosController::class, 'destroy'])->name('destroy-establecimiento');
+});
+//FACTURAS ---- punto_emision
+Route::group(['middleware' => ['can:ver punto_emision']], function () {
+    Route::get('lista-punto_emision', [PuntosEmisionController::class, 'index'])->name('punto_emision');
+});
+Route::group(['middleware' => ['can:crear punto_emision']], function () {
+    Route::get('crear-punto_emision', [PuntosEmisionController::class, 'create'])->name('crear-punto_emision');
+    Route::post('store-punto_emision', [PuntosEmisionController::class, 'store'])->name('store-punto_emision');
+});
+Route::group(['middleware' => ['can:modificar punto_emision']], function () {
+    Route::get('editar-punto_emision/{id}', [PuntosEmisionController::class, 'edit'])->name('editar-punto_emision');
+    Route::put('update-punto_emision', [PuntosEmisionController::class, 'update'])->name('update-punto_emision');
+});
+Route::group(['middleware' => ['can:eliminar punto_emision']], function () {
+    Route::delete('eliminar-punto_emision/{id}', [PuntosEmisionController::class, 'destroy'])->name('destroy-punto_emision');
+});
+
 
 //PAGOS
 Route::group(['middleware' => ['can:ver pagos']], function () {

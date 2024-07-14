@@ -41,24 +41,32 @@ class UsuariosDatatables extends DataTable
 
             ->addColumn('action', function ($query) {
 
-                if (Auth::user()->can('modificar usuario')) {
 
-                    if ($query->id != 1) {
-                        $ButtonGroup = '
-                        <div class="btn-group">
-                            <a href="' . route('editar-usuario', $query->id) . '" class="btn btn-default btn-xs">
+                $ButtonGroup = '';
+
+                if ($query->id != 1) {
+                    if (Auth::user()->can('modificar usuario')) {
+
+                        $ButtonGroup .= ' 
+                            <a href="' . route('editar-usuario', $query->id) . '" class="btn btn-default btn-sm">
                                 <i class="glyphicon glyphicon-edit"></i>
                             </a>
-                        </div>
-                    ';
-
-                        return $ButtonGroup;
+                        ';
                     }
-                    return '';
-                } else {
-                    $ButtonGroup = 'No permitido';
+
+                    if (Auth::user()->can('eliminar usuario')) {
+
+                        $ButtonGroup .= ' 
+                            <a href="' . route('destroy-usuario', $query->id) . '" class="btn btn-danger btn-sm delete-item">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        ';
+                    }
                 }
-                return $ButtonGroup;
+
+                return ' <div class="btn-group">
+                           ' . $ButtonGroup == "" ? "No permitido" : $ButtonGroup . '
+                        </div>';
             })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');

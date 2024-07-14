@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\RolesDataTable;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -15,7 +16,7 @@ class RolesController extends Controller
     /**
      * Display a listing of the FileType.
      *
-     * @param RolesDataTable $SolicitudAfiliadosDatatables
+     * @param RolesDataTable $RolesDataTable
      * @return Response
      */
     public function index(RolesDataTable $RolesDataTable)
@@ -84,5 +85,20 @@ class RolesController extends Controller
         flash('Rol actualizado correctamente!');
 
         return redirect()->route('roles');
+    }
+
+    public function destroy(int $id)
+    {
+        try {
+            $Rol = Role::findOrFail($id);
+            $Rol->delete();
+
+            flash('Rol eliminado correctamente!');
+
+            return response()->json(['status' => 'success', 'message' => 'Rol eliminado correctamente.']);
+        } catch (QueryException $e) {
+
+            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el rol porque tiene relaciones asociadas.']);
+        }
     }
 }

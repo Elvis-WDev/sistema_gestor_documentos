@@ -11,6 +11,7 @@ use File;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Facades\Auth;
 use Flasher\Notyf\Prime\NotyfInterface;
+use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -42,7 +43,7 @@ class UsuariosController extends Controller
         return view('pages.usuarios.edit', compact('Usuario'));
     }
 
-    public function updateProfile(Request $request, FlasherInterface  $flasher, NotyfInterface $notyf)
+    public function updateProfile(Request $request)
     {
 
         // dd($request);
@@ -82,5 +83,20 @@ class UsuariosController extends Controller
         flash('Perfil actualizado correctamente.');
 
         return redirect()->route('perfil.update');
+    }
+
+    public function destroy(int $id)
+    {
+        try {
+            $Usuario = User::findOrFail($id);
+            $Usuario->delete();
+
+            flash('Usuario eliminado correctamente!');
+
+            return response()->json(['status' => 'success', 'message' => 'Usuario eliminado correctamente.']);
+        } catch (QueryException $e) {
+
+            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el usuario porque tiene relaciones asociadas.']);
+        }
     }
 }

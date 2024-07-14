@@ -26,10 +26,10 @@ class ModuloPersonalizadoDataTable extends DataTable
             ->addColumn('action', function ($query) {
                 $ButtonGroup = '
              <div class="btn-group">
-                <a href="#" class="btn btn-default btn-xs">
+                <a href="#" class="btn btn-default btn-sm">
                 <i class="glyphicon glyphicon-eye-open"></i>
                 </a>
-                <a href="#" class="btn btn-default btn-xs">
+                <a href="#" class="btn btn-default btn-sm">
                     <i class="glyphicon glyphicon-edit"></i>
                 </a>
              </div>';
@@ -103,7 +103,7 @@ class ModuloPersonalizadoDataTable extends DataTable
             Column::make('TipoArchivo')->title('Tipo de archivo'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)
+            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
         ];
     }
 

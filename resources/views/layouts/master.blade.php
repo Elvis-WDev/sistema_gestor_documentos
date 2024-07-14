@@ -21,6 +21,10 @@
     <link rel="stylesheet" href="{{ asset('css/digidocu-custom.css') }}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
+    {{-- MorrisChart.js --}}
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
+
+
     @yield('css')
 </head>
 
@@ -95,43 +99,20 @@
     <script src="{{ asset('vendor/bootstrap-typeahead/js/bootstrap3-typeahead.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap-tagsinput/js/bootstrap-tagsinput.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap-wysihtml5/js/bootstrap3-wysihtml5.all.min.js') }}"></script>
-    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    {{-- SweetAlert --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.4.2/handlebars.min.js"></script>
     <script src="{{ asset('js/handlebar-helpers.js') }}"></script>
     <script src="{{ asset('js/digidocu-custom.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr@4.6.13/dist/l10n/es.js"></script>
+    {{-- Tooltip --}}
+    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
+    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
 
-    <script>
-        $(function() {
-
-            $('.select2').select2();
-
-            $("#FechaEmision").flatpickr({
-                enableTime: true,
-                dateFormat: "Y-m-d H:i",
-                locale: "es",
-                defaultDate: "today"
-            });
-            $("#created_at").flatpickr({
-                enableTime: true,
-                dateFormat: "Y-m-d H:i",
-                locale: "es",
-                defaultDate: "today"
-            });
-            $("#reporte_daterange").flatpickr({
-                mode: "range",
-                locale: "es",
-                defaultDate: "today",
-                maxDate: "today",
-                dateFormat: "Y-m-d",
-
-            });
-
-        })
-    </script>
-
-    @yield('scripts')
+    {{-- MorrisChart.js --}}
+    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
 
     <script>
         $.ajaxSetup({
@@ -139,7 +120,132 @@
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             }
         });
+
+        $('body').on('click', '.delete-item', function(event) {
+            event.preventDefault();
+
+            let deleteUrl = $(this).attr('href');
+            let message = $(this).attr('message');
+
+            Swal.fire({
+                title: message ? message : "Eliminar fila?",
+                text: "No podrás revertirlo!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#42A5F5',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+
+                    $.ajax({
+                        type: 'DELETE',
+                        url: deleteUrl,
+
+                        success: function(data) {
+
+                            console.log(data);
+
+                            if (data.status == 'success') {
+                                window.location.reload();
+                            } else if (data.status == 'error') {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "No se ha podido eiminar",
+                                    text: data.message,
+                                    confirmButtonColor: '#42A5F5',
+
+                                })
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log(error);
+                        }
+                    })
+                }
+            })
+        })
     </script>
+    <script>
+        $(function() {
+
+
+            let currentDate = new Date();
+
+            // Obtener los componentes de la fecha y hora actual
+            let year = currentDate.getFullYear();
+            let month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Meses van de 0 a 11
+            let day = String(currentDate.getDate()).padStart(2, '0');
+            let hours = String(currentDate.getHours()).padStart(2, '0');
+            let minutes = String(currentDate.getMinutes()).padStart(2, '0');
+
+            // Formatear la fecha y hora actual a "Y-m-d H:i"
+            let formattedDate = `${year}-${month}-${day} ${hours}:${minutes}`;
+
+            // Select
+            $('.select2').select2();
+
+            // FlatPickerDate
+
+            $("#FechaEmisionCreate").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+                defaultDate: formattedDate,
+            });
+
+            $("#FechaEmisionEdit").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+            });
+
+            $(".created_at").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+                defaultDate: formattedDate
+            });
+
+            $(".updated_at").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+            });
+
+            $(".reporte_daterange_fechaInicio").flatpickr({
+                locale: "es",
+                maxDate: "today",
+                dateFormat: "Y-m-d",
+            });
+
+            $(".reporte_daterange_fechaFinal").flatpickr({
+                locale: "es",
+                maxDate: "today",
+                dateFormat: "Y-m-d",
+            });
+
+            $(".fecha_abonado").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+                defaultDate: formattedDate
+            });
+
+            // Tootltip
+            tippy('[data-tippy-content]', {
+                placement: 'top',
+                animation: 'fade',
+            });
+
+
+
+
+        })
+    </script>
+
+    @yield('scripts')
+
 
     @stack('scripts')
 
@@ -150,6 +256,23 @@
             @endphp
         @endforeach
     @endif
+
+    <script>
+        function initializeTippy() {
+            tippy('[data-tippy-content]', {
+                placement: 'top',
+                animation: 'fade',
+            });
+        }
+
+        $(document).ready(function() {
+            // Inicializa Tippy después de que la tabla se haya inicializado por primera vez
+            initializeTippy();
+        });
+    </script>
+
+    <script></script>
+
 
 </body>
 

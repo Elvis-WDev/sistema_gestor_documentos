@@ -27,10 +27,27 @@ class ConfiguracionesGeneralesDatatables extends DataTable
         return (new EloquentDataTable($query))
             ->editColumn('tamano_maximo_permitido', '{{$tamano_maximo_permitido}} MB')
             ->editColumn('cantidad_permitidos', '{{$cantidad_permitidos}}  archivos')
+            ->addColumn('archivos_permitidos', function ($query) {
+
+                $mimes = explode(',', $query->archivos_permitidos);
+
+
+                $ButtonGroup = '';
+
+                foreach ($mimes as $extension) {
+                    $ButtonGroup .= '
+                     <button type="button" class="btn btn-success btn-xs">
+                           .' . $extension . '
+                       </button>
+                   ';
+                }
+
+                return  '<div class="btn-group">' . $ButtonGroup . '</div>';
+            })
             ->addColumn('action', function ($query) {
                 $ButtonGroup = '
                      <div class="btn-group">
-                        <a href="' . route('editar-configuracion', $query->id) . '" class="btn btn-default btn-xs">
+                        <a href="' . route('editar-configuracion', $query->id) . '" class="btn btn-default btn-sm">
                             <i class="glyphicon glyphicon-edit"></i>
                         </a>
                      </div>
@@ -42,9 +59,9 @@ class ConfiguracionesGeneralesDatatables extends DataTable
                 return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->updated_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'archivos_permitidos'])
             ->setRowId('id');
     }
 
@@ -102,12 +119,12 @@ class ConfiguracionesGeneralesDatatables extends DataTable
 
             Column::make('id')->title('#'),
             Column::make('nombre')->title('Nombre'),
-            Column::make('archivos_permitidos')->title('Archivos permitidos'),
+            Column::make('archivos_permitidos')->title('Archivos permitidos')->addClass('text-center'),
             Column::make('cantidad_permitidos')->title('Cantidad. max'),
             Column::make('tamano_maximo_permitido')->title('Tamaño. max'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::make('action')->title('Acción')->printable(false),
+            Column::make('action')->title('Acción')->printable(false)->addClass('text-center'),
         ];
     }
 

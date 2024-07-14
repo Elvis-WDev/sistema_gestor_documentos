@@ -26,19 +26,30 @@ class RolesDataTable extends DataTable
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
 
-                if (Auth::user()->can('modificar usuario')) {
+                $ButtonGroup = '';
 
-                    $ButtonGroup = '
-                    <div class="btn-group">
-                        <a href="' . route('editar-rol', $query->id) . '" class="btn btn-default btn-xs">
-                            <i class="glyphicon glyphicon-edit"></i>
-                        </a>
-                    </div>
-                    ';
-                } else {
-                    $ButtonGroup = 'No permitido';
+                if ($query->id != 1) {
+                    if (Auth::user()->can('modificar usuario')) {
+
+                        $ButtonGroup .= ' 
+                            <a href="' . route('editar-rol', $query->id) . '" class="btn btn-default btn-sm">
+                                <i class="glyphicon glyphicon-edit"></i>
+                            </a>
+                        ';
+                    }
+
+                    if (Auth::user()->can('eliminar usuario')) {
+
+                        $ButtonGroup .= ' 
+                            <a href="' . route('destroy-rol', $query->id) . '" class="btn btn-danger btn-sm delete-item">
+                                <i class="fas fa-trash-alt"></i>
+                            </a>
+                        ';
+                    }
                 }
-                return $ButtonGroup;
+                return ' <div class="btn-group">
+                           ' . $ButtonGroup == "" ? "No permitido" : $ButtonGroup . '
+                        </div>';
             })
             ->setRowId('id')
             ->editColumn('created_at', function ($row) {

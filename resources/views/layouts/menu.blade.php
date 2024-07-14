@@ -3,6 +3,8 @@
     <a href="{{ route('dashboard') }}"><i class="fa-solid fa-gauge"></i><span>
             Dashboard</span></a>
 </li>
+
+
 @can('ver usuario')
     <li class="treeview active">
         <a href="#">
@@ -13,11 +15,11 @@
             </span>
         </a>
         <ul class="treeview-menu">
-            <li class="{{ setActive(['usuarios']) }}">
+            <li class="{{ setActive(['usuarios', 'crear-usuario', 'editar-usuario']) }}">
                 <a href="{{ route('usuarios') }}"><i class="fas fa-users"></i><span>
                         Usuarios</span></a>
             </li>
-            <li class="{{ setActive(['roles']) }}">
+            <li class="{{ setActive(['roles', 'crear-rol', 'editar-rol']) }}">
                 <a href="{{ route('roles') }}"><i class="fas fa-users-cog"></i><span>
                         Roles</span></a>
             </li>
@@ -26,6 +28,92 @@
     </li>
 @endcan
 
+@can('ver establecimiento')
+    <li class="treeview">
+        <a href="#">
+            <i class="far fa-building"></i>
+            <span>Establecimiento</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+        <ul class="treeview-menu">
+
+            <li class="{{ setActive(['establecimientos', 'crear-establecimiento', 'editar-establecimiento']) }}">
+                <a href="{{ route('establecimientos') }}"><i class="far fa-building"></i><span>
+                        Estasblecimiento</span>
+                </a>
+            </li>
+
+        </ul>
+    </li>
+@endcan
+
+@can('ver punto_emision')
+    <li class="treeview">
+        <a href="#">
+            <i class="fa-solid fa-building-user"></i>
+            <span>Punto emisión</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+        <ul class="treeview-menu">
+
+            <li class="{{ setActive(['punto_emision', 'crear-punto_emision', 'editar-punto_emision']) }}">
+                <a href="{{ route('punto_emision') }}"> <i class="fa-solid fa-building-user"></i><span>
+                        Punto de emisión</span>
+                </a>
+            </li>
+
+        </ul>
+    </li>
+@endcan
+
+
+@can('ver facturas')
+    <li class="treeview active">
+        <a href="#">
+            <i class="fas fa-file-pdf"></i>
+            <span>Facturas</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+        <ul class="treeview-menu">
+            <li class="{{ setActive(['facturas', 'crear-factura', 'editar-factura']) }}">
+                <a href="{{ route('facturas') }}"><span>
+                        Todas</span>
+                </a>
+            </li>
+            <li class="{{ setActive(['facturas-pagadas']) }}">
+                <a href="{{ route('facturas-pagadas') }}"><span>
+                        Pagadas</span>
+                </a>
+            </li>
+            <li class="{{ setActive(['facturas-abonadas']) }}">
+                <a href="{{ route('facturas-abonadas') }}"><span>
+                        Abonadas</span>
+                </a>
+            </li>
+            <li class="{{ setActive(['facturas-anuladas']) }}">
+                <a href="{{ route('facturas-anuladas') }}"><span>
+                        Anuladas</span>
+                </a>
+            </li>
+            <li class="{{ setActive(['cuentas', 'abonos']) }}">
+                <a href="{{ route('cuentas') }}"><span>
+                        Cuentas</span>
+                </a>
+            </li>
+            <li class="{{ setActive(['facturas-reportes']) }}">
+                <a href="{{ route('facturas-reportes') }}"><span>
+                        Reportes</span>
+                </a>
+            </li>
+        </ul>
+    </li>
+@endcan
 
 <li class="treeview active">
     <a href="#">
@@ -36,12 +124,6 @@
         </span>
     </a>
     <ul class="treeview-menu">
-        @can('ver facturas')
-            <li class="{{ setActive(['facturas']) }}">
-                <a href="{{ route('facturas') }}"><i class="fa-regular fa-file-lines"></i><span>
-                        Facturas</span></a>
-            </li>
-        @endcan
         @can('ver pagos')
             <li class="{{ setActive(['pagos']) }}">
                 <a href="{{ route('pagos') }}">

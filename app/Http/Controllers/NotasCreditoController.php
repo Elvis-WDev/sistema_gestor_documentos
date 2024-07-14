@@ -11,7 +11,7 @@ class NotasCreditoController extends Controller
     /**
      * Display a listing of the FileType.
      *
-     * @param NotasCreditoDataTable $ConfiguracionesGeneralesDatatablesNotasCreditoDataTable
+     * @param NotasCreditoDataTable $NotasCreditoDataTable
      * @return Response
      */
     public function index(NotasCreditoDataTable $NotasCreditoDataTable)

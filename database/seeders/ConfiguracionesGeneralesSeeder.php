@@ -16,7 +16,7 @@ class ConfiguracionesGeneralesSeeder extends Seeder
         DB::table('config_generales')->insert([
             [
                 'nombre' => 'General',
-                'archivos_permitidos' => '[".docx",".xlsx",".pptx",".pdf",".jpg",".jpeg",".png"]',
+                'archivos_permitidos' => 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx',
                 'cantidad_permitidos' => 4,
                 'tamano_maximo_permitido' => 10,
 

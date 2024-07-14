@@ -1,3 +1,32 @@
+/* filepond */
+.dropzone {
+    border: 2px dashed #dfdfdf;
+    border-radius: 5px;
+    padding: 50px 0px 50px 0px;
+    text-align: center;
+    cursor: pointer;
+    color: #727272;
+}
+
+.dropzone>i {
+    font-size: 40px !important;
+}
+
+.dropzone:hover {
+    border-color: #42A5F5;
+    background-color: #f0f8ff;
+}
+
+.fileInput {
+    display: none !important;
+}
+
+.file-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
 /*Flasher*/
 
 .fl-wrapper {

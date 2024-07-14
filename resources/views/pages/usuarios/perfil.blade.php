@@ -32,13 +32,13 @@
                                         class="img-fluid" alt="..." width="200px">
                                 </div>
 
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-6 {{ $errors->has('Nombres') ? 'has-error' : '' }}">
                                     <label for="Nombres">Nombres:</label>
                                     <input class="form-control" name="Nombres" type="text" id="Nombres"
                                         value="{{ Auth::user()->Nombres }}">
                                 </div>
 
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-6 {{ $errors->has('Apellidos') ? 'has-error' : '' }}">
                                     <label for="Apellidos">Apellidos:</label>
                                     <input class="form-control" name="Apellidos" type="text" id="Apellidos"
                                         value="{{ Auth::user()->Apellidos }}">
@@ -56,14 +56,14 @@
                                         value="{{ Auth::user()->email }}">
                                 </div>
                                 <!-- Username Field -->
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-6 {{ $errors->has('password') ? 'has-error' : '' }}">
                                     <label for="password">Contraseña:</label>
                                     <input class="form-control" name="password" type="text" id="password">
 
                                 </div>
 
                                 <!-- Username Field -->
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-6 {{ $errors->has('password') ? 'has-error' : '' }}">
                                     <label for="password">Confirmar contraseña:</label>
                                     <input class="form-control" name="password" type="text" id="password">
 

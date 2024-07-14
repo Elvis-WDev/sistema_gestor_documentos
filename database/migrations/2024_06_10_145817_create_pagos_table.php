@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('TransaccionVenta')->unique()->desault(0);
             $table->date('Fecha');
             $table->timestamps();
-            $table->foreignId('id_factura')->constrained('facturas', 'id_factura')->onDelete('cascade');
+            $table->foreignId('id_factura')->constrained('facturas', 'id_factura')->onDelete('restrict');
         });
     }
 

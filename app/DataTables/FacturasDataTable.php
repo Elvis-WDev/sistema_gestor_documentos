@@ -2,7 +2,9 @@
 
 namespace App\DataTables;
 
+use App\Models\Establecimiento;
 use App\Models\Factura;
+use App\Models\PuntoEmision;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -24,51 +26,120 @@ class FacturasDataTable extends DataTable
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
-            ->addColumn('Estado', function ($query) {
-                if (Auth::user()->can('modificar facturas')) {
-                    $select = '
-                    <select class="form-control" id="Estado" name="Estado">
-                        <option value="1" ' . ($query->Estado == "Pagada" ? "selected" : "") . '>Pagada</option>
-                        <option value="2" ' . ($query->Estado == "Anulada" ? "selected" : "") . '>Anulada</option>
-                        <option value="3" ' . ($query->Estado == "Abonada" ? "selected" : "") . '>Abonada</option>
-                    </select>    
-                    ';
+            ->addColumn('establecimiento_id', function ($query) {
+                $Establecimiento = Establecimiento::where('id', '=', $query->establecimiento_id)->first();
+
+                if ($Establecimiento) {
+                    return $Establecimiento->nombre;
                 } else {
-                    $select = $query->Estado;
+                    return 'No existe factura asociada';
+                }
+            })
+            ->addColumn('punto_emision_id', function ($query) {
+                $PuntoEmision = PuntoEmision::where('id', '=', $query->punto_emision_id)->first();
+
+                if ($PuntoEmision) {
+                    return $PuntoEmision->nombre;
+                } else {
+                    return 'No existe factura asociada';
+                }
+            })
+            ->addColumn('Archivos', function ($query) {
+                $archivos = json_decode($query->Archivos, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return 'Error en la decodificación JSON: ' . json_last_error_msg();
                 }
 
-                return $select;
-            })
-            ->addColumn('action', function ($query) {
-                if (Auth::user()->can('modificar facturas')) {
+                // Generar botones para cada archivo
+                $buttons = '';
 
-                    $ButtonGroup = '
+                foreach ($archivos as $archivo) {
+                    $buttons .= '
+                    <a href="' . asset('storage/' . $archivo) . '" target="_blank" data-tippy-content="' . substr($archivo, 17) . '" class="btn btn-default btn-md">
+                        <i class="fas fa-print"></i>
+                    </a>';
+                }
+
+                return '
                     <div class="btn-group">
-                    <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-xs">
-                    <i class="glyphicon glyphicon-edit"></i>
-                    </a>
+                    ' . $buttons . '
                     </div>
                     ';
-                } else {
-                    $ButtonGroup = 'No permitido';
+            })
+            ->addColumn('action', function ($query) {
+
+                $ButtonGroup = "";
+
+                if (Auth::user()->can('modificar facturas')) {
+
+                    $ButtonGroup .= '
+                    <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-sm">
+                     <i class="glyphicon glyphicon-edit"></i>
+                    </a>
+                    <a href="' . route('anular-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Anular factura?">
+                    <i class="fas fa-ban"></i>
+                    </a>
+                ';
+                }
+                if (Auth::user()->can('eliminar facturas')) {
+                    $ButtonGroup .= '
+                  <a href="' . route('destroy-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar factura?">
+                <i class="fas fa-trash-alt"></i>
+                </a>
+                ';
                 }
 
-                return $ButtonGroup;
+                return '
+                <div class="btn-group">
+                        ' . $ButtonGroup == "" ? 'No permitido' : $ButtonGroup . '
+                </div>
+                ';
             })
-            ->editColumn('Abono', '$ {{$Abono}}')
-            ->editColumn('RetencionIva', '$ {{$RetencionIva}}')
-            ->editColumn('RetencionFuente', '$ {{$RetencionFuente}}')
-            ->editColumn('Total', '$ {{$Total}}')
+            ->addColumn('Estado', function ($query) {
+
+                $Button = '
+                    <button class="btn btn-default btn-xs">
+                         Desconocido
+                    </button>
+                ';
+
+                if ($query->Estado == 'Pagada') {
+                    $Button = ' 
+                    <button class="btn btn-success btn-xs">
+                         Pagada
+                    </button>';
+                } elseif ($query->Estado == 'Anulada') {
+                    $Button = ' 
+                    <button class="btn btn-danger btn-xs">
+                         Anulada
+                    </button>';
+                } elseif ($query->Estado == 'Abonada') {
+                    $Button = ' 
+                    <button class="btn btn-warning btn-xs">
+                         Abonada
+                    </button>';
+                } elseif ($query->Estado == 'Registrada') {
+                    $Button = ' 
+                    <button class="btn btn-info btn-xs">
+                         Registrada
+                    </button>';
+                }
+
+                return $Button;
+            })
+            ->editColumn('Total', function ($row) {
+                return '<strong>$ ' . $row->Total . '</strong>';
+            })
             ->editColumn('FechaEmision', function ($row) {
-                return Carbon::parse($row->FechaEmision)->translatedFormat('d \d\e F \d\e Y');
+                return Carbon::parse($row->FechaEmision)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i:s');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->updated_at)->translatedFormat('Y-m-d H:i:s');
             })
-            ->rawColumns(['Estado', 'action'])
+            ->rawColumns(['Estado', 'action', 'Archivos', 'Total'])
             ->setRowId('id');
     }
 
@@ -89,8 +160,6 @@ class FacturasDataTable extends DataTable
             ->setTableId('facturas-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            //->dom('Bfrtip')
-            ->orderBy(1)
             ->scrollX(true)
             ->selectStyleSingle()
             ->buttons([
@@ -114,6 +183,12 @@ class FacturasDataTable extends DataTable
                 'language' => [
                     'url' => url('vendor/datatables/es-ES.json')
                 ],
+                'initComplete' => 'function(settings, json) {
+                    initializeTippy();
+                }',
+                'drawCallback' => 'function(settings) {
+                    initializeTippy();
+                }',
             ]);
     }
 
@@ -124,20 +199,17 @@ class FacturasDataTable extends DataTable
     {
         return [
             Column::make('id_factura')->title('#'),
-            Column::make('Archivo')->title('Archivos'),
-            Column::make('FechaEmision')->title('Fec. emisión'),
-            Column::make('Establecimiento')->title('Establec'),
-            Column::make('PuntoEmision')->title('P. emisión'),
-            Column::make('Secuencial')->title('Secuencial'),
+            Column::make('Archivos')->title('Archivos')->addClass('text-center'),
             Column::make('RazonSocial')->title('Raz. social'),
-            Column::make('Abono')->title('Abono'),
-            Column::make('RetencionIva')->title('Ret. iva'),
-            Column::make('RetencionFuente')->title('Ret. Fuente'),
+            Column::make('FechaEmision')->title('Fec. emisión'),
+            Column::make('establecimiento_id')->title('Establec.'),
+            Column::make('punto_emision_id')->title('P. emisión'),
+            Column::make('Secuencial')->title('Secuencial'),
             Column::make('Total')->title('Total'),
+            Column::computed('Estado')->title('Estado')->addClass('text-center'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('Estado')->title('Estado')->printable(false),
-            Column::computed('action')->title('Acción')->printable(false)
+            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
         ];
     }
 
