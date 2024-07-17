@@ -93,7 +93,7 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.3/js/adminlte.min.js"></script>
+    <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/icheck.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="{{ asset('vendor/bootstrap-typeahead/js/bootstrap3-typeahead.min.js') }}"></script>
@@ -113,6 +113,11 @@
     {{-- MorrisChart.js --}}
     <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+
+    {{-- InputMask.js --}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/jquery.inputmask.min.js"
+        integrity="sha512-F5Ul1uuyFlGnIT1dk2c4kB4DBdi5wnBJjVhL7gQlGh46Xn0VhvD8kgxLtjdZ5YN83gybk/aASUAlpdoWUjRR3g=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 
     <script>
         $.ajaxSetup({
@@ -134,7 +139,7 @@
                 showCancelButton: true,
                 confirmButtonColor: '#42A5F5',
                 cancelButtonColor: '#d33',
-                confirmButtonText: 'Sí, eliminar!'
+                confirmButtonText: message ? 'Sí, anular!' : 'Sí, eliminar!'
             }).then((result) => {
                 if (result.isConfirmed) {
 

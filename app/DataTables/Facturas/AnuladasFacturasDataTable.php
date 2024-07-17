@@ -26,6 +26,7 @@ class AnuladasFacturasDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('establecimiento_id', function ($query) {
                 $Establecimiento = Establecimiento::where('id', '=', $query->establecimiento_id)->first();
@@ -128,6 +129,10 @@ class AnuladasFacturasDataTable extends DataTable
 
                 return $Button;
             })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('Total', function ($row) {
                 return '<strong>$ ' . $row->Total . '</strong>';
             })
@@ -199,7 +204,8 @@ class AnuladasFacturasDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id_factura')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id_factura')->title('#'),
             Column::make('Archivos')->title('Archivos')->addClass('text-center'),
             Column::make('RazonSocial')->title('Raz. social'),
             Column::make('FechaEmision')->title('Fec. emisión'),

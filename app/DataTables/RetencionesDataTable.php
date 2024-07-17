@@ -24,6 +24,7 @@ class RetencionesDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
 
@@ -40,15 +41,19 @@ class RetencionesDataTable extends DataTable
                 }
                 return $ButtonGroup;
             })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('Total', '$ {{$Total}}')
             ->editColumn('FechaEmision', function ($row) {
-                return Carbon::parse($row->FechaEmision)->translatedFormat('d \d\e F \d\e Y');
+                return Carbon::parse($row->FechaEmision)->translatedFormat('Y-m-d');
             })
             ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->rawColumns(['action'])
             ->setRowId('id');
@@ -106,7 +111,8 @@ class RetencionesDataTable extends DataTable
     {
         return [
 
-            Column::make('id')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id')->title('#'),
             Column::make('Archivo')->title('Archivos'),
             Column::make('FechaEmision')->title('Fec. emisión'),
             Column::make('Establecimiento')->title('Establec'),

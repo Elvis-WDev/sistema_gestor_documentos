@@ -24,6 +24,7 @@ class PuntosEmisionDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('establecimiento_id', function ($query) {
                 $Establecimiento = Establecimiento::where('id', '=', $query->establecimiento_id)->first();
@@ -62,6 +63,10 @@ class PuntosEmisionDataTable extends DataTable
                 ';
 
                 return $ButtonGroup;
+            })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
             })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i:s');
@@ -128,7 +133,8 @@ class PuntosEmisionDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id')->title('#'),
             Column::make('establecimiento_id')->title('Establecimiento'),
             Column::make('nombre')->title('Punto emision'),
             Column::make('created_at')->title('Fecha creación'),

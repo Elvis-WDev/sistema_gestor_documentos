@@ -37,10 +37,11 @@ return new class extends Migration
             $table->dateTime('FechaEmision');
             $table->unsignedBigInteger('punto_emision_id');
             $table->unsignedBigInteger('establecimiento_id');
+            $table->string('Prefijo', 50)->default('');
             $table->string('Secuencial', 50)->default('');
             $table->decimal('RetencionIva', 10, 2)->default(0);
             $table->decimal('RetencionFuente', 10, 2)->default(0);
-            $table->string('Abono', 500)->default('');
+            $table->decimal('ValorAnulado', 10, 2)->default(0);
             $table->string('RazonSocial', 255);
             $table->decimal('Total', 10, 2);
             $table->enum('Estado', ['Pagada', 'Anulada', 'Abonada', 'Registrada'])->default('Registrada');

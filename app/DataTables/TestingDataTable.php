@@ -23,6 +23,10 @@ class TestingDataTable extends DataTable
     {
         return (new EloquentDataTable($query))
             ->addColumn('action', 'testing.action')
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->setRowId('id');
     }
 

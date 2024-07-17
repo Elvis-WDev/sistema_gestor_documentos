@@ -25,6 +25,7 @@ class SolicitudAfiliadosDatatables extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
 
@@ -41,11 +42,15 @@ class SolicitudAfiliadosDatatables extends DataTable
                 }
                 return $ButtonGroup;
             })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->rawColumns(['action'])
             ->setRowId('id');
@@ -103,7 +108,8 @@ class SolicitudAfiliadosDatatables extends DataTable
     {
         return [
 
-            Column::make('id_solicitudAfiliados')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id_solicitudAfiliados')->title('#'),
             Column::make('Archivo')->title('Archivos'),
             Column::make('Prefijo')->title('Prefíjo'),
             Column::make('NombreCliente')->title('Nombre de cliente'),

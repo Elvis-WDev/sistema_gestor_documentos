@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\DataTables\AbonosDataTable;
 use App\DataTables\CuentasPorCobrarDataTable;
+use App\Models\Abonos;
 use App\Models\Factura;
 use Illuminate\Http\Request;
 
@@ -34,11 +35,27 @@ class CuentasPorCobrarController extends Controller
 
         $request->validate([
             'id' => 'required|integer',
-            'RetencionIva' => 'required|numeric',
-            'RetencionFuente' => 'required|numeric',
+            'RetencionIva' => 'required|numeric|gte:0',
+            'RetencionFuente' => 'required|numeric|gte:0',
         ]);
 
         $factura = Factura::findOrFail($request->id);
+
+        if ($factura->Estado != "Registrada") {
+
+            flash()->error('No se puede editar cuenta ya abonada, anulada o pagada');
+            return redirect()->route('editar-cuentas', $request->id);
+        }
+
+        $saldo = $factura->Total;
+        // Restar retenciones
+        $saldo -= $request->RetencionIva;
+        $saldo -= $request->RetencionFuente;
+
+        if ($saldo < 0) {
+            flash()->error('Retención iva o retención fuente superan el total de la factura');
+            return redirect()->route('editar-cuentas', $request->id);
+        }
 
         $factura->RetencionIva = $request->RetencionIva;
         $factura->RetencionFuente = $request->RetencionFuente;

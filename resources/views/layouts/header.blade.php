@@ -2,8 +2,16 @@
 
     <!-- Logo -->
     <a href="" class="hidden-xs logo">
-        <span class="logo-mini"><b></b></span>
-        <span class="logo-lg"><b></b></span>
+        <span class="logo-mini">
+            <b>
+                <img src="{{ asset('images/GS1-logo-mini.png') }}" class="logo-image" alt="Logo Image" />
+            </b>
+        </span>
+        <span class="logo-lg">
+            <b>
+                <img src="{{ asset('images/GS1-logo.png') }}" class="logo-image" alt="Logo Image" />
+            </b>
+        </span>
     </a>
 
     <!-- Header Navbar -->

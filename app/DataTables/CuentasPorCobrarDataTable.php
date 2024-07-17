@@ -27,6 +27,7 @@ class CuentasPorCobrarDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('establecimiento_id', function ($query) {
                 $Establecimiento = Establecimiento::where('id', '=', $query->establecimiento_id)->first();
@@ -76,10 +77,22 @@ class CuentasPorCobrarDataTable extends DataTable
                     <a href="' . route('editar-cuentas', $query->id_factura) . '" class="btn btn-default btn-sm">
                         <i class="glyphicon glyphicon-edit"></i>
                     </a>
-                    <a href="' . route('abonos', $query->id_factura) . '" class="btn btn-default btn-sm">
+                    <a href="' . route('abonos', $query->id_factura) . '" class="btn btn-info btn-sm">
                          <i class="fa-solid fa-money-bill-wave"></i>
                     </a>
                 ';
+
+                    if ($query->Estado == "Registrada" || $query->Estado == "Abonada") {
+                        $ButtonGroup .= '
+                    <a href="' . route('anular-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Desea anular factura?">
+                    <i class="fas fa-ban"></i>
+                    </a>';
+                    } else {
+                        $ButtonGroup .= '
+                        <button class="btn btn-danger btn-sm disabled">
+                        <i class="fas fa-ban"></i>
+                        </button>';
+                    }
                 } else {
                     $ButtonGroup = 'No permitido';
                 }
@@ -119,17 +132,32 @@ class CuentasPorCobrarDataTable extends DataTable
                 return $Button;
             })
             ->addColumn('saldo', function ($query) {
+                if ($query->Estado != 'Anulada') {
+                    $ultimoAbono = Abonos::where('factura_id', $query->id_factura)
+                        ->orderBy('fecha_abonado', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
 
-                $ultimoAbono = Abonos::where('factura_id', $query->id_factura)
-                    ->orderBy('fecha_abonado', 'desc')
-                    ->orderBy('id', 'desc')
-                    ->first();
+                    if ($ultimoAbono) {
+                        $saldo = $ultimoAbono->saldo_factura;
+                    } else {
+                        $saldo = $query->Total;
+                        $saldo -= $query->RetencionIva;
+                        $saldo -= $query->RetencionFuente;
+                    }
+                    // Asegurarse de que el saldo nunca sea negativo
+                    if ($saldo < 0) {
+                        $saldo = 0;
+                    }
 
-                if ($ultimoAbono) {
-
-                    return '$ ' . $ultimoAbono->saldo_factura;
+                    $saldoFormateado = '$ ' . number_format($saldo, 2);
+                    return '<span style="color: #43A047;"><strong>' . $saldoFormateado . '</strong></span>';
                 }
-                return '------';
+                return '<span style="color: #F44336;"><strong>' . '$ 0.00' . '</strong></span>';
+            })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
             })
             ->editColumn('RetencionIva', function ($row) {
                 return '<strong>$ ' . $row->RetencionIva . '</strong>';
@@ -140,10 +168,13 @@ class CuentasPorCobrarDataTable extends DataTable
             ->editColumn('Total', function ($row) {
                 return '<strong>$ ' . $row->Total . '</strong>';
             })
+            ->editColumn('ValorAnulado', function ($row) {
+                return '<strong>$ ' . $row->ValorAnulado . '</strong>';
+            })
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->updated_at)->translatedFormat('Y-m-d H:i:s');
             })
-            ->rawColumns(['Estado', 'action', 'Archivos', 'Total', 'RetencionIva', 'RetencionFuente'])
+            ->rawColumns(['Estado', 'action', 'Archivos', 'Total', 'RetencionIva', 'RetencionFuente', 'ValorAnulado', 'saldo'])
             ->setRowId('id');
     }
 
@@ -202,15 +233,18 @@ class CuentasPorCobrarDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id_factura')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id_factura')->title('#'),
             Column::make('Archivos')->title('Factura')->addClass('text-center'),
             Column::make('establecimiento_id')->title('Establec.'),
             Column::make('punto_emision_id')->title('P. emisión'),
             Column::make('Secuencial')->title('Secuencial'),
+            Column::make('Prefijo')->title('Pref.'),
             Column::make('Total')->title('Total fact.'),
+            Column::computed('saldo')->title('Saldo')->addClass('text-center'),
             Column::make('RetencionIva')->title('Ret. iva'),
             Column::make('RetencionFuente')->title('Ret. fuente'),
-            Column::computed('saldo')->title('Saldo')->addClass('text-center'),
+            Column::computed('ValorAnulado')->title('Valor anulado')->addClass('text-center'),
             Column::computed('Estado')->title('Estado')->addClass('text-center'),
             Column::make('updated_at')->title('última modificación'),
             Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')

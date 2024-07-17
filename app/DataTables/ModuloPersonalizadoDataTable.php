@@ -22,6 +22,7 @@ class ModuloPersonalizadoDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
                 $ButtonGroup = '
@@ -36,11 +37,15 @@ class ModuloPersonalizadoDataTable extends DataTable
 
                 return $ButtonGroup;
             })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->rawColumns(['action'])
             ->setRowId('id');
@@ -97,7 +102,8 @@ class ModuloPersonalizadoDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id_modulo')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id_modulo')->title('#'),
             Column::make('Archivo')->title('Archivo'),
             Column::make('Fecha')->title('Fecha'),
             Column::make('TipoArchivo')->title('Tipo de archivo'),

@@ -10,15 +10,12 @@
                     class="img-circle" alt="User Image" />
             </div>
             <div class="pull-left info">
-                <p>{{ Auth::user()->NombreUsuario }}</p>
-                {{-- @if (Auth::guest())
-                    <p>{{ config('settings.system_title') }}</p>
-                @else
-                    <p>{{ Auth::user()->name }}</p>
-                @endif --}}
+                <p>{{ Auth::user()->Nombres . ' ' . Auth::user()->Apellidos }}</p>
+
                 <!-- Status -->
                 <a href="{{ route('perfil.edit') }}"><i class="fa fa-circle text-success"></i>
-                    Rol</a>
+                    {{ Auth::user()->getRoleNames()->first() }}
+                </a>
             </div>
         </div>
 

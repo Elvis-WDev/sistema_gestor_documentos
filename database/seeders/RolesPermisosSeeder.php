@@ -26,6 +26,7 @@ class RolesPermisosSeeder extends Seeder
             'ver NotasCredito',
             'ver SolicitudAfiliado',
             'ver retenciones',
+            'ver custom_module',
             'crear usuario',
             'crear facturas',
             'crear establecimiento',
@@ -34,6 +35,7 @@ class RolesPermisosSeeder extends Seeder
             'crear NotasCredito',
             'crear SolicitudAfiliado',
             'crear retenciones',
+            'crear custom_module',
             'modificar usuario',
             'modificar facturas',
             'modificar establecimiento',
@@ -42,6 +44,7 @@ class RolesPermisosSeeder extends Seeder
             'modificar NotasCredito',
             'modificar SolicitudAfiliado',
             'modificar retenciones',
+            'modificar custom_module',
             'eliminar usuario',
             'eliminar facturas',
             'eliminar establecimiento',
@@ -50,6 +53,7 @@ class RolesPermisosSeeder extends Seeder
             'eliminar NotasCredito',
             'eliminar SolicitudAfiliado',
             'eliminar retenciones',
+            'eliminar custom_module',
         ];
 
         foreach ($permissions as $permission) {

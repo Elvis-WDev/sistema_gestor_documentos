@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Login | DigiDocs
+    <title>Login
         {{-- {{ config('settings.system_title') }} --}}
 
     </title>
@@ -38,7 +38,7 @@
     <div class="login-box">
         <div class="login-logo">
             <a href="{{ route('login') }}"><b>
-                    {{-- {{ config('settings.system_title') }} --}}
+                    <img src="{{ asset('images/GS1-logo.png') }}" width="150px" alt="">
                 </b></a>
         </div>
 

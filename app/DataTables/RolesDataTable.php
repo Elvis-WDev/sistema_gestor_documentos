@@ -23,6 +23,7 @@ class RolesDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('action', function ($query) {
 
@@ -51,12 +52,15 @@ class RolesDataTable extends DataTable
                            ' . $ButtonGroup == "" ? "No permitido" : $ButtonGroup . '
                         </div>';
             })
-            ->setRowId('id')
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->rawColumns(['action'])
             ->setRowId('id');
@@ -114,7 +118,8 @@ class RolesDataTable extends DataTable
     {
         return [
 
-            Column::make('id')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id')->title('#'),
             Column::make('name')->title('Nombre'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),

@@ -54,16 +54,27 @@ class FacturasController extends Controller
             'FechaEmision' => 'required|date',
             'establecimiento_id' => 'required|integer',
             'punto_emision_id' => 'required|integer',
+            'Prefijo' => ['required', 'digits:8', 'regex:/^\d{8}$/'],
             'Secuencial' => [
                 'required',
-                'string',
-                'max:9',
+                'digits:9',
+                'regex:/^\d{9}$/',
                 new UniqueSecuencial($request->input('establecimiento_id'), $request->input('punto_emision_id'))
             ],
+            'RetencionIva' => 'required|numeric|gte:0',
+            'RetencionFuente' => 'required|numeric|gte:0',
             'RazonSocial' => 'required|string|max:255',
             'Total' => 'required|numeric|gt:0',
         ]);
 
+        $retenciones = $request->RetencionIva + $request->RetencionFuente;
+
+        if ($request->Total < $retenciones) {
+
+            flash()->error('Retenciones exceden el total de la factura');
+
+            return redirect()->route('crear-factura');
+        }
 
         // Procesamiento de archivos utilizando uploadMultiFile
         $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/facturas');
@@ -74,6 +85,8 @@ class FacturasController extends Controller
             'punto_emision_id' => $request->punto_emision_id,
             'Secuencial' => $request->Secuencial,
             'RazonSocial' => $request->RazonSocial,
+            'RetencionIva' => $request->RetencionIva,
+            'RetencionFuente' => $request->RetencionFuente,
             'Total' => $request->Total,
             'Estado' => 4,
             'Archivos' => json_encode($archivos, JSON_UNESCAPED_SLASHES),
@@ -102,10 +115,11 @@ class FacturasController extends Controller
             'FechaEmision' => 'required|date',
             'establecimiento_id' => 'required|string|max:255',
             'punto_emision_id' => 'required|string|max:255',
+            'Prefijo' => ['required', 'digits:8', 'regex:/^\d{8}$/'],
             'Secuencial' => [
                 'required',
-                'string',
-                'max:9',
+                'digits:9',
+                'regex:/^\d{9}$/',
                 new UniqueSecuencial($request->input('establecimiento_id'), $request->input('punto_emision_id'), $request->input('id'))
             ],
             'RazonSocial' => 'required|string|max:255',
@@ -148,35 +162,6 @@ class FacturasController extends Controller
         return redirect()->route('facturas');
     }
 
-
-    public function anular_factura(int $id)
-    {
-
-        try {
-            $factura = Factura::findOrFail($id);
-
-            if (!is_null($factura->Archivos)) {
-                $archivos = json_decode($factura->Archivos, true);
-
-                foreach ($archivos as $archivo) {
-                    $trashPath = 'uploads/trash/facturas/' . basename($archivo);
-                    Storage::disk('public')->move($archivo, $trashPath);
-                }
-            }
-
-            // Eliminar abonos relacionados
-            $factura->abonos()->delete();
-
-            $factura->update(['Estado' => 2]);
-
-            flash('Factura anulada.');
-
-            return response()->json(['status' => 'success', 'message' => 'Factura anulada correctamente.']);
-        } catch (QueryException $e) {
-
-            return response()->json(['status' => 'error', 'message' => 'Error al anular la factura.']);
-        }
-    }
     public function destroy(int $id)
     {
 
@@ -206,6 +191,46 @@ class FacturasController extends Controller
         }
     }
 
+    public function anular_factura(int $id)
+    {
+        try {
+            $factura = Factura::findOrFail($id);
+
+            // Verificar si la factura ya está pagada
+            if ($factura->Estado == 1) {
+                return response()->json(['status' => 'error', 'message' => 'No se puede anular una factura que ya está pagada.']);
+            }
+
+            // Obtener el último abono de la factura
+            $ultimoAbono = Abonos::where('factura_id', $factura->id_factura)
+                ->orderBy('fecha_abonado', 'desc')
+                ->orderBy('id', 'desc') // Ordenar también por id para asegurar el orden correcto
+                ->first();
+
+            if ($ultimoAbono) {
+                // Calcular el saldo de la factura basado en el último abono
+                $saldo = $ultimoAbono->saldo_factura;
+                $saldo += $factura->RetencionIva;
+                $saldo += $factura->RetencionFuenta;
+                // Actualizar el campo ValorAnulado
+                $factura->ValorAnulado = $saldo; //Sumarle el valor de retencionIva yretencionFuente
+            } else {
+                $saldo = $factura->Total;
+
+                $factura->ValorAnulado = $saldo;
+            }
+
+            // Actualizar el estado de la factura a anulada
+            $factura->update(['Estado' => 2]);
+
+            flash('Factura anulada.');
+
+            return response()->json(['status' => 'success', 'message' => 'Factura anulada correctamente.']);
+        } catch (QueryException $e) {
+            return response()->json(['status' => 'error', 'message' => 'Error al anular la factura.']);
+        }
+    }
+
     public function get_punto_emision(Request $request)
     {
         $PuntoEmision = PuntoEmision::where('establecimiento_id', $request->id)->get();
@@ -229,170 +254,5 @@ class FacturasController extends Controller
         })->toArray();
 
         return view('pages.facturas.reportes.index', compact('facturas'));
-    }
-
-    public function generar_reportes(Request $request)
-    {
-        // Validar las fechas
-        $request->validate([
-            'txt_fecha_reporte_inicio' => 'required|date',
-            'txt_fecha_reporte_final' => 'required|date|after_or_equal:txt_fecha_reporte_inicio',
-        ]);
-
-        $fechaInicio = Carbon::parse($request->input('txt_fecha_reporte_inicio'));
-        $fechaFinal = Carbon::parse($request->input('txt_fecha_reporte_final'));
-
-        // Consulta SQL para obtener la suma total de las facturas que no están anuladas
-        $totalFacturasNoAnuladas = DB::table('facturas')
-            ->select(DB::raw('SUM(Total) AS total_facturas_no_anuladas'))
-            ->where('FechaEmision', '>=', $fechaInicio)
-            ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-            ->where('Estado', '<>', 'Anulada')
-            ->first();
-
-        // Consulta SQL para obtener la suma total de las facturas anuladas
-        $totalFacturasAnuladas = DB::table('facturas')
-            ->select(DB::raw('SUM(Total) AS total_facturas_anuladas'))
-            ->where('FechaEmision', '>=', $fechaInicio)
-            ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-            ->where('Estado', '=', 'Anulada')
-            ->first();
-
-        // Consulta SQL para obtener la suma de los abonos realizados de todas las facturas
-        $totalAbonos = DB::table('abonos')
-            ->select(DB::raw('SUM(valor_abono) AS total_abonos'))
-            ->whereIn('factura_id', function ($query) use ($fechaInicio, $fechaFinal) {
-                $query->select('id_factura')
-                    ->from('facturas')
-                    ->where('FechaEmision', '>=', $fechaInicio)
-                    ->where('FechaEmision', '<', $fechaFinal->copy()->addDay());
-            })
-            ->first();
-
-        // Consulta SQL para obtener la suma de RetencionIva de todas las facturas que no están anuladas
-        $totalRetencionIva = DB::table('facturas')
-            ->select(DB::raw('SUM(RetencionIva) AS total_retencion_iva'))
-            ->where('FechaEmision', '>=', $fechaInicio)
-            ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-            ->where('Estado', '<>', 'Anulada')
-            ->first();
-
-        // Consulta SQL para obtener la suma de RetencionFuente de todas las facturas que no están anuladas
-        $totalRetencionFuente = DB::table('facturas')
-            ->select(DB::raw('SUM(RetencionFuente) AS total_retencion_fuente'))
-            ->where('FechaEmision', '>=', $fechaInicio)
-            ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-            ->where('Estado', '<>', 'Anulada')
-            ->first();
-
-        // Consulta SQL para obtener la suma total de los saldos de los abonos realizados
-        $totalSaldoAbonos = DB::table('abonos as a')
-            ->join(DB::raw('(SELECT factura_id, MAX(fecha_abonado) as max_fecha_abonado, MAX(id) as max_id FROM abonos GROUP BY factura_id) as b'), function ($join) {
-                $join->on('a.factura_id', '=', 'b.factura_id')
-                    ->on('a.fecha_abonado', '=', 'b.max_fecha_abonado')
-                    ->on('a.id', '=', 'b.max_id');
-            })
-            ->whereIn('a.factura_id', function ($query) use ($fechaInicio, $fechaFinal) {
-                $query->select('id_factura')
-                    ->from('facturas')
-                    ->where('FechaEmision', '>=', $fechaInicio)
-                    ->where('FechaEmision', '<', $fechaFinal->copy()->addDay());
-            })
-            ->sum('a.saldo_factura');
-
-        // Si no se encontraron facturas, establecer total en 0
-        $totalFacturasNoAnuladas = $totalFacturasNoAnuladas->total_facturas_no_anuladas ?? 0;
-        $totalFacturasAnuladas = $totalFacturasAnuladas->total_facturas_anuladas ?? 0;
-        $totalAbonos = $totalAbonos->total_abonos ?? 0;
-        $totalRetencionIva = $totalRetencionIva->total_retencion_iva ?? 0;
-        $totalRetencionFuente = $totalRetencionFuente->total_retencion_fuente ?? 0;
-        $totalSaldoAbonos = $totalSaldoAbonos ?? 0;
-
-        // Formatear las fechas
-        $fechaInicioFormatted = $fechaInicio->isoFormat('D [de] MMMM');
-        $fechaFinalFormatted = $fechaFinal->isoFormat('D [de] MMMM');
-
-        // Determinar el título del mes
-        $mesInicio = $fechaInicio->isoFormat('MMMM');
-        $mesFinal = $fechaFinal->isoFormat('MMMM');
-        $tituloMes = $mesInicio === $mesFinal ? $mesInicio : "$mesInicio - $mesFinal";
-
-        // Obtener todos los establecimientos
-        $establecimientos = Establecimiento::all();
-        $reportesPorEstablecimiento = [];
-
-        foreach ($establecimientos as $establecimiento) {
-            $reportesPorEstablecimiento[$establecimiento->nombre] = [
-                'totalFacturasNoAnuladas' => DB::table('facturas')
-                    ->select(DB::raw('SUM(Total) AS total_facturas_no_anuladas'))
-                    ->where('FechaEmision', '>=', $fechaInicio)
-                    ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-                    ->where('Estado', '<>', 'Anulada')
-                    ->where('establecimiento_id', $establecimiento->id)
-                    ->first()->total_facturas_no_anuladas ?? 0,
-                'totalFacturasAnuladas' => DB::table('facturas')
-                    ->select(DB::raw('SUM(Total) AS total_facturas_anuladas'))
-                    ->where('FechaEmision', '>=', $fechaInicio)
-                    ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-                    ->where('Estado', '=', 'Anulada')
-                    ->where('establecimiento_id', $establecimiento->id)
-                    ->first()->total_facturas_anuladas ?? 0,
-                'totalAbonos' => DB::table('abonos')
-                    ->select(DB::raw('SUM(valor_abono) AS total_abonos'))
-                    ->whereIn('factura_id', function ($query) use ($fechaInicio, $fechaFinal, $establecimiento) {
-                        $query->select('id_factura')
-                            ->from('facturas')
-                            ->where('FechaEmision', '>=', $fechaInicio)
-                            ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-                            ->where('establecimiento_id', $establecimiento->id);
-                    })
-                    ->first()->total_abonos ?? 0,
-                'totalRetencionIva' => DB::table('facturas')
-                    ->select(DB::raw('SUM(RetencionIva) AS total_retencion_iva'))
-                    ->where('FechaEmision', '>=', $fechaInicio)
-                    ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-                    ->where('Estado', '<>', 'Anulada')
-                    ->where('establecimiento_id', $establecimiento->id)
-                    ->first()->total_retencion_iva ?? 0,
-                'totalRetencionFuente' => DB::table('facturas')
-                    ->select(DB::raw('SUM(RetencionFuente) AS total_retencion_fuente'))
-                    ->where('FechaEmision', '>=', $fechaInicio)
-                    ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-                    ->where('Estado', '<>', 'Anulada')
-                    ->where('establecimiento_id', $establecimiento->id)
-                    ->first()->total_retencion_fuente ?? 0,
-                'totalSaldoAbonos' => DB::table('abonos as a')
-                    ->join(DB::raw('(SELECT factura_id, MAX(fecha_abonado) as max_fecha_abonado, MAX(id) as max_id FROM abonos GROUP BY factura_id) as b'), function ($join) {
-                        $join->on('a.factura_id', '=', 'b.factura_id')
-                            ->on('a.fecha_abonado', '=', 'b.max_fecha_abonado')
-                            ->on('a.id', '=', 'b.max_id');
-                    })
-                    ->whereIn('a.factura_id', function ($query) use ($fechaInicio, $fechaFinal, $establecimiento) {
-                        $query->select('id_factura')
-                            ->from('facturas')
-                            ->where('FechaEmision', '>=', $fechaInicio)
-                            ->where('FechaEmision', '<', $fechaFinal->copy()->addDay())
-                            ->where('establecimiento_id', $establecimiento->id);
-                    })
-                    ->sum('a.saldo_factura') ?? 0,
-            ];
-        }
-
-        $data = [
-            'tituloMes' => $tituloMes,
-            'fechaInicio' => $fechaInicioFormatted,
-            'fechaFinal' => $fechaFinalFormatted,
-            'totalFacturasNoAnuladas' => $totalFacturasNoAnuladas,
-            'totalFacturasAnuladas' => $totalFacturasAnuladas,
-            'totalAbonos' => $totalAbonos,
-            'totalRetencionIva' => $totalRetencionIva,
-            'totalRetencionFuente' => $totalRetencionFuente,
-            'totalSaldoAbonos' => $totalSaldoAbonos,
-            'reportesPorEstablecimiento' => $reportesPorEstablecimiento,
-        ];
-
-        $pdf = PDF::loadView('pages.facturas.reportes.pdf.reporte_general', $data);
-
-        return $pdf->stream('Reporte_general_facturas.pdf');
     }
 }

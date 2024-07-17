@@ -9,9 +9,8 @@
 
             @can('crear facturas')
                 <a class="btn btn-primary pull-right mx-2" style="margin-top: -10px;margin-bottom: 5px"
-                    href="{{ route('crear-factura') }}">
-                    <i class="fa fa-plus"></i>
-                    nueva factura
+                    href="{{ route('facturas-reportes') }}">
+                    Reportes
                 </a>
             @endcan
 

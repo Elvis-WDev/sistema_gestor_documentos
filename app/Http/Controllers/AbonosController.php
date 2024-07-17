@@ -27,14 +27,26 @@ class AbonosController extends Controller
             return redirect()->route('abonos', $factura->id_factura);
         }
 
+        // Calcular saldo inicial restando las retenciones del total de la factura
+        $retencionIva = $factura->RetencionIva ?: 0;
+        $retencionFuente = $factura->RetencionFuente ?: 0;
+
+        $totalRetenciones = $retencionIva + $retencionFuente;
+        $saldoInicial = $factura->Total - $totalRetenciones;
+
+        if ($totalRetenciones > $factura->Total) {
+            flash()->error('Las retenciones no pueden exceder el valor total de la factura.');
+            return redirect()->route('abonos', $factura->id_factura);
+        }
+
         $ultimoAbono = Abonos::where('factura_id', $factura->id_factura)
             ->orderBy('fecha_abonado', 'desc')
-            ->orderBy('id', 'desc') // Ordenar también por id para asegurar el orden correcto
+            ->orderBy('id', 'desc')
             ->first();
 
         $nuevoSaldo = $ultimoAbono
             ? $ultimoAbono->saldo_factura - $validatedData['valor_abono']
-            : $factura->Total - $validatedData['valor_abono'];
+            : $saldoInicial - $validatedData['valor_abono'];
 
         if ($nuevoSaldo < 0) {
             flash()->error('El valor del abono excede el saldo de la factura.');
@@ -43,7 +55,7 @@ class AbonosController extends Controller
 
         Abonos::create([
             'factura_id' => $validatedData['factura_id'],
-            'total_factura' => $factura->Total, // Usar el total de la factura de la base de datos
+            'total_factura' => $factura->Total,
             'valor_abono' => $validatedData['valor_abono'],
             'saldo_factura' => $nuevoSaldo,
             'fecha_abonado' => $validatedData['fecha_abonado'],
@@ -58,7 +70,6 @@ class AbonosController extends Controller
         flash('Abono registrado correctamente!');
         return redirect()->route('abonos', $factura->id_factura);
     }
-
     /**
      * Display a listing of the FileType.
      *

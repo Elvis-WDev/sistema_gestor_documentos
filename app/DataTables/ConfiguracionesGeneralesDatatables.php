@@ -56,10 +56,10 @@ class ConfiguracionesGeneralesDatatables extends DataTable
                 return $ButtonGroup;
             })
             ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->updated_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->updated_at)->translatedFormat('Y-m-d H:i');
             })
             ->rawColumns(['action', 'archivos_permitidos'])
             ->setRowId('id');

@@ -15,6 +15,7 @@ use App\Http\Controllers\{
     PagosController,
     ProfileController,
     PuntosEmisionController,
+    ReportesController,
     RetencionesController,
     RolesController,
     SolicitudAfiliadosController,
@@ -34,9 +35,9 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::patch('/perfil', [UsuariosController::class, 'updateProfile'])->name('perfil.update');
 
     //CUSTOM-MODULE
-    Route::get('lista-custom-module', [ModulosPersonalizadoController::class, 'index'])->name('custom-module');
 
-    Route::get('crear-custom-module', [ModulosPersonalizadoController::class, 'create'])->name('crear-custom-module');
+
+
 
     //CONFIGURACIONES-GENERALES
     Route::get('lista-configuraciones', [ConfiguracionesGeneralesController::class, 'index'])->name('configuraciones');
@@ -69,6 +70,7 @@ Route::group(['middleware' => ['can:modificar usuario']], function () {
 
     Route::put('update-rol', [RolesController::class, 'update'])->name('update-rol');
 });
+
 Route::group(['middleware' => ['can:eliminar usuario']], function () {
     Route::delete('eliminar-usuario/{id}', [UsuariosController::class, 'destroy'])->name('destroy-usuario');
     Route::delete('eliminar-rol/{id}', [RolesController::class, 'destroy'])->name('destroy-rol');
@@ -88,7 +90,7 @@ Route::group(['middleware' => ['can:crear facturas']], function () {
     Route::post('store-factura', [FacturasController::class, 'store'])->name('store-factura');
     Route::post('store-abono', [AbonosController::class, 'store'])->name('store-abono');
     Route::get('get-punto_emision', [FacturasController::class, 'get_punto_emision'])->name('get-punto_emision');
-    Route::post('generar-reporte', [FacturasController::class, 'generar_reportes'])->name('generar-reporte');
+    Route::post('generar-reporte', [ReportesController::class, 'generar_reportes'])->name('generar-reporte');
 });
 Route::group(['middleware' => ['can:modificar facturas']], function () {
     Route::get('editar-factura/{id_factura}', [FacturasController::class, 'edit'])->name('editar-factura');
@@ -178,6 +180,15 @@ Route::group(['middleware' => ['can:modificar retenciones']], function () {
     Route::get('editar-retencion/{id}', [RetencionesController::class, 'edit'])->name('editar-retencion');
 });
 
+// Documentos
+Route::group(['middleware' => ['can:ver custom_module']], function () {
+    Route::get('lista-custom-module', [ModulosPersonalizadoController::class, 'index'])->name('custom-module');
+});
+
+Route::group(['middleware' => ['can:crear custom_module']], function () {
+    Route::get('crear-custom-module', [ModulosPersonalizadoController::class, 'create'])->name('crear-custom-module');
+    Route::post('store-custom_module', [ModulosPersonalizadoController::class, 'store'])->name('store-custom_module');
+});
 
 // Route::group(['middleware' => ['auth', 'verified']], function () {
 

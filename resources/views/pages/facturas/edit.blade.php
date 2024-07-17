@@ -76,19 +76,17 @@
                                     <input class="form-control" name="Secuencial" type="text" id="Secuencial"
                                         value="{{ $Factura->Secuencial }}">
                                 </div>
-
                                 <!-- RazonSocial Field -->
                                 <div class="form-group col-sm-6 {{ $errors->has('RazonSocial') ? 'has-error' : '' }}">
                                     <label for="RazonSocial">Razón social:</label>
                                     <input class="form-control" name="RazonSocial" type="text" id="RazonSocial"
                                         value="{{ $Factura->RazonSocial }}">
                                 </div>
-
-                                <!-- FechaEmision Field -->
-                                <div class="form-group col-sm-6 {{ $errors->has('FechaEmision') ? 'has-error' : '' }}">
-                                    <label for="FechaEmisionEdit">Fecha de emisión:</label>
-                                    <input class="form-control" name="FechaEmision" type="text" id="FechaEmisionEdit"
-                                        value="{{ $Factura->FechaEmision }}">
+                                <!-- Prefijo Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('Prefijo') ? 'has-error' : '' }}">
+                                    <label for="Prefijo">Prefijo:</label>
+                                    <input class="form-control" name="Prefijo" type="text" id="Prefijo"
+                                        value="{{ $Factura->Prefijo }}">
                                 </div>
 
                                 <!-- Total Field -->
@@ -97,9 +95,14 @@
                                     <input class="form-control" name="Total" type="number" id="Total" min="0"
                                         step="any" value="{{ $Factura->Total }}" disabled>
                                 </div>
-
+                                <!-- FechaEmision Field -->
+                                <div class="form-group col-sm-3 {{ $errors->has('FechaEmision') ? 'has-error' : '' }}">
+                                    <label for="FechaEmisionEdit">Fecha de emisión:</label>
+                                    <input class="form-control" name="FechaEmision" type="text" id="FechaEmisionEdit"
+                                        value="{{ $Factura->FechaEmision }}">
+                                </div>
                                 <!-- ultima modificacion Field -->
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-3">
                                     <label for="updated_at">última modificación:</label>
                                     <input class="form-control updated_at" name="updated_at" type="text" id="updated_at"
                                         value="{{ $Factura->updated_at }}" disabled>
@@ -261,6 +264,17 @@
                 const archivosInput = document.querySelector('.Archivos');
                 archivosInput.files = dataTransfer.files;
             }
+        });
+        $(document).ready(function() {
+            $("#Secuencial").inputmask({
+                mask: "999999999",
+                placeholder: "",
+                clearIncomplete: true
+            });
+            $("#Prefijo").inputmask({
+                mask: "99999999",
+                clearIncomplete: true
+            });
         });
     </script>
 @endpush

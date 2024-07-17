@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\ModuloPersonalizadoDataTable;
+use App\Models\ModuloPersonalizado;
 use Illuminate\Http\Request;
 
 class ModulosPersonalizadoController extends Controller
@@ -20,5 +21,23 @@ class ModulosPersonalizadoController extends Controller
     public function create()
     {
         return view('pages.modulospesonalizados.create');
+    }
+    public function store(Request $request)
+    {
+
+        $request->validate([
+
+            'NombreModulo' => ['required', 'string', 'max:255', 'unique:' . ModuloPersonalizado::class],
+
+        ]);
+
+        ModuloPersonalizado::create([
+            'NombreModulo' => $request->NombreModulo,
+        ]);
+
+
+        flash('Carpeta creada correctamente!');
+
+        return redirect()->route('custom-module');
     }
 }

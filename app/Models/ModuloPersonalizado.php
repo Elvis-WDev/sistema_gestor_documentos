@@ -10,7 +10,7 @@ class ModuloPersonalizado extends Model
     use HasFactory;
 
     protected $table = 'modulos_personalizados';
-
+    protected $primaryKey = 'id_modulo';
     protected $fillable = [
         'NombreModulo',
     ];

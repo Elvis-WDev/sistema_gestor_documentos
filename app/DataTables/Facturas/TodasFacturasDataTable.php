@@ -26,6 +26,9 @@ class TodasFacturasDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+
+        $count = 0;
+
         return (new EloquentDataTable($query))
             ->addColumn('establecimiento_id', function ($query) {
                 $Establecimiento = Establecimiento::where('id', '=', $query->establecimiento_id)->first();
@@ -77,9 +80,6 @@ class TodasFacturasDataTable extends DataTable
                     <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-sm">
                      <i class="glyphicon glyphicon-edit"></i>
                     </a>
-                    <a href="' . route('anular-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Anular factura?">
-                    <i class="fas fa-ban"></i>
-                    </a>
                 ';
                 }
                 if (Auth::user()->can('eliminar facturas')) {
@@ -90,11 +90,7 @@ class TodasFacturasDataTable extends DataTable
                 ';
                 }
 
-                return '
-                <div class="btn-group">
-                        ' . $ButtonGroup == "" ? 'No permitido' : $ButtonGroup . '
-                </div>
-                ';
+                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
             })
             ->addColumn('Estado', function ($query) {
 
@@ -128,6 +124,10 @@ class TodasFacturasDataTable extends DataTable
 
                 return $Button;
             })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('Total', function ($row) {
                 return '<strong>$ ' . $row->Total . '</strong>';
             })
@@ -140,7 +140,7 @@ class TodasFacturasDataTable extends DataTable
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->updated_at)->translatedFormat('Y-m-d H:i:s');
             })
-            ->rawColumns(['Estado', 'action', 'Archivos', 'Total'])
+            ->rawColumns(['Estado', 'action', 'Archivos', 'Total', 'numero'])
             ->setRowId('id');
     }
 
@@ -199,7 +199,8 @@ class TodasFacturasDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id_factura')->title('#'),
+            Column::computed('fila')->title('#'),
+            // Column::make('id_factura')->title('#'),
             Column::make('Archivos')->title('Archivos')->addClass('text-center'),
             Column::make('RazonSocial')->title('Raz. social'),
             Column::make('FechaEmision')->title('Fec. emisión'),

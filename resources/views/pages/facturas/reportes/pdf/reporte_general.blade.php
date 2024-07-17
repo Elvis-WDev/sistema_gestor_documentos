@@ -24,59 +24,87 @@
 
         th {
             background-color: #f2f2f2;
+            font-size: 15px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header img {
+            width: 150px;
+        }
+
+        .header p {
+            text-align: right;
+            margin: 0;
         }
     </style>
 </head>
 
 <body>
-    <h1>Reporte Mensual - {{ $tituloMes }}</h1>
-    <p>Período: {{ $fechaInicio }} a {{ $fechaFinal }}</p>
 
-    <h2>Totales Globales</h2>
+    <div class="header">
+        <img src="{{ asset('images/GS1-logo.png') }}" alt="">
+        <p>{{ $fechaInicio }} a {{ $fechaFinal }}</p>
+    </div>
+
     <table>
         <thead>
             <tr>
-                <th>Total Facturas (No Anuladas)</th>
+                <th colspan="2">Reporte de cuentas por cobrar - {{ $tituloMes }}</th>
+            </tr>
+        </thead>
+    </table>
+
+    <h4>General</h4>
+    <table>
+        <thead>
+            <tr>
+                <th>Total Facturado</th>
                 <th>Total Facturas Anuladas</th>
                 <th>Total Abonos</th>
                 <th>Total Retención IVA</th>
                 <th>Total Retención Fuente</th>
-                <th>Total Saldo Abonos</th>
+                <th>Total cuentas por cobrar</th>
             </tr>
         </thead>
         <tbody>
             <tr>
-                <td>${{ $totalFacturasNoAnuladas }}</td>
+                <td>${{ $totalFacturado }}</td>
                 <td>${{ $totalFacturasAnuladas }}</td>
                 <td>${{ $totalAbonos }}</td>
                 <td>${{ $totalRetencionIva }}</td>
                 <td>${{ $totalRetencionFuente }}</td>
-                <td>${{ $totalSaldoAbonos }}</td>
+                <td>${{ $totalCuentasPorCobrar }}</td>
             </tr>
         </tbody>
     </table>
 
     @foreach ($reportesPorEstablecimiento as $nombreEstablecimiento => $reporte)
-        <h2>Totales por Establecimiento: {{ $nombreEstablecimiento }}</h2>
+        <h4>Establecimiento: {{ $nombreEstablecimiento }}</h4>
         <table>
             <thead>
                 <tr>
-                    <th>Total Facturas (No Anuladas)</th>
+                    <th>Total Facturado</th>
                     <th>Total Facturas Anuladas</th>
                     <th>Total Abonos</th>
                     <th>Total Retención IVA</th>
                     <th>Total Retención Fuente</th>
-                    <th>Total Saldo Abonos</th>
+                    <th>Total cuentas por cobrar</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td>${{ $reporte['totalFacturasNoAnuladas'] }}</td>
+                    <td>${{ $reporte['totalFacturado'] }}</td>
                     <td>${{ $reporte['totalFacturasAnuladas'] }}</td>
                     <td>${{ $reporte['totalAbonos'] }}</td>
                     <td>${{ $reporte['totalRetencionIva'] }}</td>
                     <td>${{ $reporte['totalRetencionFuente'] }}</td>
-                    <td>${{ $reporte['totalSaldoAbonos'] }}</td>
+                    <td>${{ $reporte['totalCuentasPorCobrar'] }}</td>
                 </tr>
             </tbody>
         </table>

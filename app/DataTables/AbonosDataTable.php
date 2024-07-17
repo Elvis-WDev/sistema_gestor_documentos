@@ -31,8 +31,13 @@ class AbonosDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        return (new EloquentDataTable($query))
+        $count = 0; // Inicializar el contador fuera de la función anónima
 
+        return (new EloquentDataTable($query))
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('valor_abono', function ($row) {
                 return '<strong>$ ' . $row->valor_abono . '</strong>';
             })
@@ -42,7 +47,7 @@ class AbonosDataTable extends DataTable
             ->editColumn('fecha_abonado', function ($row) {
                 return Carbon::parse($row->fecha_abonado)->translatedFormat('Y-m-d H:i');
             })
-            ->rawColumns(['action', 'valor_abono', 'saldo_factura'])
+            ->rawColumns(['action', 'valor_abono', 'saldo_factura', 'numero'])
             ->setRowId('id');
     }
 
@@ -97,7 +102,8 @@ class AbonosDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id')->title('Pago Nro.'),
+            Column::computed('fila')->title('#'),
+            // Column::make('id')->visible(false),
             Column::make('valor_abono')->title('Abono'),
             // Column::make('total_pre_abono')->title('Total factura'),
             Column::make('saldo_factura')->title('Saldo'),

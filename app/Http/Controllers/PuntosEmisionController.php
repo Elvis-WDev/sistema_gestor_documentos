@@ -98,7 +98,7 @@ class PuntosEmisionController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Punto de emisión eliminado correctamente.']);
         } catch (QueryException $e) {
 
-            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el punto de emisión porque tiene relaciones asociadas.']);
+            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el punto de emisión porque tiene facturas asociadas.']);
         }
     }
 }

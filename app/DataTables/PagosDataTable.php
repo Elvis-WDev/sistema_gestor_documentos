@@ -25,6 +25,7 @@ class PagosDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('id_factura', function ($query) {
                 $factura = Factura::where('id_factura', '=', $query->id_factura)->first();
@@ -51,12 +52,16 @@ class PagosDataTable extends DataTable
                 }
                 return $ButtonGroup;
             })
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('Total', '$ {{$Total}}')
             ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('d \d\e F \d\e Y \a \l\a\s H:i');
+                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->rawColumns(['action'])
             ->setRowId('id');
@@ -113,7 +118,8 @@ class PagosDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('id_pago')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id_pago')->title('#'),
             Column::make('id_factura')->title('Factura'),
             Column::make('Archivo')->title('Archivos'),
             Column::make('Total')->title('Total'),

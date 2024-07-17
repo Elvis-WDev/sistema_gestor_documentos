@@ -62,19 +62,20 @@
                                         value="{{ old('Secuencial') }}">
                                 </div>
 
-                                <!-- FechaEmision Field -->
-                                <div class="form-group col-sm-6 {{ $errors->has('FechaEmision') ? 'has-error' : '' }}">
-                                    <label for="FechaEmision">Fecha de emisión:</label>
-                                    <input class="form-control" name="FechaEmision" type="text" id="FechaEmisionCreate"
-                                        value="{{ old('FechaEmision') }}">
-                                </div>
-
                                 <!-- RazonSocial Field -->
                                 <div class="form-group col-sm-6 {{ $errors->has('RazonSocial') ? 'has-error' : '' }}">
                                     <label for="RazonSocial">Razón social:</label>
                                     <input class="form-control" name="RazonSocial" type="text" id="RazonSocial"
                                         value="{{ old('RazonSocial') }}">
                                 </div>
+
+                                <!-- Prefijo Field -->
+                                <div class="form-group col-sm-6 {{ $errors->has('Prefijo') ? 'has-error' : '' }}">
+                                    <label for="Prefijo">Prefijo:</label>
+                                    <input class="form-control" name="Prefijo" type="text" id="Prefijo"
+                                        value="{{ old('Prefijo') }}">
+                                </div>
+
 
                                 <!-- Total Field -->
                                 <div class="form-group col-sm-6 {{ $errors->has('Total') ? 'has-error' : '' }}">
@@ -83,12 +84,37 @@
                                         step="any" value="{{ old('Total') ? old('Total') : 0 }}">
                                 </div>
 
+
+                                <!-- FechaEmision Field -->
+                                <div class="form-group col-sm-3 {{ $errors->has('FechaEmision') ? 'has-error' : '' }}">
+                                    <label for="FechaEmision">Fecha de emisión:</label>
+                                    <input class="form-control" name="FechaEmision" type="text" id="FechaEmisionCreate"
+                                        value="{{ old('FechaEmision') }}">
+                                </div>
+
                                 <!-- created_at Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-3 ">
                                     <label for="created_at">Fecha de carga:</label>
                                     <input class="form-control created_at" name="created_at" type="text" id="created_at"
                                         disabled>
                                 </div>
+
+                                <!-- RetenciónIva Field -->
+                                <div class="form-group col-sm-3 {{ $errors->has('RetencionIva') ? 'has-error' : '' }}">
+                                    <label for="RetencionIva">Retención iva:</label>
+                                    <input class="form-control" name="RetencionIva" type="text" id="RetencionIva"
+                                        value="{{ old('RetencionIva') ? old('RetencionIva') : 0 }}">
+                                </div>
+
+                                <!-- RetenciónFuente Field -->
+                                <div class="form-group col-sm-3 {{ $errors->has('RetencionFuente') ? 'has-error' : '' }}">
+                                    <label for="RetencionFuente">Retención fuente:</label>
+                                    <input class="form-control" name="RetencionFuente" type="text" id="RetencionFuente"
+                                        value="{{ old('RetencionFuente') ? old('RetencionFuente') : 0 }}">
+                                </div>
+
+
+
 
                                 <!-- Total Field -->
                                 <div class="form-group col-sm-12">
@@ -227,6 +253,18 @@
                 const archivosInput = document.querySelector('.Archivos');
                 archivosInput.files = dataTransfer.files;
             }
+        });
+
+        $(document).ready(function() {
+            $("#Secuencial").inputmask({
+                mask: "999999999",
+                placeholder: "",
+                clearIncomplete: true
+            });
+            $("#Prefijo").inputmask({
+                mask: "99999999",
+                clearIncomplete: true
+            });
         });
     </script>
 @endpush

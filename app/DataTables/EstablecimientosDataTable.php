@@ -23,6 +23,7 @@ class EstablecimientosDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
+        $count = 0;
         return (new EloquentDataTable($query))
 
             ->addColumn('action', function ($query) {
@@ -51,7 +52,10 @@ class EstablecimientosDataTable extends DataTable
                 </div>
                 ';
             })
-
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i:s');
             })
@@ -118,7 +122,8 @@ class EstablecimientosDataTable extends DataTable
     {
         return [
 
-            Column::make('id')->title('#'),
+            Column::make('fila')->title('#'),
+            // Column::make('id')->title('#'),
             Column::make('nombre')->title('Nombre'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
