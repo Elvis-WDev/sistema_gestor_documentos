@@ -2,6 +2,7 @@
 
 namespace App\DataTables\Facturas;
 
+use App\Models\Abonos;
 use App\Models\Establecimiento;
 use App\Models\Factura;
 use App\Models\PagadasFactura;
@@ -57,95 +58,105 @@ class PagadasFacturasDataTable extends DataTable
 
                 foreach ($archivos as $archivo) {
                     $buttons .= '
-                    <a href="' . asset('storage/' . $archivo) . '" target="_blank" data-tippy-content="' . substr($archivo, 17) . '" class="btn btn-default btn-md">
-                        <i class="fas fa-print"></i>
-                    </a>';
+            <a href="' . asset('storage/' . $archivo) . '" target="_blank" data-tippy-content="' . substr($archivo, 17) . '" class="btn btn-default btn-md">
+                <i class="fas fa-print"></i>
+            </a>';
                 }
 
                 return '
-                    <div class="btn-group">
-                    ' . $buttons . '
-                    </div>
-                    ';
+            <div class="btn-group">
+            ' . $buttons . '
+            </div>
+            ';
             })
             ->addColumn('action', function ($query) {
 
-                $ButtonGroup = "";
-
                 if (Auth::user()->can('modificar facturas')) {
 
-                    $ButtonGroup .= '
-                    <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-sm">
-                     <i class="glyphicon glyphicon-edit"></i>
+                    $ButtonGroup = '
+                    <a href="' . route('abonos', $query->id_factura) . '" class="btn btn-info btn-sm">
+                        <i class="fa-solid fa-money-bill-wave"></i>
                     </a>
-                    <a href="' . route('anular-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Anular factura?">
-                    <i class="fas fa-ban"></i>
-                    </a>
-                ';
-                }
-                if (Auth::user()->can('eliminar facturas')) {
-                    $ButtonGroup .= '
-                  <a href="' . route('destroy-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar factura?">
-                <i class="fas fa-trash-alt"></i>
-                </a>
-                ';
+                    ';
+                } else {
+                    $ButtonGroup = 'No permitido';
                 }
 
-                return '
-                <div class="btn-group">
-                        ' . $ButtonGroup == "" ? 'No permitido' : $ButtonGroup . '
-                </div>
-                ';
+                return $ButtonGroup;
             })
             ->addColumn('Estado', function ($query) {
 
                 $Button = '
-                    <button class="btn btn-default btn-xs">
-                         Desconocido
-                    </button>
-                ';
+                <button class="btn btn-default btn-xs">
+                     Desconocido
+                </button>
+            ';
 
                 if ($query->Estado == 'Pagada') {
                     $Button = ' 
-                    <button class="btn btn-success btn-xs">
-                         Pagada
-                    </button>';
+                <button class="btn btn-success btn-xs">
+                     Pagada
+                </button>';
                 } elseif ($query->Estado == 'Anulada') {
                     $Button = ' 
-                    <button class="btn btn-danger btn-xs">
-                         Anulada
-                    </button>';
+                <button class="btn btn-danger btn-xs">
+                     Anulada
+                </button>';
                 } elseif ($query->Estado == 'Abonada') {
                     $Button = ' 
-                    <button class="btn btn-warning btn-xs">
-                         Abonada
-                    </button>';
+                <button class="btn btn-warning btn-xs">
+                     Abonada
+                </button>';
                 } elseif ($query->Estado == 'Registrada') {
                     $Button = ' 
-                    <button class="btn btn-info btn-xs">
-                         Registrada
-                    </button>';
+                <button class="btn btn-info btn-xs">
+                     Registrada
+                </button>';
                 }
 
                 return $Button;
+            })
+            ->addColumn('saldo', function ($query) {
+                if ($query->Estado != 'Anulada') {
+                    $ultimoAbono = Abonos::where('factura_id', $query->id_factura)
+                        ->orderBy('fecha_abonado', 'desc')
+                        ->orderBy('id', 'desc')
+                        ->first();
+
+                    if ($ultimoAbono) {
+                        $saldo = $ultimoAbono->saldo_factura;
+                    } else {
+                        $saldo = $query->Total;
+                        $saldo -= $query->RetencionIva;
+                        $saldo -= $query->RetencionFuente;
+                    }
+                    // Asegurarse de que el saldo nunca sea negativo
+                    if ($saldo < 0) {
+                        $saldo = 0;
+                    }
+
+                    $saldoFormateado = '$ ' . number_format($saldo, 2);
+                    return '<span style="color: #43A047;"><strong>' . $saldoFormateado . '</strong></span>';
+                }
+                return '<span style="color: #F44336;"><strong>' . '$ 0.00' . '</strong></span>';
             })
             ->addColumn('fila', function () use (&$count) {
                 $count++;
                 return $count;
             })
+            ->editColumn('RetencionIva', function ($row) {
+                return '<strong>$ ' . $row->RetencionIva . '</strong>';
+            })
+            ->editColumn('RetencionFuente', function ($row) {
+                return '<strong>$ ' . $row->RetencionFuente . '</strong>';
+            })
             ->editColumn('Total', function ($row) {
                 return '<strong>$ ' . $row->Total . '</strong>';
-            })
-            ->editColumn('FechaEmision', function ($row) {
-                return Carbon::parse($row->FechaEmision)->translatedFormat('Y-m-d H:i');
-            })
-            ->editColumn('created_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i:s');
             })
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->updated_at)->translatedFormat('Y-m-d H:i:s');
             })
-            ->rawColumns(['Estado', 'action', 'Archivos', 'Total'])
+            ->rawColumns(['Estado', 'action', 'Archivos', 'Total', 'RetencionIva', 'RetencionFuente', 'ValorAnulado', 'saldo'])
             ->setRowId('id');
     }
 
@@ -206,15 +217,17 @@ class PagadasFacturasDataTable extends DataTable
         return [
             Column::make('fila')->title('#'),
             // Column::make('id_factura')->title('#'),
-            Column::make('Archivos')->title('Archivos')->addClass('text-center'),
-            Column::make('RazonSocial')->title('Raz. social'),
-            Column::make('FechaEmision')->title('Fec. emisión'),
+            Column::make('Archivos')->title('Factura')->printable(false)->addClass('text-center'),
             Column::make('establecimiento_id')->title('Establec.'),
             Column::make('punto_emision_id')->title('P. emisión'),
             Column::make('Secuencial')->title('Secuencial'),
+            Column::make('Prefijo')->title('Pref.'),
+            Column::make('FechaEmision')->title('Fec. emisión'),
             Column::make('Total')->title('Total'),
+            Column::computed('saldo')->title('Saldo')->addClass('text-center'),
+            Column::make('RetencionIva')->title('Ret. iva'),
+            Column::make('RetencionFuente')->title('Ret. fuente'),
             Column::computed('Estado')->title('Estado')->addClass('text-center'),
-            Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
             Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
         ];

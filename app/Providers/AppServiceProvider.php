@@ -19,13 +19,23 @@ class AppServiceProvider extends ServiceProvider
     /**
      * Bootstrap any application services.
      */
-    public function boot(): void
+    public function boot()
     {
-        $generalSetting = configuraciones_generales::first();
+        $generalSetting = configuraciones_generales::where('nombre', 'General')->first();
+        $archivosSetting = configuraciones_generales::where('nombre', 'Archivos')->first();
 
-        Config::set('config_general.general.nombre', $generalSetting->host ?? 'General');
-        Config::set('config_general.general.archivos_permitidos', $generalSetting->archivos_permitidos ?? 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx');
-        Config::set('config_general.general.cantidad_permitidos', $generalSetting->cantidad_permitidos ?? 1);
-        Config::set('config_general.general.tamano_maximo_permitido', $generalSetting->tamano_maximo_permitido ?? 1);
+        if ($generalSetting) {
+            Config::set('config_general.general.nombre', $generalSetting->nombre);
+            Config::set('config_general.general.archivos_permitidos', $generalSetting->archivos_permitidos);
+            Config::set('config_general.general.cantidad_permitidos', $generalSetting->cantidad_permitidos);
+            Config::set('config_general.general.tamano_maximo_permitido', $generalSetting->tamano_maximo_permitido);
+        }
+
+        if ($archivosSetting) {
+            Config::set('config_general.archivos.nombre', $archivosSetting->nombre);
+            Config::set('config_general.archivos.archivos_permitidos', $archivosSetting->archivos_permitidos);
+            Config::set('config_general.archivos.cantidad_permitidos', $archivosSetting->cantidad_permitidos);
+            Config::set('config_general.archivos.tamano_maximo_permitido', $archivosSetting->tamano_maximo_permitido);
+        }
     }
 }

@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Establecimiento;
+use App\Models\Factura;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use setasign\Fpdi\PdfParser\StreamReader;
+use setasign\Fpdi\Tcpdf\Fpdi;
 
 class ReportesController extends Controller
 {
@@ -41,7 +44,7 @@ class ReportesController extends Controller
 
         $pdf = PDF::loadView('pages.facturas.reportes.pdf.reporte_general', $data);
 
-        return $pdf->stream('Reporte_general_facturas.pdf');
+        return $pdf->stream('Reporte_general_facturas.pdf', array('Attachment' => 0));
     }
 
     private function getReportData($fechaInicio, $fechaFinal)
@@ -65,18 +68,8 @@ class ReportesController extends Controller
 
             $totalNoAnuladas =  $query->where('Estado', '<>', 'Anulada')->sum('Total');
 
-            // Consulta para los abonos de las facturas anuladas
-            $totalAbonosAnuladas = DB::table('abonos')
-                ->whereIn('factura_id', function ($query) use ($fechaInicio, $fechaFinal) {
-                    $query->select('id_factura')
-                        ->from('facturas')
-                        ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
-                        ->where('Estado', '=', 'Anulada');
-                })
-                ->sum('valor_abono');
-
             // Sumar ambos resultados
-            return $totalNoAnuladas + $totalAbonosAnuladas;
+            return $totalNoAnuladas;
         } else {
             $query->where('Estado', '=', 'Anulada');
             return $query->sum('ValorAnulado');
@@ -172,19 +165,8 @@ class ReportesController extends Controller
 
             $totalNoAnuladas = $query->where('Estado', '<>', 'Anulada')->sum('Total');
 
-            // Consulta para los abonos de las facturas anuladas
-            $totalAbonosAnuladas = DB::table('abonos')
-                ->whereIn('factura_id', function ($query) use ($fechaInicio, $fechaFinal, $establecimientoId) {
-                    $query->select('id_factura')
-                        ->from('facturas')
-                        ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
-                        ->where('Estado', '=', 'Anulada')
-                        ->where('establecimiento_id', $establecimientoId);
-                })
-                ->sum('valor_abono');
-
             // Sumar ambos resultados
-            return $totalNoAnuladas + $totalAbonosAnuladas;
+            return $totalNoAnuladas;
         } else {
             $query->where('Estado', '=', 'Anulada');
             return $query->sum('ValorAnulado');
@@ -248,5 +230,64 @@ class ReportesController extends Controller
         }
 
         return $totalCuentasPorCobrar;
+    }
+
+    // Reportes Anuladas
+    public function generar_reportes_anuladas(Request $request)
+    {
+        // Validación de los datos de entrada
+        $request->validate([
+            'txt_fecha_reporte_inicio' => 'required|date',
+            'txt_fecha_reporte_final' => 'required|date|after_or_equal:txt_fecha_reporte_inicio',
+        ]);
+
+        $fechaInicio = Carbon::parse($request->input('txt_fecha_reporte_inicio'));
+        $fechaFinal = Carbon::parse($request->input('txt_fecha_reporte_final'))->endOfDay();
+
+        // Formatear las fechas
+        $fechaInicioFormatted = $fechaInicio->isoFormat('D [de] MMMM');
+        $fechaFinalFormatted = $fechaFinal->isoFormat('D [de] MMMM');
+
+        $allFacturas = Factura::with(['establecimiento', 'puntoEmision'])
+            ->where('Estado', 'Anulada')
+            ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
+            ->get();
+
+        $totalValorAnulados = Factura::where('Estado', 'Anulada')
+            ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
+            ->sum('ValorAnulado');
+
+        $pdfFiles = [];
+        $chunkedFacturas = $allFacturas->chunk(100);  // Ajusta el tamaño del chunk según tus necesidades
+
+        foreach ($chunkedFacturas as $index => $facturasChunk) {
+            // Agregar el índice del chunk para diferenciar el encabezado
+            $pdfContent = view('pages.facturas.reportes.pdf.reporte_anuladas', [
+                'Facturas' => $facturasChunk,
+                'TotalValorAnulados' => $totalValorAnulados,
+                'fechaInicio' => $fechaInicioFormatted,
+                'fechaFinal' => $fechaFinalFormatted,
+                'loop' => (object) ['first' => $index === 0]  // Determina si es el primer chunk
+            ])->render();
+
+            $pdf = PDF::loadHTML($pdfContent);
+            $pdfFiles[] = $pdf->output();
+        }
+
+        // Combina todos los PDFs en uno solo
+        $combinedPdf = new Fpdi();
+
+        foreach ($pdfFiles as $pdfFile) {
+            $pageCount = $combinedPdf->setSourceFile(StreamReader::createByString($pdfFile));
+
+            for ($i = 1; $i <= $pageCount; $i++) {
+                $tplId = $combinedPdf->importPage($i);
+                $combinedPdf->AddPage();
+                $combinedPdf->useTemplate($tplId);
+            }
+        }
+
+        return response($combinedPdf->Output('Reporte_total_anuladas.pdf'), 200)
+            ->header('Content-Type', 'application/pdf');
     }
 }

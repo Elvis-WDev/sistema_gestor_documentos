@@ -36,13 +36,6 @@
                                         type="text" id="nombre">
                                 </div>
 
-                                <!-- archivos_permitidos Field -->
-                                {{-- <div class="form-group col-sm-6 ">
-                                    <label for="archivos_permitidos">Archivos permitidos:</label>
-                                    <input class="form-control" name="archivos_permitidos" type="text"
-                                        id="archivos_permitidos" value="{{ $Config_generales->archivos_permitidos }}">
-                                </div> --}}
-
                                 <!-- cantidad_permitidos Field -->
                                 <div class="form-group col-sm-6 ">
                                     <label for="cantidad_permitidos">Cantidad de archivo permitidos por subida:</label>

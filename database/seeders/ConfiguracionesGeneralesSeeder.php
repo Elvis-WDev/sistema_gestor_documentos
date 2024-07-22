@@ -17,8 +17,15 @@ class ConfiguracionesGeneralesSeeder extends Seeder
             [
                 'nombre' => 'General',
                 'archivos_permitidos' => 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx',
-                'cantidad_permitidos' => 4,
-                'tamano_maximo_permitido' => 10,
+                'cantidad_permitidos' => 1,
+                'tamano_maximo_permitido' => 2,
+
+            ],
+            [
+                'nombre' => 'Archivos',
+                'archivos_permitidos' => 'jpg,jpeg,png,pdf,doc,docx,xls,xlsx',
+                'cantidad_permitidos' => 1,
+                'tamano_maximo_permitido' => 2,
 
             ]
         ]);

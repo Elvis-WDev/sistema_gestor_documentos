@@ -13,15 +13,16 @@ class ModuloPersonalizado extends Model
     protected $primaryKey = 'id_modulo';
     protected $fillable = [
         'NombreModulo',
+        'id_usuario',
+        'Estado',
     ];
-
-    public function columnasPersonalizadas()
-    {
-        return $this->hasMany(ColumnaPersonalizada::class, 'id_modulo');
-    }
 
     public function archivos()
     {
         return $this->hasMany(ArchivoModuloPersonalizado::class, 'id_modulo');
+    }
+    public function user()
+    {
+        return $this->belongsTo(user::class, 'id_usuario');
     }
 }

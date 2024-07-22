@@ -3,6 +3,28 @@
     DigiDocs || Abonos
 @endsection
 @section('content')
+    @php
+        $saldoFormateado = 0;
+        if ($Factura->Estado != 'Anulada') {
+            $ultimoAbono = \App\Models\Abonos::where('factura_id', $Factura->id_factura)
+                ->orderBy('fecha_abonado', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+
+            if ($ultimoAbono) {
+                $saldo = $ultimoAbono->saldo_factura;
+            } else {
+                $saldo = $Factura->Total;
+                $saldo -= $Factura->RetencionIva;
+                $saldo -= $Factura->RetencionFuente;
+            }
+            if ($saldo < 0) {
+                $saldo = 0;
+            }
+
+            $saldoFormateado = number_format($saldo, 2);
+        }
+    @endphp
     <section class="content-header">
         <h1>
 
@@ -13,7 +35,7 @@
 
             Factura No. <a
                 href="{{ route('editar-factura', $Factura->id_factura) }}">{{ $establecimiento->nombre }}-{{ $puntoemision->nombre }}-{{ $Factura->Secuencial }}</a>
-            ({{ $Factura->Estado == 'Pagada' ? 'Pagada' : '$' . $Factura->Total }})
+            ({{ $Factura->Estado == 'Pagada' ? 'Pagada' : '$' . $saldoFormateado }})
         </h1>
     </section>
     <div class="content">

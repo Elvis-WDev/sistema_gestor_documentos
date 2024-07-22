@@ -59,11 +59,6 @@
                         Anuladas</span>
                 </a>
             </li>
-            <li class="{{ setActive(['facturas-reportes']) }}">
-                <a href="{{ route('facturas-reportes') }}"><span>
-                        Reporte general</span>
-                </a>
-            </li>
         </ul>
     </li>
 @endcan
@@ -100,10 +95,34 @@
         </ul>
     </li>
 @endif
+<li class="treeview active">
+    <a href="#">
+        <i class="fa-solid fa-folder-open"></i>
+        <span>Otros</span>
+        <span class="pull-right-container">
+            <i class="fa fa-angle-left pull-right"></i>
+        </span>
+    </a>
+    <ul class="treeview-menu">
+        <li class="{{ setActive(['pagos']) }}">
+            <a href="{{ route('pagos') }}">
+                <i class="fas fa-trash-alt"></i><span> Papelera</span></a>
+        </li>
+        <li class="{{ setActive(['custom-module']) }}">
+            <a href="{{ route('custom-module') }}"><i class="fas fa-folder-open"></i>
+                <span>
+                    Archivos
+                </span>
+            </a>
+        </li>
+
+    </ul>
+</li>
 
 @if (Auth::user()->can('ver usuario') ||
         Auth::user()->can('ver establecimiento') ||
-        Auth::user()->can('ver punto_emision'))
+        Auth::user()->can('ver punto_emision') ||
+        Auth::user()->can('ver configuraciones'))
     <li class="treeview active">
         <a href="#">
             <i class="fa fa-gear"></i>
@@ -159,23 +178,15 @@
                     </ul>
                 </li>
             @endif
-            <li class="treeview">
-                <a href="#"> <i class="fa fa-gear"></i> Generales
-                    <span class="pull-right-container">
-                        <i class="fa fa-angle-left pull-right"></i>
-                    </span>
-                </a>
-                <ul class="treeview-menu">
-                    <li class="{{ setActive(['configuraciones']) }}">
-                        <a href="{{ route('configuraciones') }}"><i class="fas fa-genderless"></i><span>
-                                Generales</span></a>
-                    </li>
-                    <li class="{{ setActive(['custom-module']) }}">
-                        <a href="{{ route('custom-module') }}"><i class="fas fa-genderless"></i></i><span>
-                                Archivos</span></a>
-                    </li>
-                </ul>
-            </li>
+            @can('configuraciones')
+                <li class="{{ setActive(['configuraciones']) }}">
+                    <a href="{{ route('configuraciones') }}"><i class="fa fa-gear"></i>
+                        <span>
+                            Generales
+                        </span>
+                    </a>
+                </li>
+            @endcan
         </ul>
     </li>
 @endif

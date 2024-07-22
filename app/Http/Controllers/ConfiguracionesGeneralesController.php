@@ -37,11 +37,15 @@ class ConfiguracionesGeneralesController extends Controller
         $request->validate([
             'id' => 'required|integer',
             'nombre' => 'required|string|max:255',
-            'archivos_permitidos.*' => 'required|string|max:255',
+            'archivos_permitidos.*' => 'required',
             'cantidad_permitidos' => 'required|integer',
             'tamano_maximo_permitido' => 'required|integer',
         ]);
 
+        if (!$request->archivos_permitidos) {
+            flash()->error('Campos incompletos!');
+            return redirect()->route('configuraciones');
+        }
 
         // Formateo de arreglo a campo que acepta VFalidation doc,pdf,etc
         $mimesPermitidos = '';
@@ -56,7 +60,9 @@ class ConfiguracionesGeneralesController extends Controller
 
         $configuracion->nombre = $request->nombre;
         $configuracion->archivos_permitidos = $mimesPermitidos;
-        $configuracion->cantidad_permitidos = $request->cantidad_permitidos;
+        if ($request->id != 2) {
+            $configuracion->cantidad_permitidos = $request->cantidad_permitidos;
+        }
         $configuracion->tamano_maximo_permitido = $request->tamano_maximo_permitido;
 
         $configuracion->save();

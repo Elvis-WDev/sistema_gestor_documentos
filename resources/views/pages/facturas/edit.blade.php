@@ -272,8 +272,9 @@
                 clearIncomplete: true
             });
             $("#Prefijo").inputmask({
-                mask: "99999999",
-                clearIncomplete: true
+                mask: "9{1,8}",
+                greedy: false,
+                placeholder: "",
             });
         });
     </script>

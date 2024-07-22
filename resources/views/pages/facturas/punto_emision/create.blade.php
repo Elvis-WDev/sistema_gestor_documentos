@@ -47,7 +47,7 @@
                                 <!-- Nombre Field -->
                                 <div class="form-group col-sm-6 {{ $errors->has('nombre') ? 'has-error' : '' }}">
                                     <label for="nombre">Punto emisión:</label>
-                                    <input class="form-control" name="nombre" type="text" id="nombre"
+                                    <input class="form-control" name="nombre" type="text" id="PuntoEmision"
                                         value="{{ old('nombre') }}">
                                 </div>
 
@@ -79,3 +79,15 @@
         </div>
     </div>
 @endsection
+@push('scripts')
+    <script>
+        $(document).ready(function() {
+
+            $("#PuntoEmision").inputmask({
+                mask: "9{1,4}",
+                greedy: false,
+                placeholder: "",
+            });
+        });
+    </script>
+@endpush

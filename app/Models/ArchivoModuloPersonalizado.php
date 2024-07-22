@@ -10,16 +10,21 @@ class ArchivoModuloPersonalizado extends Model
     use HasFactory;
 
     protected $table = 'archivos_modulos_personalizados';
-
+    protected $primaryKey = 'id_archivo';
     protected $fillable = [
         'id_modulo',
+        'id_usuario',
         'Archivo',
-        'Fecha',
-        'TipoArchivo',
+        'Nombre',
+        'extension',
     ];
 
     public function moduloPersonalizado()
     {
         return $this->belongsTo(ModuloPersonalizado::class, 'id_modulo');
+    }
+    public function User()
+    {
+        return $this->belongsTo(User::class, 'id_usuario');
     }
 }

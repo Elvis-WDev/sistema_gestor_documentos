@@ -54,7 +54,7 @@ class FacturasController extends Controller
             'FechaEmision' => 'required|date',
             'establecimiento_id' => 'required|integer',
             'punto_emision_id' => 'required|integer',
-            'Prefijo' => ['required', 'digits:8', 'regex:/^\d{8}$/'],
+            'Prefijo' => ['required', 'regex:/^\d{1,8}$/'],
             'Secuencial' => [
                 'required',
                 'digits:9',
@@ -84,6 +84,7 @@ class FacturasController extends Controller
             'establecimiento_id' => $request->establecimiento_id,
             'punto_emision_id' => $request->punto_emision_id,
             'Secuencial' => $request->Secuencial,
+            'Prefijo' => $request->Prefijo,
             'RazonSocial' => $request->RazonSocial,
             'RetencionIva' => $request->RetencionIva,
             'RetencionFuente' => $request->RetencionFuente,
@@ -115,7 +116,7 @@ class FacturasController extends Controller
             'FechaEmision' => 'required|date',
             'establecimiento_id' => 'required|string|max:255',
             'punto_emision_id' => 'required|string|max:255',
-            'Prefijo' => ['required', 'digits:8', 'regex:/^\d{8}$/'],
+            'Prefijo' => ['required', 'regex:/^\d{1,8}$/'],
             'Secuencial' => [
                 'required',
                 'digits:9',
@@ -149,6 +150,7 @@ class FacturasController extends Controller
             $factura->Archivos = null;
         }
 
+        $factura->Prefijo = $request->Prefijo;
         $factura->FechaEmision = $request->FechaEmision;
         $factura->establecimiento_id = $request->establecimiento_id;
         $factura->punto_emision_id = $request->punto_emision_id;

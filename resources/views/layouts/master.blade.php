@@ -149,8 +149,6 @@
 
                         success: function(data) {
 
-                            console.log(data);
-
                             if (data.status == 'success') {
                                 window.location.reload();
                             } else if (data.status == 'error') {

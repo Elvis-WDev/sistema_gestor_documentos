@@ -54,6 +54,7 @@ class RolesPermisosSeeder extends Seeder
             'eliminar SolicitudAfiliado',
             'eliminar retenciones',
             'eliminar custom_module',
+            'configuraciones',
         ];
 
         foreach ($permissions as $permission) {

@@ -22,7 +22,7 @@
                     </div>
                     <!-- /.box-header -->
                     <!-- form start -->
-                    <form method="post" action="{{ route('generar-reporte') }}">
+                    <form method="post" action="{{ route('generar-reporte') }}" formtarget="_blank" target="_blank">
                         @csrf
                         <div class="box-body">
 
@@ -43,7 +43,7 @@
                                         type="text" id="reporte_daterange_fechaFinal">
 
                                 </div>
-                                <div class="form-group col-sm-12">
+                                <div class="form-group col-sm-2">
                                     <button type="submit" class="btn btn-success btn-md">
                                         Generar
                                     </button>

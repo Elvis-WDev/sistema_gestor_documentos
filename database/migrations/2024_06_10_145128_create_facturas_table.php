@@ -17,14 +17,14 @@ return new class extends Migration
     {
         Schema::create('establecimientos', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre', 50);
+            $table->string('nombre', 4);
             $table->timestamps();
         });
 
         Schema::create('puntos_emision', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('establecimiento_id');
-            $table->string('nombre', 50);
+            $table->string('nombre', 4);
             $table->timestamps();
 
             // Corrected foreign key definition
@@ -37,8 +37,8 @@ return new class extends Migration
             $table->dateTime('FechaEmision');
             $table->unsignedBigInteger('punto_emision_id');
             $table->unsignedBigInteger('establecimiento_id');
-            $table->string('Prefijo', 50)->default('');
-            $table->string('Secuencial', 50)->default('');
+            $table->string('Prefijo', 8)->default('');
+            $table->string('Secuencial', 9)->default('');
             $table->decimal('RetencionIva', 10, 2)->default(0);
             $table->decimal('RetencionFuente', 10, 2)->default(0);
             $table->decimal('ValorAnulado', 10, 2)->default(0);

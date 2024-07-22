@@ -1,11 +1,11 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Crear módulo
+    DigiDocs || Crear carpeta
 @endsection
 @section('content')
     <section class="content-header">
         <h1>
-            Módulos
+            Carpetas
         </h1>
     </section>
     <div class="content">
@@ -15,7 +15,7 @@
                 <!-- general form elements -->
                 <div class="box box-primary">
                     <div class="box-header with-border">
-                        <h3 class="box-title">Crear módulo</h3>
+                        <h3 class="box-title">Crear carpeta</h3>
                     </div>
                     <!-- /.box-header -->
                     <!--  form start -->
@@ -24,10 +24,10 @@
                         <div class="box-body">
 
                             <div class="row">
-
+                                <input type="hidden" name="id_usuario" value="{{ Auth::user()->id }}">
                                 <!-- Establecimiento Field -->
                                 <div class="form-group col-sm-12 ">
-                                    <label for="NombreModulo">Nombre del Módulo:</label>
+                                    <label for="NombreModulo">Nombre de carpeta:</label>
                                     <input class="form-control" name="NombreModulo" type="text" id="NombreModulo">
                                 </div>
 

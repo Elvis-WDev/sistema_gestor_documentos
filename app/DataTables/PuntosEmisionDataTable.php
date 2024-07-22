@@ -50,7 +50,7 @@ class PuntosEmisionDataTable extends DataTable
                 }
                 if (Auth::user()->can('eliminar punto_emision')) {
                     $ButtonGroup .= '
-                  <a href="' . route('destroy-punto_emision', $query->id) . '" class="btn btn-default btn-sm delete-item">
+                  <a href="' . route('destroy-punto_emision', $query->id) . '" class="btn btn-danger btn-sm delete-item">
                 <i class="fas fa-trash-alt"></i>
                 </a>
                 ';

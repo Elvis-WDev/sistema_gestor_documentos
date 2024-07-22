@@ -10,9 +10,16 @@ return new class extends Migration
     {
         Schema::create('archivos_modulos_personalizados', function (Blueprint $table) {
             $table->id('id_archivo');
-            $table->foreignId('id_modulo')->constrained('modulos_personalizados', 'id_modulo')->onDelete('restrict');
-            $table->string('Archivos', 255);
+            $table->string('Nombre', 255)->unique();
+            $table->unsignedBigInteger('id_modulo');
+            $table->unsignedBigInteger('id_usuario');
+            $table->string('Archivo', 60);
+            $table->string('extension', 5);
+            $table->enum('Estado', ['Activo', 'Inactivo'])->default('Activo');
             $table->timestamps();
+
+            $table->foreign('id_modulo')->references('id_modulo')->on('modulos_personalizados')->onDelete('restrict');
+            $table->foreign('id_usuario')->references('id')->on('users')->onDelete('restrict');
         });
     }
 

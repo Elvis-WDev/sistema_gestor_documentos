@@ -35,8 +35,7 @@ class PuntosEmisionController extends Controller
             'establecimiento_id' => 'required|integer',
             'nombre' => [
                 'required',
-                'string',
-                'max:255',
+                'regex:/^\d{1,4}$/',
                 new UniqueEstablecimientoPuntoEmision($request->input('establecimiento_id'))
             ],
 
@@ -68,7 +67,7 @@ class PuntosEmisionController extends Controller
             'nombre' => [
                 'required',
                 'string',
-                'max:255',
+                'regex:/^\d{1,4}$/',
                 new UniqueEstablecimientoPuntoEmision($request->input('establecimiento_id'), $request->input('id'))
             ],
 

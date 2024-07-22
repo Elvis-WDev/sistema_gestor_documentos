@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Módulos
+    DigiDocs || Carpetas
 @endsection
 
 
@@ -63,12 +63,12 @@
     </style>
     <section class="content-header">
         <h1 class="pull-left">
-            Documentos
+            Carpetas
         </h1>
         <h1 class="pull-right">
             <a href="{{ route('crear-custom-module') }}" class="btn btn-primary">
                 <i class="fa fa-plus"></i>
-                Nuevo
+                Nueva carpeta
             </a>
         </h1>
     </section>
@@ -81,7 +81,7 @@
             <div class="box-body">
                 <div class="row">
                     @php
-                        $Modulo = \App\Models\ModuloPersonalizado::all();
+                        $Modulo = \App\Models\ModuloPersonalizado::where('Estado', 'Activo')->get();
                     @endphp
                     @foreach ($Modulo as $modulo)
                         <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 m-t-20" style="cursor:pointer;">
@@ -89,8 +89,7 @@
                                 <div class="widget-user-header bg-gray bg-folder-shaper no-padding">
                                     <div class="folder-shape-top bg-gray"></div>
                                     <div class="box-header">
-                                        <a href="http://localhost/Plantillas/digidocu-1.0.4/public/admin/documents/1"
-                                            style="color: black;">
+                                        <a href="{{ route('carpeta', $modulo->id_modulo) }}" style="color: black;">
                                             <h3 class="box-title"><i class="fa fa-folder text-yellow"></i></h3>
                                         </a>
 
@@ -103,21 +102,14 @@
                                                     <span class="sr-only">Toggle Dropdown</span>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-left" role="menu">
-                                                    <li><a
-                                                            href="http://localhost/Plantillas/digidocu-1.0.4/public/admin/documents/1">Show</a>
+                                                    <li><a href="{{ route('carpeta', $modulo->id_modulo) }}">Ver</a>
                                                     </li>
                                                     <li><a
-                                                            href="http://localhost/Plantillas/digidocu-1.0.4/public/admin/documents/1/edit">Edit</a>
+                                                            href="{{ route('edit-custom_module', $modulo->id_modulo) }}">Editar</a>
                                                     </li>
                                                     <li>
-                                                        <form method="POST"
-                                                            action="http://localhost/Plantillas/digidocu-1.0.4/public/admin/documents/1"
-                                                            accept-charset="UTF-8"><input name="_method" type="hidden"
-                                                                value="DELETE"><input name="_token" type="hidden"
-                                                                value="6Dw75leyO8tbyEhDByInAXIzdZBvLLM0xbsSePwt">
-                                                            <button type="submit" class="btn btn-link"
-                                                                onclick="return conformDel(this,event)">Delete</button>
-                                                        </form>
+                                                        <a class="btn_eliminar_module"
+                                                            id="{{ $modulo->id_modulo }}">Eliminar</a>
                                                     </li>
 
                                                 </ul>
@@ -125,8 +117,7 @@
                                         </div>
                                     </div>
                                     <!-- /.widget-user-image -->
-                                    <a href="http://localhost/Plantillas/digidocu-1.0.4/public/admin/documents/1"
-                                        style="color: black;">
+                                    <a href="{{ route('carpeta', $modulo->id_modulo) }}" style="color: black;">
                                         {{-- <span style="max-lines: 1; white-space: nowrap;margin-left: 3px;">
                                             <small class="label"
                                                 style="background-color: #000000;font-size: 0.93rem;">Test</small>
@@ -149,6 +140,12 @@
                     @endforeach
 
                 </div>
+                @if ($Modulo->isEmpty())
+                    <div class="alert alert-info alert-dismissible">
+                        <h4><i class="icon fa fa-info"></i>No existen carpetas</h4>
+                        Crea una nueva carpeta
+                    </div>
+                @endif
             </div>
             <div class="box-footer">
 
@@ -156,3 +153,54 @@
         </div>
     </div>
 @endsection
+
+
+@push('scripts')
+    <script>
+        $('.btn_eliminar_module').click(function(e) {
+            // Stop the form submitting
+            let id_module = $(this).attr('id');
+
+            Swal.fire({
+                title: "Eliminar carpeta?",
+                text: "No podrás revertirlo!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#42A5F5',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Sí, eliminar!'
+            }).then((result) => {
+                /* Read more about isConfirmed, isDenied below */
+                if (result.isConfirmed) {
+                    $.ajax({
+                        type: 'PUT',
+                        url: "{{ route('change-status-custom_module') }}",
+                        data: {
+                            id_module: id_module
+                        },
+                        success: function(data) {
+
+                            if (data.status == 'success') {
+                                window.location.reload();
+                            } else if (data.status == 'error') {
+                                Swal.fire({
+                                    icon: "error",
+                                    title: "No se ha podido eiminar",
+                                    text: data.message,
+                                    confirmButtonColor: '#42A5F5',
+
+                                })
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.log(error);
+                        }
+                    })
+                } else if (result.isDenied) {
+
+                }
+            });
+
+        });
+    </script>
+@endpush

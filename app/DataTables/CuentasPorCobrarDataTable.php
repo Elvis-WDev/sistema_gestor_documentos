@@ -183,7 +183,7 @@ class CuentasPorCobrarDataTable extends DataTable
      */
     public function query(Factura $model): QueryBuilder
     {
-        return $model->newQuery();
+        return $model->whereIn('Estado', ['Registrada', 'Abonada'])->newQuery();
     }
 
     /**
@@ -235,11 +235,12 @@ class CuentasPorCobrarDataTable extends DataTable
         return [
             Column::make('fila')->title('#'),
             // Column::make('id_factura')->title('#'),
-            Column::make('Archivos')->title('Factura')->addClass('text-center'),
+            Column::make('Archivos')->title('Factura')->printable(false)->addClass('text-center'),
             Column::make('establecimiento_id')->title('Establec.'),
             Column::make('punto_emision_id')->title('P. emisión'),
             Column::make('Secuencial')->title('Secuencial'),
             Column::make('Prefijo')->title('Pref.'),
+            Column::make('FechaEmision')->title('Fec. emisión'),
             Column::make('Total')->title('Total fact.'),
             Column::computed('saldo')->title('Saldo')->addClass('text-center'),
             Column::make('RetencionIva')->title('Ret. iva'),

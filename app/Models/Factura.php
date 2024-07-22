@@ -21,6 +21,7 @@ class Factura extends Model
         'RetencionIva',
         'RetencionFuente',
         'Secuencial',
+        'Prefijo',
         'RazonSocial',
         'Abono',
         'Total',
@@ -29,12 +30,12 @@ class Factura extends Model
 
     public function establecimiento()
     {
-        return $this->belongsTo(Establecimiento::class, 'establecimiento_id');
+        return $this->belongsTo(Establecimiento::class);
     }
 
     public function puntoEmision()
     {
-        return $this->belongsTo(PuntoEmision::class, 'punto_emision_id');
+        return $this->belongsTo(PuntoEmision::class);
     }
 
     public function pagos()

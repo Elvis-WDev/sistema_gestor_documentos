@@ -10,8 +10,12 @@ return new class extends Migration
     {
         Schema::create('modulos_personalizados', function (Blueprint $table) {
             $table->id('id_modulo');
-            $table->string('NombreModulo', 50)->unique();
+            $table->string('NombreModulo', 50);
+            $table->unsignedBigInteger('id_usuario');
+            $table->enum('Estado', ['Activo', 'Inactivo'])->default('Activo');
             $table->timestamps();
+
+            $table->foreign('id_usuario')->references('id')->on('users')->onDelete('restrict');
         });
     }
 
