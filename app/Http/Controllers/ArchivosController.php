@@ -4,14 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Models\Archivo;
 use App\Models\ArchivoModuloPersonalizado;
+use App\Models\Establecimiento;
 use App\Models\ModuloPersonalizado;
+use App\Models\PuntoEmision;
 use App\Traits\FilesUploadTrait;
+use App\Traits\RegistrarActividad;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ArchivosController extends Controller
 {
-    use FilesUploadTrait;
+    use FilesUploadTrait, RegistrarActividad;
 
     public function index(int $id)
     {
@@ -47,6 +51,12 @@ class ArchivosController extends Controller
             'Estado' => 1,
         ]);
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha creado un archivo",
+            $request->Nombre
+        );
+
         flash('Archivo subido registrada correctamente!');
 
         return redirect()->route('carpeta', $request->id_modulo);
@@ -64,6 +74,13 @@ class ArchivosController extends Controller
             $archivo->Estado = 2;
 
             $archivo->save();
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha eliminado un archivo", 
+                $archivo->Nombre
+            );
+
 
             flash('Eliminado correctamente!');
 

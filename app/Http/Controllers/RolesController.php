@@ -3,15 +3,19 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\RolesDataTable;
+use App\Traits\RegistrarActividad;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RolesController extends Controller
 {
+
+    use RegistrarActividad;
 
     /**
      * Display a listing of the FileType.
@@ -45,6 +49,12 @@ class RolesController extends Controller
 
         // Asignar los permisos seleccionados al rol
         $role->syncPermissions($request->permissions);
+
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha registrado un nuevo rol",
+            $request->name
+        );
 
         flash('Rol creado correctamente!');
 
@@ -82,6 +92,12 @@ class RolesController extends Controller
         // Sincronizar los permisos del rol
         $role->syncPermissions($request->permissions);
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha editado un rol",
+            $request->name
+        );
+
         flash('Rol actualizado correctamente!');
 
         return redirect()->route('roles');
@@ -91,7 +107,14 @@ class RolesController extends Controller
     {
         try {
             $Rol = Role::findOrFail($id);
+            $tempRol = $Rol;
             $Rol->delete();
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha eliminado un rol",
+                $tempRol->name
+            );
 
             flash('Rol eliminado correctamente!');
 

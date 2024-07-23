@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\DataTables\EstablecimientosDataTable;
 use App\Models\Establecimiento;
+use App\Traits\RegistrarActividad;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class EstablecimientosController extends Controller
 {
+
+    use RegistrarActividad;
+
     /**
      * Display a listing of the FileType.
      *
@@ -39,6 +44,11 @@ class EstablecimientosController extends Controller
             'nombre' => $request->nombre,
         ]);
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha registrado un establecimiento",
+            "Establecimiento: " .  $request->nombre
+        );
 
         flash('Establecimiento registrado correctamente!');
 
@@ -67,6 +77,12 @@ class EstablecimientosController extends Controller
 
         $Establecimiento->save();
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha editado un establecimiento",
+            "Establecimiento: " .  $request->nombre
+        );
+
         flash('Establecimiento actualizado correctamente!');
 
         return redirect()->route('establecimientos');
@@ -77,8 +93,17 @@ class EstablecimientosController extends Controller
         try {
 
             $establecimiento = Establecimiento::findOrFail($id);
+            $tempEstablecimiento = $establecimiento;
             $establecimiento->delete();
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha eliminado un establecimiento",
+                "Establecimiento: " .  $tempEstablecimiento->nombre
+            );
+
             flash('Establecimiento eliminado correctamente!');
+
             return response()->json(['status' => 'success', 'message' => 'Establecimiento eliminado correctamente.']);
         } catch (QueryException $e) {
 

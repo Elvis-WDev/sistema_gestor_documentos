@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use App\Models\Establecimiento;
 use App\Models\Factura;
+use App\Traits\RegistrarActividad;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Illuminate\Support\Facades\Auth;
 use setasign\Fpdi\PdfParser\StreamReader;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
 class ReportesController extends Controller
 {
+    use RegistrarActividad;
+
     public function generar_reportes(Request $request)
     {
         $request->validate([
@@ -43,6 +47,12 @@ class ReportesController extends Controller
         ]);
 
         $pdf = PDF::loadView('pages.facturas.reportes.pdf.reporte_general', $data);
+
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha generado un reporte general",
+            "Modúlo facturas: " . $fechaInicioFormatted . " a " . $fechaFinalFormatted
+        );
 
         return $pdf->stream('Reporte_general_facturas.pdf', array('Attachment' => 0));
     }
@@ -286,6 +296,12 @@ class ReportesController extends Controller
                 $combinedPdf->useTemplate($tplId);
             }
         }
+
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha generado un reporte de anulaciones",
+            "Modúlo facturas: " . $fechaInicioFormatted . " a " . $fechaFinalFormatted
+        );
 
         return response($combinedPdf->Output('Reporte_total_anuladas.pdf'), 200)
             ->header('Content-Type', 'application/pdf');

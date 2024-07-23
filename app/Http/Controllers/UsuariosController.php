@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Traits\ImageUploadTrait;
+use App\Traits\RegistrarActividad;
 use File;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Facades\Auth;
@@ -17,7 +18,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class UsuariosController extends Controller
 {
-    use ImageUploadTrait, HasRoles;
+    use ImageUploadTrait, HasRoles, RegistrarActividad;
     /**
      * Display a listing of the FileType.
      *
@@ -45,8 +46,6 @@ class UsuariosController extends Controller
 
     public function updateProfile(Request $request)
     {
-
-        // dd($request);
 
         $request->validate([
             'id' => ['required', 'integer', 'max:255'],
@@ -90,6 +89,12 @@ class UsuariosController extends Controller
         try {
             $Usuario = User::findOrFail($id);
             $Usuario->delete();
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha eliminado un usuario",
+                ""
+            );
 
             flash('Usuario eliminado correctamente!');
 

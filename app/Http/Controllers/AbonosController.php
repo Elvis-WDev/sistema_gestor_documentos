@@ -4,13 +4,18 @@ namespace App\Http\Controllers;
 
 use App\DataTables\AbonosDataTable;
 use App\Models\Abonos;
+use App\Models\Establecimiento;
 use App\Models\Factura;
+use App\Models\PuntoEmision;
+use App\Traits\RegistrarActividad;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AbonosController extends Controller
 {
+    use RegistrarActividad;
 
     public function store(Request $request)
     {
@@ -61,12 +66,21 @@ class AbonosController extends Controller
             'fecha_abonado' => $validatedData['fecha_abonado'],
         ]);
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha registrado un abono",
+            "Factura Nro: " . Establecimiento::findOrFail($factura->establecimiento_id)->nombre . PuntoEmision::findOrFail($factura->punto_emision_id)->nombre . $factura->Secuencial
+        );
+
         $factura->update(['Estado' => $nuevoSaldo == 0 ? 1 : 3]);
 
         if ($nuevoSaldo == 0) {
             flash('Factura pagada con éxito!');
             return redirect()->route('cuentas');
         }
+
+
+
         flash('Abono registrado correctamente!');
         return redirect()->route('abonos', $factura->id_factura);
     }

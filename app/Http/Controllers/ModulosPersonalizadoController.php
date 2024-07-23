@@ -4,12 +4,17 @@ namespace App\Http\Controllers;
 
 use App\DataTables\ModuloPersonalizadoDataTable;
 use App\Models\ModuloPersonalizado;
+use App\Traits\RegistrarActividad;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class ModulosPersonalizadoController extends Controller
 {
+
+    use RegistrarActividad;
+
     public function index()
     {
         return view('pages.modulospesonalizados.index');
@@ -34,6 +39,11 @@ class ModulosPersonalizadoController extends Controller
             'Estado' => 1,
         ]);
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha creado una carpeta",
+            "Carpeta: " .  $request->NombreModulo
+        );
 
         flash('Carpeta creada correctamente!');
 
@@ -68,6 +78,12 @@ class ModulosPersonalizadoController extends Controller
 
         $modulo->save();
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha editado una carpeta",
+            "Carpeta: " .  $request->NombreModulo
+        );
+
         flash('Carpeta actualizada correctamente!');
 
         return redirect()->route('custom-module');
@@ -85,6 +101,12 @@ class ModulosPersonalizadoController extends Controller
             $module->Estado = 2;
 
             $module->save();
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha eliminado una carpeta",
+                "Carpeta: " .  $module->NombreModulo
+            );
 
             flash('Eliminado correctamente!');
 

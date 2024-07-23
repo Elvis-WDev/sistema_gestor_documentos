@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Traits\RegistrarActividad;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -11,6 +12,8 @@ use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
+    use RegistrarActividad;
+
     /**
      * Display the login view.
      */
@@ -37,16 +40,13 @@ class AuthenticatedSessionController extends Controller
         // Obtener el usuario autenticado
         $user = Auth::user();
 
-        // Redirigir según el id_rol del usuario
-        if ($user->id_rol == 1) {
-            return redirect()->route('dashboard');
-        } elseif ($user->id_rol == 2) {
-            return redirect()->route('dashboard');
-        } elseif ($user->id_rol == 3) {
-            return redirect()->route('dashboard');
-        } else {
-            return redirect('/');
-        }
+        $this->Actividad(
+            $user->id,
+            "Ha iniciado sesión",
+            ""
+        );
+
+        return redirect()->intended(route('dashboard', absolute: false));
     }
 
     /**

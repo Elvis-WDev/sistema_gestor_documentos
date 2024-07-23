@@ -5,12 +5,17 @@ namespace App\Http\Controllers;
 use App\DataTables\PuntosEmisionDataTable;
 use App\Models\PuntoEmision;
 use App\Rules\UniqueEstablecimientoPuntoEmision;
+use App\Traits\RegistrarActividad;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class PuntosEmisionController extends Controller
 {
+
+    use RegistrarActividad;
+
     /**
      * Display a listing of the FileType.
      *
@@ -45,6 +50,12 @@ class PuntosEmisionController extends Controller
             'establecimiento_id' => $request->establecimiento_id,
             'nombre' => $request->nombre,
         ]);
+
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha registrado un punto emisión",
+            "Punto emisión: " .  $request->nombre
+        );
 
         flash('Punto emision registrado correctamente!');
 
@@ -82,6 +93,12 @@ class PuntosEmisionController extends Controller
 
         $PuntoEmision->save();
 
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha editado un punto emisión",
+            "Punto emisión: " .  $request->nombre
+        );
+
         flash('Punto emisión actualizado correctamente!');
 
         return redirect()->route('punto_emision');
@@ -90,7 +107,14 @@ class PuntosEmisionController extends Controller
     {
         try {
             $PuntoEmision = PuntoEmision::findOrFail($id);
+            $tempPuntoEmision =  $PuntoEmision;
             $PuntoEmision->delete();
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha eliminado un punto emisión",
+                "Punto emisión: " .  $tempPuntoEmision->nombre
+            );
 
             flash('Punto emisión eliminado correctamente!');
 

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Traits\ImageUploadTrait;
+use App\Traits\RegistrarActividad;
 use File;
 use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +21,7 @@ use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
 {
-    use ImageUploadTrait;
+    use ImageUploadTrait, RegistrarActividad;
     /**
      * Display the registration view.
      */
@@ -61,6 +62,12 @@ class RegisteredUserController extends Controller
         // event(new Registered($user));
 
         // Auth::login($user);
+
+        $this->Actividad(
+            $user->id,
+            "Ha registrado un nuevo usuario",
+            ""
+        );
 
         flash('Usuario creado correctamente!');
 
@@ -108,6 +115,12 @@ class RegisteredUserController extends Controller
         // Actualizar rol
         $role = Role::findById($request->id_rol);
         $usuario->syncRoles([$role->name]);
+
+        $this->Actividad(
+            $request->id,
+            "Ha editado a un usuario",
+            ""
+        );
 
         flash('Usuario actualizado correctamente!');
 

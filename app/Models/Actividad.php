@@ -10,9 +10,10 @@ class Actividad extends Model
     use HasFactory;
 
     protected $table = 'actividades';
+    protected $primaryKey = 'id_actividad';
 
     protected $fillable = [
-        'user_id',
+        'id_usuario',
         'Accion',
         'Detalles',
         'FechaHora',
@@ -20,6 +21,6 @@ class Actividad extends Model
 
     public function usuario()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class, 'id_usuario');
     }
 }

@@ -4,10 +4,13 @@ namespace App\Http\Controllers;
 
 use App\DataTables\ConfiguracionesGeneralesDatatables;
 use App\Models\configuraciones_generales;
+use App\Traits\RegistrarActividad;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class ConfiguracionesGeneralesController extends Controller
 {
+    use RegistrarActividad;
     /**
      * Display a listing of the FileType.
      *
@@ -66,6 +69,12 @@ class ConfiguracionesGeneralesController extends Controller
         $configuracion->tamano_maximo_permitido = $request->tamano_maximo_permitido;
 
         $configuracion->save();
+
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha modificado la configuración",
+            "Archivos permitidos: " . $mimesPermitidos . " Tamaño: " . $request->tamano_maximo_permitido
+        );
 
         flash('Configuracion general actualizada correctamente!');
 

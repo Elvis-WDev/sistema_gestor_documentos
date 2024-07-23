@@ -5,11 +5,18 @@ namespace App\Http\Controllers;
 use App\DataTables\AbonosDataTable;
 use App\DataTables\CuentasPorCobrarDataTable;
 use App\Models\Abonos;
+use App\Models\Establecimiento;
 use App\Models\Factura;
+use App\Models\PuntoEmision;
+use App\Traits\RegistrarActividad;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class CuentasPorCobrarController extends Controller
 {
+
+    use RegistrarActividad;
+
     /**
      * Display a listing of the FileType.
      *
@@ -61,6 +68,12 @@ class CuentasPorCobrarController extends Controller
         $factura->RetencionFuente = $request->RetencionFuente;
 
         $factura->save();
+
+        $this->Actividad(
+            Auth::user()->id,
+            "Ha editado una cuenta",
+            "Factura Nro: " . Establecimiento::findOrFail($factura->establecimiento_id)->nombre . PuntoEmision::findOrFail($factura->punto_emision_id)->nombre . $factura->Secuencial
+        );
 
         flash('Cuenta actualizada correctamente!');
 
