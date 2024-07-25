@@ -10,11 +10,12 @@ class SolicitudAfiliados extends Model
     use HasFactory;
 
     protected $table = 'solicitud_afiliados';
-    protected $primaryKey = 'id_solicitudAfiliados';
+    protected $primaryKey = 'id';
 
     protected $fillable = [
-        'Archivo',
+        'Archivos',
         'Prefijo',
         'NombreCliente',
+        'FechaSolicitud',
     ];
 }

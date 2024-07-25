@@ -21,18 +21,15 @@ class HandleFlashValidationErrors
     {
         $response = $next($request);
 
-        // Verificar si hay errores de validación en la respuesta
         if ($response->isRedirect() && $response->getSession()->has('errors')) {
             $errors = $response->getSession()->get('errors');
 
-            // Mostrar mensajes de error individualmente usando Notyf
             foreach ($errors->getBag('default')->messages() as $fieldErrors) {
                 foreach ($fieldErrors as $error) {
                     $this->notyf->danger($error);
                 }
             }
 
-            // Limpia los errores de la sesión para que no se muestren más de una vez
             $response->getSession()->forget('errors');
         }
 

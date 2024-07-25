@@ -1,6 +1,5 @@
 <?php
 
-use App\DataTables\RolesDataTable;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     AbonosController,
@@ -12,12 +11,10 @@ use App\Http\Controllers\{
     EstablecimientosController,
     FacturasController,
     ModulosPersonalizadoController,
-    NotasCreditoController,
     PagosController,
     ProfileController,
     PuntosEmisionController,
     ReportesController,
-    RetencionesController,
     RolesController,
     SolicitudAfiliadosController,
     UsuariosController
@@ -69,7 +66,6 @@ Route::group(['middleware' => ['can:ver facturas']], function () {
     Route::get('lista-facturas-pagadas', [FacturasController::class, 'FacturasPagadas_index'])->name('facturas-pagadas');
     Route::get('lista-facturas-abonadas', [FacturasController::class, 'FacturasAbonada_index'])->name('facturas-abonadas');
     Route::get('lista-facturas-anuladas', [FacturasController::class, 'FacturasAnulada_index'])->name('facturas-anuladas');
-    // Route::get('lista-facturas-reportes', [FacturasController::class, 'reportes'])->name('facturas-reportes');
     Route::get('lista-facturas', [FacturasController::class, 'index'])->name('facturas');
     Route::get('lista-cuentas', [CuentasPorCobrarController::class, 'index'])->name('cuentas');
 });
@@ -140,37 +136,20 @@ Route::group(['middleware' => ['can:eliminar pagos']], function () {
     Route::delete('destroy-pago/{id}', [PagosController::class, 'destroy'])->name('destroy-pago');
 });
 
-//NotasDeCredito
-Route::group(['middleware' => ['can:ver NotasCredito']], function () {
-    Route::get('lista-notas-credito', [NotasCreditoController::class, 'index'])->name('notas-credito');
-});
-Route::group(['middleware' => ['can:crear NotasCredito']], function () {
-    Route::get('crear-notas-credito', [NotasCreditoController::class, 'create'])->name('crear-notas-credito');
-});
-Route::group(['middleware' => ['can:modificar NotasCredito']], function () {
-    Route::get('editar-nota-credito/{id}', [NotasCreditoController::class, 'edit'])->name('editar-nota-credito');
-});
-
 //SolicitudAfiliado
 Route::group(['middleware' => ['can:ver SolicitudAfiliado']], function () {
     Route::get('lista-solicitud-afiliados', [SolicitudAfiliadosController::class, 'index'])->name('solicitud-afiliados');
 });
 Route::group(['middleware' => ['can:crear SolicitudAfiliado']], function () {
     Route::get('crear-solicitud-afiliados', [SolicitudAfiliadosController::class, 'create'])->name('crear-solicitud-afiliados');
+    Route::post('store-solicitud', [SolicitudAfiliadosController::class, 'store'])->name('store-solicitud');
 });
 Route::group(['middleware' => ['can:modificar SolicitudAfiliado']], function () {
-    Route::get('editar-solicitud-afiliado/{id_solicitudAfiliados}', [SolicitudAfiliadosController::class, 'edit'])->name('editar-solicitud-afiliado');
+    Route::get('editar-solicitud-afiliado/{id}', [SolicitudAfiliadosController::class, 'edit'])->name('editar-solicitud-afiliado');
+    Route::put('update-solicitud', [SolicitudAfiliadosController::class, 'update'])->name('update-solicitud');
 });
-
-//RETENCIONES
-Route::group(['middleware' => ['can:ver retenciones']], function () {
-    Route::get('lista-retenciones', [RetencionesController::class, 'index'])->name('retenciones');
-});
-Route::group(['middleware' => ['can:crear retenciones']], function () {
-    Route::get('crear-retencion', [RetencionesController::class, 'create'])->name('crear-retencion');
-});
-Route::group(['middleware' => ['can:modificar retenciones']], function () {
-    Route::get('editar-retencion/{id}', [RetencionesController::class, 'edit'])->name('editar-retencion');
+Route::group(['middleware' => ['can:eliminar SolicitudAfiliado']], function () {
+    Route::delete('destroy-solicitud/{id}', [SolicitudAfiliadosController::class, 'destroy'])->name('destroy-solicitud');
 });
 
 // Documentos

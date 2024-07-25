@@ -73,7 +73,7 @@ class PagosController extends Controller
     {
 
         $request->validate([
-            'id_pago' => 'required|numeric',
+            'id_pago' => 'required|integer',
             'old_archivos' => 'required|string|max:1000',
             'id_factura' => 'required|numeric',
             'Archivos.*' => 'file|mimes:' . config('config_general')['general']['archivos_permitidos'] . '|max:' . (config('config_general')['general']['tamano_maximo_permitido']) * 1024,
@@ -113,7 +113,7 @@ class PagosController extends Controller
         return redirect()->route('pagos');
     }
 
-    public function destroy(string $id)
+    public function destroy(Int $id)
     {
         try {
 

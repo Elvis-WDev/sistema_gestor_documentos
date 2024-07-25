@@ -7,6 +7,8 @@ use App\Models\Factura;
 use App\Models\NotasCredito;
 use App\Models\Pago;
 use App\Models\Retenciones;
+use App\Models\SolicitudAfiliados;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
@@ -15,8 +17,8 @@ class DashboardController extends Controller
     {
         $CantidadFacturas = Factura::all()->count();
         $CantidadPagos = Pago::all()->count();
-        $CantidadNotasCredito = NotasCredito::all()->count();
-        $CantidadRetenciones = Retenciones::all()->count();
+        $CantidadSolicitudAfiliados = SolicitudAfiliados::all()->count();
+        $CantidadUsuarios = User::all()->count();
 
         $CantidadFacturasPagadas = Factura::where('Estado', 'Pagada')->count();
         $CantidadFacturasAbonadas = Factura::where('Estado', 'Abonada')->count();
@@ -30,7 +32,6 @@ class DashboardController extends Controller
             DB::raw('SUM(Total) as value')
         )->groupBy('FechaEmision')->get();
 
-        // Convert the collection to an array
         $DataFacturasTotal = $DataFacturasTotal->map(function ($item) {
             return [
                 'FechaEmision' => $item->FechaEmision,
@@ -42,8 +43,8 @@ class DashboardController extends Controller
 
             "CantidadFacturas" => $CantidadFacturas,
             "CantidadPagos" => $CantidadPagos,
-            "CantidadNotasCredito" => $CantidadNotasCredito,
-            "CantidadRetenciones" => $CantidadRetenciones,
+            "CantidadSolicitudAfiliados" => $CantidadSolicitudAfiliados,
+            "CantidadUsuarios" => $CantidadUsuarios,
             "CantidadFacturasPagadas" => $CantidadFacturasPagadas,
             "CantidadFacturasAbonadas" => $CantidadFacturasAbonadas,
             "CantidadFacturasAnuladas" => $CantidadFacturasAnuladas,

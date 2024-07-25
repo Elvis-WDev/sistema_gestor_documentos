@@ -24,9 +24,7 @@ class DatabaseSeeder extends Seeder
         //     FacturaSeeder::class,
         //     PagosSeeder::class,
         // ]);
-        $this->call(SolicitudAfiliadoSeeder::class);
-        $this->call(NotasCreditoSeeder::class);
-        $this->call(RetencionesSeeder::class);
+        // $this->call(SolicitudAfiliadoSeeder::class);
 
         Storage::disk('public')->deleteDirectory('uploads');
     }

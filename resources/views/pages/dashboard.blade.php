@@ -44,13 +44,13 @@
 
                     <div class="small-box bg-yellow">
                         <div class="inner">
-                            <h3>{{ $Data['CantidadNotasCredito'] }}</h3>
-                            <p>Notas de crédito</p>
+                            <h3>{{ $Data['CantidadSolicitudAfiliados'] }}</h3>
+                            <p>Solicitud afiliados</p>
                         </div>
                         <div class="icon">
                             <i class="fa-brands fa-creative-commons-share"></i>
                         </div>
-                        <a href="{{ route('notas-credito') }}" class="small-box-footer">Más info <i
+                        <a href="{{ route('solicitud-afiliados') }}" class="small-box-footer">Más info <i
                                 class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>
@@ -59,13 +59,13 @@
 
                     <div class="small-box bg-red">
                         <div class="inner">
-                            <h3>{{ $Data['CantidadRetenciones'] }}</h3>
-                            <p>Retenciones</p>
+                            <h3>{{ $Data['CantidadUsuarios'] }}</h3>
+                            <p>Usuarios</p>
                         </div>
                         <div class="icon">
-                            <i class="fa-solid fa-hand-holding-dollar"></i>
+                            <i class="far fa-user-circle"></i>
                         </div>
-                        <a href="{{ route('retenciones') }}" class="small-box-footer">Más info <i
+                        <a href="{{ route('usuarios') }}" class="small-box-footer">Más info <i
                                 class="fa fa-arrow-circle-right"></i></a>
                     </div>
                 </div>

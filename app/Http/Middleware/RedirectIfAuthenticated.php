@@ -28,26 +28,4 @@ class RedirectIfAuthenticated
 
         return $next($request);
     }
-
-    // public function handle(Request $request, Closure $next, string ...$guards): Response
-    // {
-    //     $guards = empty($guards) ? [null] : $guards;
-
-
-    //     foreach ($guards as $guard) {
-    //         if (Auth::guard($guard)->check()) {
-    //             if ($request->user()->id_rol == 1) {
-    //                 return redirect()->route('SuperAdmin.dashboard');
-    //             } elseif ($request->user()->id_rol == 2) {
-    //                 return redirect()->route('Administrador.dashboard');
-    //             } elseif ($request->user()->id_rol == 3) {
-    //                 return redirect()->route('Usuario.dashboard');
-    //             } else {
-    //                 return redirect()->route('/');
-    //             }
-    //         }
-    //     }
-
-    //     return $next($request);
-    // }
 }

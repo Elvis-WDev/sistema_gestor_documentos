@@ -12,10 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('solicitud_afiliados', function (Blueprint $table) {
-            $table->id('id_solicitudAfiliados');
-            $table->string('Archivo', 255);
-            $table->string('Prefijo', 50)->unique()->default('');
-            $table->text('NombreCliente');
+            $table->id();
+            $table->string('Archivos', 1000)->default('[]');
+            $table->string('Prefijo', 50)->default('');
+            $table->text('NombreCliente', 255)->default('');
+            $table->datetime('FechaSolicitud');
             $table->timestamps();
         });
     }

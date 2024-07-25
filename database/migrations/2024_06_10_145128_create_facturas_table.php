@@ -33,7 +33,7 @@ return new class extends Migration
 
         Schema::create('facturas', function (Blueprint $table) {
             $table->id('id_factura');
-            $table->string('Archivos', 1000)->default('');
+            $table->string('Archivos', 1000)->default('[]');
             $table->dateTime('FechaEmision');
             $table->unsignedBigInteger('punto_emision_id');
             $table->unsignedBigInteger('establecimiento_id');

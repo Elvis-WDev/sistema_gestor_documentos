@@ -19,7 +19,8 @@
                 </li>
             @endcan
             @can('ver SolicitudAfiliado')
-                <li class="{{ setActive(['solicitud-afiliados']) }}">
+                <li
+                    class="{{ setActive(['solicitud-afiliados', 'crear-solicitud-afiliados', 'editar-solicitud-afiliado']) }}">
                     <a href="{{ route('solicitud-afiliados') }}"><i class="fa-solid fa-user-check"></i><span> Solicitudes
                             de
                             afilación</span></a>
@@ -74,22 +75,9 @@
         </a>
         <ul class="treeview-menu">
             @can('ver pagos')
-                <li class="{{ setActive(['pagos']) }}">
+                <li class="{{ setActive(['pagos', 'crear-pago', 'editar-pago']) }}">
                     <a href="{{ route('pagos') }}">
                         <i class="fa-solid fa-dollar-sign"></i><span> Pagos</span></a>
-                </li>
-            @endcan
-            @can('ver NotasCredito')
-                <li class="{{ setActive(['notas-credito']) }}">
-                    <a href="{{ route('notas-credito') }}"><i class="fa-brands fa-creative-commons-share"></i><span>
-                            Notas
-                            de crédito</span></a>
-                </li>
-            @endcan
-            @can('ver retenciones')
-                <li class="{{ setActive(['retenciones']) }}">
-                    <a href="{{ route('retenciones') }}"><i class="fa-solid fa-hand-holding-dollar"></i><span>
-                            Retenciones</span></a>
                 </li>
             @endcan
         </ul>

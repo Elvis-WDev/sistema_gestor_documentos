@@ -6,6 +6,7 @@
     <title>
         @yield('title')
     </title>
+    <link rel="shortcut icon" href="{{ asset('images/GS1-logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -210,6 +211,17 @@
                 defaultDate: formattedDate,
             });
             $("#FechaPagoUpdate").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+            });
+            $("#FechaSolicitudCreate").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+                defaultDate: formattedDate,
+            });
+            $("#FechaSolicitudUpdate").flatpickr({
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",
                 locale: "es",
