@@ -136,24 +136,12 @@ class FacturasController extends Controller
         $factura = Factura::findOrFail($request->id);
 
         if ($request->hasFile('Archivos')) {
-            // Mover archivos antiguos a la carpeta de "trash" si hay nuevos archivos
-            if ($request->filled('old_archivos')) {
-                $old_archivos = json_decode($request->old_archivos, true);
 
-                foreach ($old_archivos as $old_archivo) {
-                    $trashPath = 'uploads/trash/facturas/' . basename($old_archivo);
-                    Storage::disk('public')->move($old_archivo, $trashPath);
-                }
-            }
-
-            // Subir nuevos archivos y actualizar el campo Archivos
-            $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/facturas');
-            $factura->Archivos = json_encode($archivos);
+            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/facturas', 'old_archivos');
+            $factura->Archivos = $archivos;
         } elseif ($request->filled('old_archivos')) {
-            // Si no hay nuevos archivos pero se especificaron archivos antiguos, mantener los archivos antiguos
             $factura->Archivos = $request->old_archivos;
         } else {
-            // Si no hay nuevos archivos ni archivos antiguos, limpiar el campo Archivos
             $factura->Archivos = null;
         }
 

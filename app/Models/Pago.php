@@ -14,13 +14,13 @@ class Pago extends Model
 
     protected $fillable = [
         'id_factura',
-        'Archivo',
-        'Monto',
-        'transaccionVenta',
+        'Archivos',
+        'FechaPago',
+        'Total',
     ];
 
     public function factura()
     {
-        return $this->belongsTo(Factura::class, 'id_factura', 'id_factura');
+        return $this->belongsTo(Factura::class, 'id_factura');
     }
 }

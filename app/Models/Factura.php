@@ -40,7 +40,7 @@ class Factura extends Model
 
     public function pagos()
     {
-        return $this->hasMany(Pago::class, 'id_factura', 'id_factura');
+        return $this->hasMany(Pago::class, 'id_factura');
     }
     public function abonos()
     {

@@ -13,11 +13,6 @@
                     Nuevo pago
                 </a>
             @endcan
-            <button type="button" class="btn btn-primary pull-right"
-                style="margin-top: -10px;margin-bottom: 5px;margin-right:10px" id="reporte_daterange">
-                <i class="fa fa-plus"></i>
-                Reportes por fecha
-            </button>
 
         </h1>
     </section>

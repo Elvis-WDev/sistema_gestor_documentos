@@ -30,5 +30,34 @@ class SolicitudAfiliadosController extends Controller
         return view('pages.solicitud_afiliados.edit', compact('SolicitudAfiliados'));
     }
 
-    //editar-solicitud-afiliado
+    // public function store(Request $request)
+    // {
+    //     $request->validate([
+    //         'id_factura' => 'required|numeric',
+    //         'Archivos.*' => 'file|mimes:' . config('config_general')['general']['archivos_permitidos'] . '|max:' . (config('config_general')['general']['tamano_maximo_permitido']) * 1024,
+    //         'Archivos' => 'max:' . config('config_general')['general']['cantidad_permitidos'],
+    //         'FechaPago' => 'required|date',
+    //         'Total' => 'required|numeric|gt:0',
+    //     ]);
+
+    //     // Procesamiento de archivos utilizando uploadMultiFile
+    //     $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/pagos');
+
+    //     Pago::create([
+    //         'id_factura' => $request->id_factura,
+    //         'Archivos' => json_encode($archivos, JSON_UNESCAPED_SLASHES),
+    //         'Total' => $request->Total,
+    //         'FechaPago' => $request->FechaPago,
+    //     ]);
+
+    //     $this->Actividad(
+    //         Auth::user()->id,
+    //         "Ha registrado un pago",
+    //         "Monto: $" . $request->Total
+    //     );
+
+    //     flash('Pago registrado correctamente!');
+
+    //     return redirect()->route('pagos');
+    // }
 }

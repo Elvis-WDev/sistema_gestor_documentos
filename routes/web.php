@@ -124,16 +124,20 @@ Route::group(['middleware' => ['can:eliminar punto_emision']], function () {
     Route::delete('eliminar-punto_emision/{id}', [PuntosEmisionController::class, 'destroy'])->name('destroy-punto_emision');
 });
 
-
 //PAGOS
 Route::group(['middleware' => ['can:ver pagos']], function () {
     Route::get('lista-pagos', [PagosController::class, 'index'])->name('pagos');
 });
 Route::group(['middleware' => ['can:crear pagos']], function () {
     Route::get('crear-pago', [PagosController::class, 'create'])->name('crear-pago');
+    Route::post('store-pago', [PagosController::class, 'store'])->name('store-pago');
 });
 Route::group(['middleware' => ['can:modificar pagos']], function () {
-    Route::get('editar-pago/{id_pago}', [PagosController::class, 'edit'])->name('editar-pago');
+    Route::get('editar-pago/{id}', [PagosController::class, 'edit'])->name('editar-pago');
+    Route::put('update-pago', [PagosController::class, 'update'])->name('update-pago');
+});
+Route::group(['middleware' => ['can:eliminar pagos']], function () {
+    Route::delete('destroy-pago/{id}', [PagosController::class, 'destroy'])->name('destroy-pago');
 });
 
 //NotasDeCredito

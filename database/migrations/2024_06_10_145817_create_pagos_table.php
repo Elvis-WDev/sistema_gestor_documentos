@@ -10,12 +10,11 @@ return new class extends Migration
     {
         Schema::create('pagos', function (Blueprint $table) {
             $table->id('id_pago');
-            $table->string('Archivo', 255);
-            $table->decimal('Total', 10, 2);
-            $table->string('TransaccionVenta')->unique()->desault(0);
-            $table->date('Fecha');
-            $table->timestamps();
             $table->foreignId('id_factura')->constrained('facturas', 'id_factura')->onDelete('restrict');
+            $table->string('Archivos', 1000)->default('');
+            $table->decimal('Total', 10, 2)->default(0);
+            $table->dateTime('FechaPago');
+            $table->timestamps();
         });
     }
 

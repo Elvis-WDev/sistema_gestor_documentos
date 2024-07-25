@@ -203,6 +203,18 @@
                 locale: "es",
             });
 
+            $("#FechaPagoCreate").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+                defaultDate: formattedDate,
+            });
+            $("#FechaPagoUpdate").flatpickr({
+                enableTime: true,
+                dateFormat: "Y-m-d H:i",
+                locale: "es",
+            });
+
             $(".created_at").flatpickr({
                 enableTime: true,
                 dateFormat: "Y-m-d H:i",

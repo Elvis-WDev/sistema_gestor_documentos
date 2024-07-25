@@ -28,29 +28,55 @@ class PagosDataTable extends DataTable
         $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('id_factura', function ($query) {
-                $factura = Factura::where('id_factura', '=', $query->id_factura)->first();
 
-                if ($factura) {
-                    return $factura->Archivo;
-                } else {
-                    return 'No existe factura asociada';
+                $factura = Factura::with(['establecimiento', 'puntoEmision'])->where('id_factura', '=', $query->id_factura)->first();
+
+                return  $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial;
+            })
+            ->addColumn('Archivos', function ($query) {
+
+                $archivos = json_decode($query->Archivos, true);
+                if (json_last_error() !== JSON_ERROR_NONE) {
+                    return 'Error en la decodificación JSON: ' . json_last_error_msg();
                 }
+
+                // Generar botones para cada archivo
+                $buttons = '';
+
+                foreach ($archivos as $archivo) {
+                    $buttons .= '
+                    <a href="' . asset('storage/' . $archivo) . '" target="_blank" data-tippy-content="' . substr($archivo, 17) . '" class="btn btn-default btn-md">
+                        <i class="fas fa-print"></i>
+                    </a>';
+                }
+
+                return '
+                    <div class="btn-group">
+                    ' . $buttons . '
+                    </div>
+                    ';
             })
             ->addColumn('action', function ($query) {
 
+                $ButtonGroup = "";
+
                 if (Auth::user()->can('modificar pagos')) {
 
-                    $ButtonGroup = '
-                    <div class="btn-group">
-                    <a href="' . route('editar-pago', $query->id_pago) . '" class="btn btn-default btn-xs">
-                    <i class="glyphicon glyphicon-edit"></i>
+                    $ButtonGroup .= '
+                    <a href="' . route('editar-pago', $query->id_pago) . '" class="btn btn-default btn-sm">
+                     <i class="glyphicon glyphicon-edit"></i>
                     </a>
-                    </div>
-                    ';
-                } else {
-                    $ButtonGroup = 'No permitido';
+                ';
                 }
-                return $ButtonGroup;
+                if (Auth::user()->can('eliminar pagos')) {
+                    $ButtonGroup .= '
+                  <a href="' . route('destroy-pago', $query->id_pago) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar pago?">
+                <i class="fas fa-trash-alt"></i>
+                </a>
+                ';
+                }
+
+                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
             })
             ->addColumn('fila', function () use (&$count) {
                 $count++;
@@ -63,7 +89,7 @@ class PagosDataTable extends DataTable
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'Archivos'])
             ->setRowId('id');
     }
 
@@ -109,6 +135,12 @@ class PagosDataTable extends DataTable
                 'language' => [
                     'url' => url('vendor/datatables/es-ES.json')
                 ],
+                'initComplete' => 'function(settings, json) {
+                    initializeTippy();
+                }',
+                'drawCallback' => 'function(settings) {
+                    initializeTippy();
+                }',
             ]);
     }
 
@@ -120,12 +152,13 @@ class PagosDataTable extends DataTable
         return [
             Column::make('fila')->title('#'),
             // Column::make('id_pago')->title('#'),
-            Column::make('id_factura')->title('Factura'),
-            Column::make('Archivo')->title('Archivos'),
+            Column::make('id_factura')->title('Factura Nro.')->addClass('text-center'),
+            Column::make('Archivos')->title('Archivos')->printable(false)->addClass('text-center'),
             Column::make('Total')->title('Total'),
+            Column::make('FechaPago')->title('Fecha del pago'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)
+            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
         ];
     }
 

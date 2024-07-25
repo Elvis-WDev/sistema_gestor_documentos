@@ -113,17 +113,12 @@
                                         value="{{ old('RetencionFuente') ? old('RetencionFuente') : 0 }}">
                                 </div>
 
-
-
-
-                                <!-- Total Field -->
+                                <!-- Archivos Field -->
                                 <div class="form-group col-sm-12">
                                     <label for="fileList">Archivos:</label></br>
                                     <div class="fileList" id="fileList"></div>
 
                                 </div>
-
-                                <!-- Archivos Field -->
                                 <div class="form-group col-sm-12">
 
                                     <div class="dropzone" id="dropzone">

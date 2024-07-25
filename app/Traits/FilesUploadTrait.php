@@ -2,9 +2,36 @@
 
 namespace App\Traits;
 
+use Illuminate\Support\Facades\Storage;
 
 trait FilesUploadTrait
 {
+
+    public function uploadFile($request, $inputName, $path)
+    {
+        $fileInfo = [];
+
+        if ($request->hasFile($inputName)) {
+            $file = $request->file($inputName);
+
+            $originalName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $baseName = pathinfo($originalName, PATHINFO_FILENAME);
+            $shortName = substr($baseName, 0, 15);
+            $currentDate = date('Ymd');
+
+            $fileName = uniqid() . '_' . $shortName . '_' . $currentDate . '.' . $extension;
+
+            // Guardar el archivo en storage/public/<path>
+            $filePath = $file->storeAs($path, $fileName, 'public');
+
+            // Agregar la ruta y la extensión del archivo al array
+            $fileInfo[] = $filePath;
+            $fileInfo[] = $extension;
+        }
+
+        return $fileInfo;
+    }
 
     public function uploadMultiFile($request, $inputName, $path)
     {
@@ -34,29 +61,21 @@ trait FilesUploadTrait
         return $filePaths;
     }
 
-    public function uploadFile($request, $inputName, $path)
+    public function updateMultiFile($request, $inputName, $path, $old_archivos_txt)
     {
-        $fileInfo = [];
+        // Mover archivos antiguos a la carpeta de "trash" si hay nuevos archivos
+        if ($request->filled($old_archivos_txt)) {
+            $old_archivos = json_decode($request->old_archivos, true);
 
-        if ($request->hasFile($inputName)) {
-            $file = $request->file($inputName);
-
-            $originalName = $file->getClientOriginalName();
-            $extension = $file->getClientOriginalExtension();
-            $baseName = pathinfo($originalName, PATHINFO_FILENAME);
-            $shortName = substr($baseName, 0, 15);
-            $currentDate = date('Ymd');
-
-            $fileName = uniqid() . '_' . $shortName . '_' . $currentDate . '.' . $extension;
-
-            // Guardar el archivo en storage/public/<path>
-            $filePath = $file->storeAs($path, $fileName, 'public');
-
-            // Agregar la ruta y la extensión del archivo al array
-            $fileInfo[] = $filePath;
-            $fileInfo[] = $extension;
+            foreach ($old_archivos as $old_archivo) {
+                $trashPath = 'uploads/trash/pagos/' . basename($old_archivo);
+                Storage::disk('public')->move($old_archivo, $trashPath);
+            }
         }
 
-        return $fileInfo;
+        // Subir nuevos archivos y actualizar el campo Archivos
+        $archivos = $this->uploadMultiFile($request, $inputName, $path);
+
+        return json_encode($archivos);
     }
 }
