@@ -24,7 +24,6 @@ class SolicitudAfiliadosController extends Controller
      */
     public function index(SolicitudAfiliadosDatatables $SolicitudAfiliadosDatatables)
     {
-        // $this->isSuperAdmin();
         return $SolicitudAfiliadosDatatables->render('pages.solicitud_afiliados.index');
     }
     public function create()
@@ -84,7 +83,7 @@ class SolicitudAfiliadosController extends Controller
 
         if ($request->hasFile('Archivos')) {
 
-            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/solicitud_afiliados', 'old_archivos');
+            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/solicitud_afiliados', 'old_archivos', 'uploads/trash/solicitud_afiliados/', "Archivos eliminados al editar una solicitud afiliados con prefijo: # " . $request->Prefijo);
 
             $solicitud->Archivos = $archivos;
         } elseif ($request->filled('old_archivos')) {
@@ -121,14 +120,7 @@ class SolicitudAfiliadosController extends Controller
 
             $tempSolicitud = $solicitud;
 
-            if (!is_null($solicitud->Archivos)) {
-                $archivos = json_decode($solicitud->Archivos, true);
-
-                foreach ($archivos as $archivo) {
-                    $trashPath = 'uploads/trash/solicitud_afiliados/' . basename($archivo);
-                    Storage::disk('public')->move($archivo, $trashPath);
-                }
-            }
+            $this->DestroyFiles($solicitud->Archivos, 'uploads/trash/solicitud_afiliados/', 'Archivos eliminados al eliminar una solicitud afiliado: $' . $tempSolicitud->Prefijo);
 
             $solicitud->delete();
 

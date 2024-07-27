@@ -92,8 +92,8 @@
         </span>
     </a>
     <ul class="treeview-menu">
-        <li class="{{ setActive(['pagos']) }}">
-            <a href="{{ route('pagos') }}">
+        <li class="{{ setActive(['pepelera']) }}">
+            <a href="{{ route('pepelera') }}">
                 <i class="fas fa-trash-alt"></i><span> Papelera</span></a>
         </li>
         <li class="{{ setActive(['custom-module']) }}">

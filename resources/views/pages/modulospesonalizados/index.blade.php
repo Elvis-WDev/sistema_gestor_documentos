@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Carpetas
+    Carpetas
 @endsection
 
 
@@ -74,8 +74,6 @@
     </section>
     <div class="content" style="margin-top: 22px;">
         <div class="clearfix"></div>
-
-
         <div class="clearfix"></div>
         <div class="box box-primary">
             <div class="box-body">

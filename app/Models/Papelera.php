@@ -8,4 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 class Papelera extends Model
 {
     use HasFactory;
+
+    protected $table = 'papelera';
+    protected $primaryKey = 'id';
+
+    protected $fillable = [
+        'Archivos',
+        'Detalle',
+    ];
 }

@@ -115,6 +115,7 @@ class ReportesController extends Controller
         $totalCuentasPorCobrar = 0;
 
         foreach ($facturas as $factura) {
+
             $ultimoAbono = DB::table('abonos')
                 ->where('factura_id', $factura->id_factura)
                 ->orderBy('fecha_abonado', 'desc')
@@ -216,11 +217,7 @@ class ReportesController extends Controller
 
         foreach ($facturas as $factura) {
 
-            $ultimoAbono = DB::table('abonos')
-                ->where('factura_id', $factura->id_factura)
-                ->orderBy('fecha_abonado', 'desc')
-                ->orderBy('id', 'desc')
-                ->first();
+            $ultimoAbono = AbonosController::UltimoAbono($factura->id_factura);
 
             if ($ultimoAbono) {
                 $saldo = $ultimoAbono->saldo_factura;
@@ -230,8 +227,6 @@ class ReportesController extends Controller
                 $saldo -= $factura->RetencionIva;
                 $saldo -= $factura->RetencionFuente;
             }
-
-
 
             // Asegurar que el saldo no sea negativo
             $saldo = max(0, $saldo);
@@ -245,7 +240,6 @@ class ReportesController extends Controller
     // Reportes Anuladas
     public function generar_reportes_anuladas(Request $request)
     {
-        // Validación de los datos de entrada
         $request->validate([
             'txt_fecha_reporte_inicio' => 'required|date',
             'txt_fecha_reporte_final' => 'required|date|after_or_equal:txt_fecha_reporte_inicio',
@@ -254,7 +248,6 @@ class ReportesController extends Controller
         $fechaInicio = Carbon::parse($request->input('txt_fecha_reporte_inicio'));
         $fechaFinal = Carbon::parse($request->input('txt_fecha_reporte_final'))->endOfDay();
 
-        // Formatear las fechas
         $fechaInicioFormatted = $fechaInicio->isoFormat('D [de] MMMM');
         $fechaFinalFormatted = $fechaFinal->isoFormat('D [de] MMMM');
 
@@ -263,15 +256,19 @@ class ReportesController extends Controller
             ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
             ->get();
 
+        if ($allFacturas->isEmpty()) {
+            flash()->error('No hay facturas anuladas en estas fechas');
+            return redirect()->route('facturas-anuladas');
+        }
+
         $totalValorAnulados = Factura::where('Estado', 'Anulada')
             ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
             ->sum('ValorAnulado');
 
         $pdfFiles = [];
-        $chunkedFacturas = $allFacturas->chunk(100);  // Ajusta el tamaño del chunk según tus necesidades
+        $chunkedFacturas = $allFacturas->chunk(100);
 
         foreach ($chunkedFacturas as $index => $facturasChunk) {
-            // Agregar el índice del chunk para diferenciar el encabezado
             $pdfContent = view('pages.facturas.reportes.pdf.reporte_anuladas', [
                 'Facturas' => $facturasChunk,
                 'TotalValorAnulados' => $totalValorAnulados,
@@ -284,7 +281,6 @@ class ReportesController extends Controller
             $pdfFiles[] = $pdf->output();
         }
 
-        // Combina todos los PDFs en uno solo
         $combinedPdf = new Fpdi();
 
         foreach ($pdfFiles as $pdfFile) {

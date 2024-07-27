@@ -8,8 +8,6 @@ use App\Models\Establecimiento;
 use App\Models\Factura;
 use App\Models\PuntoEmision;
 use App\Traits\RegistrarActividad;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,7 +30,6 @@ class AbonosController extends Controller
             return redirect()->route('abonos', $factura->id_factura);
         }
 
-        // Calcular saldo inicial restando las retenciones del total de la factura
         $retencionIva = $factura->RetencionIva ?: 0;
         $retencionFuente = $factura->RetencionFuente ?: 0;
 
@@ -44,10 +41,7 @@ class AbonosController extends Controller
             return redirect()->route('abonos', $factura->id_factura);
         }
 
-        $ultimoAbono = Abonos::where('factura_id', $factura->id_factura)
-            ->orderBy('fecha_abonado', 'desc')
-            ->orderBy('id', 'desc')
-            ->first();
+        $ultimoAbono = AbonosController::UltimoAbono($factura->id_factura);
 
         $nuevoSaldo = $ultimoAbono
             ? $ultimoAbono->saldo_factura - $validatedData['valor_abono']
@@ -79,8 +73,6 @@ class AbonosController extends Controller
             return redirect()->route('cuentas');
         }
 
-
-
         flash('Abono registrado correctamente!');
         return redirect()->route('abonos', $factura->id_factura);
     }
@@ -93,9 +85,20 @@ class AbonosController extends Controller
      */
     public function edit(int $id_factura, AbonosDataTable $abonosDataTable)
     {
-        $Factura = Factura::findOrFail($id_factura);
+        $Factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($id_factura);
         $abonosDataTable->setFacturaId($id_factura);
 
         return $abonosDataTable->render('pages.facturas.cuentas_por_cobrar.abonos.index', compact('Factura'));
+    }
+
+    static public function UltimoAbono($id_factura)
+    {
+
+        $ultimoAbono = Abonos::where('factura_id', $id_factura)
+            ->orderBy('fecha_abonado', 'desc')
+            ->orderBy('id', 'desc')
+            ->first();
+
+        return $ultimoAbono;
     }
 }

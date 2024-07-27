@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('archivos_modulos_personalizados', function (Blueprint $table) {
             $table->id('id_archivo');
-            $table->string('Nombre', 255)->unique();
+            $table->string('Nombre', 255);
             $table->unsignedBigInteger('id_modulo');
             $table->unsignedBigInteger('id_usuario');
             $table->string('Archivo', 60);

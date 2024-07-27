@@ -3,16 +3,12 @@
 namespace App\DataTables;
 
 use App\Models\configuraciones_generales;
-use App\Models\ConfiguracionesGeneralesDatatable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
-use Illuminate\Support\Facades\Auth;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class ConfiguracionesGeneralesDatatables extends DataTable
@@ -27,39 +23,28 @@ class ConfiguracionesGeneralesDatatables extends DataTable
         return (new EloquentDataTable($query))
             ->editColumn('tamano_maximo_permitido', '{{$tamano_maximo_permitido}} MB')
             ->editColumn('cantidad_permitidos', '{{$cantidad_permitidos}}  archivos')
-            ->addColumn('archivos_permitidos', function ($query) {
-
-                $mimes = explode(',', $query->archivos_permitidos);
-
-
-                $ButtonGroup = '';
-
-                foreach ($mimes as $extension) {
-                    $ButtonGroup .= '
-                     <button type="button" class="btn btn-success btn-xs">
-                           .' . $extension . '
-                       </button>
-                   ';
-                }
-
-                return  '<div class="btn-group">' . $ButtonGroup . '</div>';
-            })
-            ->addColumn('action', function ($query) {
-                $ButtonGroup = '
-                     <div class="btn-group">
-                        <a href="' . route('editar-configuracion', $query->id) . '" class="btn btn-default btn-sm">
-                            <i class="glyphicon glyphicon-edit"></i>
-                        </a>
-                     </div>
-                    ';
-
-                return $ButtonGroup;
-            })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->updated_at)->translatedFormat('Y-m-d H:i');
+            })
+            ->addColumn('archivos_permitidos', function ($query) {
+
+                $mimes = explode(',', $query->archivos_permitidos);
+
+                $ButtonGroup = '';
+
+                foreach ($mimes as $extension) {
+                    $ButtonGroup .= '<button type="button" class="btn btn-success btn-xs">.' . $extension . '</button>';
+                }
+
+                return  '<div class="btn-group">' . $ButtonGroup . '</div>';
+            })
+            ->addColumn('action', function ($query) {
+                $ButtonGroup = '<div class="btn-group"><a href="' . route('editar-configuracion', $query->id) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a></div>';
+
+                return $ButtonGroup;
             })
             ->rawColumns(['action', 'archivos_permitidos'])
             ->setRowId('id');
@@ -116,7 +101,6 @@ class ConfiguracionesGeneralesDatatables extends DataTable
     public function getColumns(): array
     {
         return [
-
             Column::make('id')->title('#'),
             Column::make('nombre')->title('Nombre'),
             Column::make('archivos_permitidos')->title('Archivos permitidos')->addClass('text-center'),
@@ -124,7 +108,7 @@ class ConfiguracionesGeneralesDatatables extends DataTable
             Column::make('tamano_maximo_permitido')->title('Tamaño. max'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::make('action')->title('Acción')->printable(false)->addClass('text-center'),
+            Column::make('action')->title('Acción')->exportable(false)->printable(false)->addClass('text-center'),
         ];
     }
 

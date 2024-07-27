@@ -23,7 +23,6 @@ class EstablecimientosController extends Controller
      */
     public function index(EstablecimientosDataTable $EstablecimientosDataTable)
     {
-        // $this->isSuperAdmin();
         return $EstablecimientosDataTable->render('pages.facturas.establecimiento.index');
     }
     public function create()

@@ -2,10 +2,8 @@
 
 namespace App\DataTables\Facturas;
 
-use App\Models\Establecimiento;
 use App\Models\Factura;
-use App\Models\PuntoEmision;
-use App\Models\TodasFactura;
+use App\Traits\Datatables;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -13,12 +11,11 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class TodasFacturasDataTable extends DataTable
 {
+    use Datatables;
     /**
      * Build the DataTable class.
      *
@@ -26,107 +23,23 @@ class TodasFacturasDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-
         $count = 0;
-
         return (new EloquentDataTable($query))
-            ->addColumn('establecimiento_id', function ($query) {
-                $Establecimiento = Establecimiento::where('id', '=', $query->establecimiento_id)->first();
-
-                if ($Establecimiento) {
-                    return $Establecimiento->nombre;
-                } else {
-                    return 'No existe factura asociada';
-                }
-            })
-            ->addColumn('punto_emision_id', function ($query) {
-                $PuntoEmision = PuntoEmision::where('id', '=', $query->punto_emision_id)->first();
-
-                if ($PuntoEmision) {
-                    return $PuntoEmision->nombre;
-                } else {
-                    return 'No existe factura asociada';
-                }
-            })
-            ->addColumn('Archivos', function ($query) {
-                $archivos = json_decode($query->Archivos, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    return 'Error en la decodificación JSON: ' . json_last_error_msg();
-                }
-
-                // Generar botones para cada archivo
-                $buttons = '';
-
-                foreach ($archivos as $archivo) {
-                    $buttons .= '
-                    <a href="' . asset('storage/' . $archivo) . '" target="_blank" data-tippy-content="' . substr($archivo, 17) . '" class="btn btn-default btn-md">
-                        <i class="fas fa-print"></i>
-                    </a>';
-                }
-
-                return '
-                    <div class="btn-group">
-                    ' . $buttons . '
-                    </div>
-                    ';
-            })
-            ->addColumn('action', function ($query) {
-
-                $ButtonGroup = "";
-
-                if (Auth::user()->can('modificar facturas')) {
-
-                    $ButtonGroup .= '
-                    <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-sm">
-                     <i class="glyphicon glyphicon-edit"></i>
-                    </a>
-                ';
-                }
-                if (Auth::user()->can('eliminar facturas')) {
-                    $ButtonGroup .= '
-                  <a href="' . route('destroy-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar factura?">
-                <i class="fas fa-trash-alt"></i>
-                </a>
-                ';
-                }
-
-                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
-            })
-            ->addColumn('Estado', function ($query) {
-
-                $Button = '
-                    <button class="btn btn-default btn-xs">
-                         Desconocido
-                    </button>
-                ';
-
-                if ($query->Estado == 'Pagada') {
-                    $Button = ' 
-                    <button class="btn btn-success btn-xs">
-                         Pagada
-                    </button>';
-                } elseif ($query->Estado == 'Anulada') {
-                    $Button = ' 
-                    <button class="btn btn-danger btn-xs">
-                         Anulada
-                    </button>';
-                } elseif ($query->Estado == 'Abonada') {
-                    $Button = ' 
-                    <button class="btn btn-warning btn-xs">
-                         Abonada
-                    </button>';
-                } elseif ($query->Estado == 'Registrada') {
-                    $Button = ' 
-                    <button class="btn btn-info btn-xs">
-                         Registrada
-                    </button>';
-                }
-
-                return $Button;
-            })
             ->addColumn('fila', function () use (&$count) {
                 $count++;
                 return $count;
+            })
+            ->addColumn('establecimiento_id', function ($query) {
+                return $query->establecimiento->nombre;
+            })
+            ->addColumn('punto_emision_id', function ($query) {
+                return $query->puntoEmision->nombre;
+            })
+            ->addColumn('Archivos', function ($query) {
+                return $this->DatatableArchivos($query->Archivos);
+            })
+            ->addColumn('Estado', function ($query) {
+                return $this->DatatableEstado($query->Estado);
             })
             ->editColumn('Total', function ($row) {
                 return '<strong>$ ' . $row->Total . '</strong>';
@@ -139,6 +52,25 @@ class TodasFacturasDataTable extends DataTable
             })
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->updated_at)->translatedFormat('Y-m-d H:i:s');
+            })
+            ->addColumn('action', function ($query) {
+
+                $ButtonGroup = "";
+
+                if (Auth::user()->can('modificar facturas')) {
+
+                    $ButtonGroup .= '
+                    <a href="' . route('editar-factura', $query->id_factura) . '" class="btn btn-default btn-sm">
+                     <i class="glyphicon glyphicon-edit"></i>
+                    </a>';
+                }
+                if (Auth::user()->can('eliminar facturas')) {
+                    $ButtonGroup .= '
+                    <a href="' . route('destroy-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar factura?">
+                    <i class="fas fa-trash-alt"></i></a>';
+                }
+
+                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
             })
             ->rawColumns(['Estado', 'action', 'Archivos', 'Total', 'numero'])
             ->setRowId('id');
@@ -200,8 +132,7 @@ class TodasFacturasDataTable extends DataTable
     {
         return [
             Column::computed('fila')->title('#'),
-            // Column::make('id_factura')->title('#'),
-            Column::make('Archivos')->title('Archivos')->printable(false)->addClass('text-center'),
+            Column::make('Archivos')->title('Archivos')->printable(false)->exportable(false)->addClass('text-center'),
             Column::make('RazonSocial')->title('Raz. social'),
             Column::make('establecimiento_id')->title('Establec.'),
             Column::make('punto_emision_id')->title('P. emisión'),
@@ -211,7 +142,7 @@ class TodasFacturasDataTable extends DataTable
             Column::computed('Estado')->title('Estado')->addClass('text-center'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
+            Column::computed('action')->title('Acción')->printable(false)->exportable(false)->addClass('text-center')
         ];
     }
 

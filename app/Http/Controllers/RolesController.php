@@ -25,7 +25,6 @@ class RolesController extends Controller
      */
     public function index(RolesDataTable $RolesDataTable)
     {
-        // $this->isSuperAdmin();
         return $RolesDataTable->render('pages.usuarios.roles.index');
     }
 

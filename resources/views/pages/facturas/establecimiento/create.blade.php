@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Establecimientos
+    Establecimientos
 @endsection
 @section('content')
     <section class="content-header">
@@ -51,10 +51,6 @@
                     </form>
                 </div>
                 <!-- /.box -->
-
-
-
-
             </div>
         </div>
     </div>

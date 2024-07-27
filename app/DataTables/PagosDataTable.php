@@ -4,20 +4,19 @@ namespace App\DataTables;
 
 use App\Models\Factura;
 use App\Models\Pago;
+use App\Traits\Datatables;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class PagosDataTable extends DataTable
 {
+    use Datatables;
     /**
      * Build the DataTable class.
      *
@@ -27,6 +26,10 @@ class PagosDataTable extends DataTable
     {
         $count = 0;
         return (new EloquentDataTable($query))
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->addColumn('id_factura', function ($query) {
 
                 $factura = Factura::with(['establecimiento', 'puntoEmision'])->where('id_factura', '=', $query->id_factura)->first();
@@ -34,53 +37,7 @@ class PagosDataTable extends DataTable
                 return  $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial;
             })
             ->addColumn('Archivos', function ($query) {
-
-                $archivos = json_decode($query->Archivos, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    return 'Error en la decodificación JSON: ' . json_last_error_msg();
-                }
-
-                // Generar botones para cada archivo
-                $buttons = '';
-
-                foreach ($archivos as $archivo) {
-                    $buttons .= '
-                    <a href="' . asset('storage/' . $archivo) . '" target="_blank" data-tippy-content="' . substr($archivo, 17) . '" class="btn btn-default btn-md">
-                        <i class="fas fa-print"></i>
-                    </a>';
-                }
-
-                return '
-                    <div class="btn-group">
-                    ' . $buttons . '
-                    </div>
-                    ';
-            })
-            ->addColumn('action', function ($query) {
-
-                $ButtonGroup = "";
-
-                if (Auth::user()->can('modificar pagos')) {
-
-                    $ButtonGroup .= '
-                    <a href="' . route('editar-pago', $query->id_pago) . '" class="btn btn-default btn-sm">
-                     <i class="glyphicon glyphicon-edit"></i>
-                    </a>
-                ';
-                }
-                if (Auth::user()->can('eliminar pagos')) {
-                    $ButtonGroup .= '
-                  <a href="' . route('destroy-pago', $query->id_pago) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar pago?">
-                <i class="fas fa-trash-alt"></i>
-                </a>
-                ';
-                }
-
-                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
-            })
-            ->addColumn('fila', function () use (&$count) {
-                $count++;
-                return $count;
+                return $this->DatatableArchivos($query->Archivos);
             })
             ->editColumn('Total', '$ {{$Total}}')
             ->editColumn('created_at', function ($row) {
@@ -88,6 +45,19 @@ class PagosDataTable extends DataTable
             })
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
+            })
+            ->addColumn('action', function ($query) {
+                $ButtonGroup = "";
+
+                if (Auth::user()->can('modificar pagos')) {
+
+                    $ButtonGroup .= '<a href="' . route('editar-pago', $query->id_pago) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a>';
+                }
+                if (Auth::user()->can('eliminar pagos')) {
+                    $ButtonGroup .= '<a href="' . route('destroy-pago', $query->id_pago) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar pago?"><i class="fas fa-trash-alt"></i></a>';
+                }
+
+                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
             })
             ->rawColumns(['action', 'Archivos'])
             ->setRowId('id');
@@ -151,14 +121,13 @@ class PagosDataTable extends DataTable
     {
         return [
             Column::make('fila')->title('#'),
-            // Column::make('id_pago')->title('#'),
             Column::make('id_factura')->title('Factura Nro.')->addClass('text-center'),
-            Column::make('Archivos')->title('Archivos')->printable(false)->addClass('text-center'),
+            Column::make('Archivos')->title('Archivos')->exportable(false)->printable(false)->addClass('text-center'),
             Column::make('Total')->title('Total'),
             Column::make('FechaPago')->title('Fecha del pago'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
+            Column::computed('action')->title('Acción')->exportable(false)->printable(false)->addClass('text-center')
         ];
     }
 

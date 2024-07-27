@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Configuraciones
+    Configuraciones
 @endsection
 @section('content')
     <section class="content-header">
@@ -9,7 +9,6 @@
     <div class="content">
         <div class="clearfix"></div>
 
-        {{-- @include('flash::message') --}}
 
         <div class="clearfix"></div>
         <div class="box box-primary">

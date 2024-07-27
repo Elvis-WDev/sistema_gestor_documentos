@@ -3,6 +3,7 @@
 namespace App\DataTables;
 
 use App\Models\SolicitudAfiliados;
+use App\Traits\Datatables;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -14,6 +15,7 @@ use Yajra\DataTables\Services\DataTable;
 
 class SolicitudAfiliadosDatatables extends DataTable
 {
+    use Datatables;
     /**
      * Build the DataTable class.
      *
@@ -23,60 +25,31 @@ class SolicitudAfiliadosDatatables extends DataTable
     {
         $count = 0;
         return (new EloquentDataTable($query))
-            ->addColumn('action', function ($query) {
-
-                $ButtonGroup = "";
-
-                if (Auth::user()->can('modificar SolicitudAfiliado')) {
-
-                    $ButtonGroup .= '
-                <a href="' . route('editar-solicitud-afiliado', $query->id) . '" class="btn btn-default btn-sm">
-                 <i class="glyphicon glyphicon-edit"></i>
-                </a>
-            ';
-                }
-                if (Auth::user()->can('eliminar pagos')) {
-                    $ButtonGroup .= '
-              <a href="' . route('destroy-solicitud', $query->id) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar solicitud?">
-            <i class="fas fa-trash-alt"></i>
-            </a>
-            ';
-                }
-
-                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
-            })
-            ->addColumn('Archivos', function ($query) {
-
-                $archivos = json_decode($query->Archivos, true);
-                if (json_last_error() !== JSON_ERROR_NONE) {
-                    return 'Error en la decodificación JSON: ' . json_last_error_msg();
-                }
-
-                // Generar botones para cada archivo
-                $buttons = '';
-
-                foreach ($archivos as $archivo) {
-                    $buttons .= '
-                    <a href="' . asset('storage/' . $archivo) . '" target="_blank" data-tippy-content="' . substr($archivo, 28) . '" class="btn btn-default btn-md">
-                        <i class="fas fa-print"></i>
-                    </a>';
-                }
-
-                return '
-                    <div class="btn-group">
-                    ' . $buttons . '
-                    </div>
-                    ';
-            })
             ->addColumn('fila', function () use (&$count) {
                 $count++;
                 return $count;
+            })
+            ->addColumn('Archivos', function ($query) {
+                return $this->DatatableArchivos($query->Archivos);
             })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
             ->editColumn('updated_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
+            })
+            ->addColumn('action', function ($query) {
+
+                $ButtonGroup = "";
+
+                if (Auth::user()->can('modificar SolicitudAfiliado')) {
+                    $ButtonGroup .= '<a href="' . route('editar-solicitud-afiliado', $query->id) . '" class="btn btn-default btn-sm"><i class="glyphicon-edit"></i></a>';
+                }
+                if (Auth::user()->can('eliminar pagos')) {
+                    $ButtonGroup .= '<a href="' . route('destroy-solicitud', $query->id) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar solicitud?"><i class="fas fa-trash-alt"></i></a>';
+                }
+
+                return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
             })
             ->rawColumns(['action', 'Archivos'])
             ->setRowId('id');
@@ -141,14 +114,13 @@ class SolicitudAfiliadosDatatables extends DataTable
         return [
 
             Column::make('fila')->title('#'),
-            // Column::make('id_solicitudAfiliados')->title('#'),
-            Column::make('Archivos')->title('Archivos')->printable(false)->addClass('text-center'),
+            Column::make('Archivos')->title('Archivos')->printable(false)->exportable(false)->addClass('text-center'),
             Column::make('Prefijo')->title('Prefíjo'),
             Column::make('NombreCliente')->title('Nombre de cliente'),
             Column::make('FechaSolicitud')->title('Fecha de solicitud'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
+            Column::computed('action')->title('Acción')->printable(false)->exportable(false)->addClass('text-center')
         ];
     }
 

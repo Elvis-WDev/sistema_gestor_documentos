@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Cuentas por cobrar
+    Cuentas por cobrar
 @endsection
 @section('content')
     <section class="content-header">

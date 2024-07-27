@@ -6,7 +6,6 @@ use App\DataTables\Facturas\AnuladasFacturasDataTable;
 use App\DataTables\Facturas\AbonadasFacturasDataTable;
 use App\DataTables\Facturas\PagadasFacturasDataTable;
 use App\DataTables\Facturas\TodasFacturasDataTable;
-use App\Models\Abonos;
 use App\Models\Establecimiento;
 use App\Models\Factura;
 use App\Models\PuntoEmision;
@@ -15,10 +14,6 @@ use App\Traits\FilesUploadTrait;
 use App\Traits\RegistrarActividad;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 
 class FacturasController extends Controller
@@ -78,7 +73,6 @@ class FacturasController extends Controller
             return redirect()->route('crear-factura');
         }
 
-        // Procesamiento de archivos utilizando uploadMultiFile
         $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/facturas');
 
         Factura::create([
@@ -98,7 +92,7 @@ class FacturasController extends Controller
         $this->Actividad(
             Auth::user()->id,
             "Ha registrado una factura",
-            "Factura Nro: " . Establecimiento::findOrFail($request->establecimiento_id)->nombre . PuntoEmision::findOrFail($request->punto_emision_id)->nombre . $request->Secuencial
+            "Factura #: " . Establecimiento::findOrFail($request->establecimiento_id)->nombre . PuntoEmision::findOrFail($request->punto_emision_id)->nombre . $request->Secuencial
         );
 
         flash('Factura registrada correctamente!');
@@ -106,9 +100,9 @@ class FacturasController extends Controller
         return redirect()->route('facturas');
     }
 
-    public function edit(int $id_factura)
+    public function edit(int $id)
     {
-        $Factura = Factura::findOrFail($id_factura);
+        $Factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($id);
 
         return view('pages.facturas.edit', compact('Factura'));
     }
@@ -133,11 +127,12 @@ class FacturasController extends Controller
             'RazonSocial' => 'required|string|max:255',
         ]);
 
-        $factura = Factura::findOrFail($request->id);
+        $factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($request->id);
 
         if ($request->hasFile('Archivos')) {
 
-            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/facturas', 'old_archivos');
+            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/facturas', 'old_archivos', 'uploads/trash/facturas/', "Archivos eliminados al editar factura con prefijo: # " . $request->Prefijo);
+
             $factura->Archivos = $archivos;
         } elseif ($request->filled('old_archivos')) {
             $factura->Archivos = $request->old_archivos;
@@ -157,7 +152,7 @@ class FacturasController extends Controller
         $this->Actividad(
             Auth::user()->id,
             "Ha editado una factura",
-            "Factura Nro: " . Establecimiento::findOrFail($request->establecimiento_id)->nombre . PuntoEmision::findOrFail($request->punto_emision_id)->nombre . $request->Secuencial
+            "Factura #: " .  $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial
         );
 
         flash('Factura actualizada correctamente!');
@@ -169,20 +164,12 @@ class FacturasController extends Controller
     {
 
         try {
-            $factura = Factura::findOrFail($id);
+            $factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($id);
 
             $tempFactura = $factura;
 
-            if (!is_null($factura->Archivos)) {
-                $archivos = json_decode($factura->Archivos, true);
+            $this->DestroyFiles($factura->Archivos, 'uploads/trash/facturas/', 'Archivos eliminados al eliminar una factura: # ' . $tempFactura->establecimiento->nombre . $tempFactura->puntoEmision->nombre . $tempFactura->Secuencial);
 
-                foreach ($archivos as $archivo) {
-                    $trashPath = 'uploads/trash/facturas/' . basename($archivo);
-                    Storage::disk('public')->move($archivo, $trashPath);
-                }
-            }
-
-            // Eliminar abonos relacionados
             $factura->abonos()->delete();
 
             $factura->delete();
@@ -190,7 +177,7 @@ class FacturasController extends Controller
             $this->Actividad(
                 Auth::user()->id,
                 "Ha eliminado una factura",
-                "Factura Nro: " . Establecimiento::findOrFail($tempFactura->establecimiento_id)->nombre . PuntoEmision::findOrFail($tempFactura->punto_emision_id)->nombre . $tempFactura->Secuencial
+                "Factura #: " . $tempFactura->establecimiento->nombre . $tempFactura->puntoEmision->nombre . $tempFactura->Secuencial
             );
 
             flash('Factura eliminada correctamente.');
@@ -213,16 +200,13 @@ class FacturasController extends Controller
             }
 
             // Obtener el último abono de la factura
-            $ultimoAbono = Abonos::where('factura_id', $factura->id_factura)
-                ->orderBy('fecha_abonado', 'desc')
-                ->orderBy('id', 'desc') // Ordenar también por id para asegurar el orden correcto
-                ->first();
+            $ultimoAbono = AbonosController::UltimoAbono($factura->id_factura);
 
             if ($ultimoAbono) {
-                // Calcular el saldo de la factura basado en el último abono
+
                 $saldo = $ultimoAbono->saldo_factura;
                 $saldo += $factura->RetencionIva;
-                $saldo += $factura->RetencionFuenta;
+                $saldo += $factura->RetencionFuente;
                 // Actualizar el campo ValorAnulado
                 $factura->ValorAnulado = $saldo; //Sumarle el valor de retencionIva yretencionFuente
             } else {
@@ -239,7 +223,7 @@ class FacturasController extends Controller
             $this->Actividad(
                 Auth::user()->id,
                 "Ha anulado una factura",
-                "Factura Nro: " . Establecimiento::findOrFail($factura->establecimiento_id)->nombre . PuntoEmision::findOrFail($factura->punto_emision_id)->nombre . $factura->Secuencial
+                "Factura #: " . $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial
             );
 
             return response()->json(['status' => 'success', 'message' => 'Factura anulada correctamente.']);
@@ -252,24 +236,5 @@ class FacturasController extends Controller
     {
         $PuntoEmision = PuntoEmision::where('establecimiento_id', $request->id)->get();
         return $PuntoEmision;
-    }
-
-    public function reportes()
-    {
-
-        $facturas = Factura::select(
-            DB::raw('DATE_FORMAT(FechaEmision, "%Y-%m-%d") as FechaEmision'),
-            DB::raw('SUM(Total) as value')
-        )->groupBy('FechaEmision')->get();
-
-        // Convert the collection to an array
-        $facturas = $facturas->map(function ($item) {
-            return [
-                'FechaEmision' => $item->FechaEmision,
-                'value' => $item->value
-            ];
-        })->toArray();
-
-        return view('pages.facturas.reportes.index', compact('facturas'));
     }
 }

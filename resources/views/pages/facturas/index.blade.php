@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Facturas
+    Facturas
 @endsection
 @section('content')
     <section class="content-header">
@@ -19,11 +19,29 @@
     </section>
     <div class="content">
         <div class="clearfix"></div>
-
-        {{-- @include('flash::message') --}}
-
         <div class="clearfix"></div>
         <div class="box box-primary">
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-sm-6">
+                    </div>
+                    <div class="col-sm-6 text-right">
+
+                        <div class="btn-group">
+                            <a href="{{ route('facturas') }}" type="button" class="btn btn-xs btn-info">Facturas</a>
+                            <a href="{{ route('cuentas') }}" type="button" class="btn btn-xs btn-primary">Cuentas</a>
+                            <a href="{{ route('facturas-pagadas') }}" type="button"
+                                class="btn btn-xs btn-success">Pagadas</a>
+                            <a href="{{ route('facturas-abonadas') }}" type="button"
+                                class="btn btn-xs btn-warning">Abonadas</a>
+                            <a href="{{ route('facturas-anuladas') }}" type="button"
+                                class="btn btn-xs btn-danger">Anuladas</a>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
             <div class="box-body">
             @section('css')
                 @include('layouts.datatables.datatables_css')

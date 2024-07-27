@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Crear carpeta
+    Crear carpeta
 @endsection
 @section('content')
     <section class="content-header">
@@ -26,7 +26,7 @@
                             <div class="row">
                                 <input type="hidden" name="id_usuario" value="{{ Auth::user()->id }}">
                                 <!-- Establecimiento Field -->
-                                <div class="form-group col-sm-12 ">
+                                <div class="form-group col-sm-12 {{ $errors->has('NombreModulo') ? 'has-error' : '' }}">
                                     <label for="NombreModulo">Nombre de carpeta:</label>
                                     <input class="form-control" name="NombreModulo" type="text" id="NombreModulo">
                                 </div>

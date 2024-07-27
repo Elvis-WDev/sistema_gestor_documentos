@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Edit Roles
+    Edit Roles
 @endsection
 @section('content')
     <section class="content-header">
@@ -79,10 +79,6 @@
                     </form>
                 </div>
                 <!-- /.box -->
-
-
-
-
             </div>
         </div>
     </div>

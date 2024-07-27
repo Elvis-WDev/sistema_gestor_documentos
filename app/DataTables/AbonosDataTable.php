@@ -2,17 +2,13 @@
 
 namespace App\DataTables;
 
-use App\Models\Abono;
 use App\Models\Abonos;
-use App\Models\Factura;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class AbonosDataTable extends DataTable
@@ -31,8 +27,7 @@ class AbonosDataTable extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-        $count = 0; // Inicializar el contador fuera de la función anónima
-
+        $count = 0;
         return (new EloquentDataTable($query))
             ->addColumn('fila', function () use (&$count) {
                 $count++;
@@ -103,12 +98,9 @@ class AbonosDataTable extends DataTable
     {
         return [
             Column::computed('fila')->title('#'),
-            // Column::make('id')->visible(false),
             Column::make('valor_abono')->title('Abono'),
-            // Column::make('total_pre_abono')->title('Total factura'),
             Column::make('saldo_factura')->title('Saldo'),
             Column::make('fecha_abonado')->title('Fecha'),
-
         ];
     }
     /**

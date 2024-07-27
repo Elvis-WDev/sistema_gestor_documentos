@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Perfil de usuario
+    Perfil de usuario
 @endsection
 @section('content')
     <section class="content-header">
@@ -8,7 +8,7 @@
             Perfil de usuario
         </h1>
     </section>
-    {{-- {{ dd(Auth::user()->NombreUsuario) }} --}}
+
     <div class="content">
         <div class="row">
             <!-- left column -->
@@ -94,10 +94,6 @@
                     </form>
                 </div>
                 <!-- /.box -->
-
-
-
-
             </div>
         </div>
     </div>

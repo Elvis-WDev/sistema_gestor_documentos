@@ -86,7 +86,7 @@ class PagosController extends Controller
 
         if ($request->hasFile('Archivos')) {
 
-            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/pagos', 'old_archivos');
+            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/pagos', 'old_archivos', 'uploads/trash/pagos/', "Archivos eliminados al editar un pago de $" . $request->Total);
 
             $Pago->Archivos = $archivos;
         } elseif ($request->filled('old_archivos')) {
@@ -121,14 +121,7 @@ class PagosController extends Controller
 
             $tempPago = $Pago;
 
-            if (!is_null($Pago->Archivos)) {
-                $archivos = json_decode($Pago->Archivos, true);
-
-                foreach ($archivos as $archivo) {
-                    $trashPath = 'uploads/trash/pagos/' . basename($archivo);
-                    Storage::disk('public')->move($archivo, $trashPath);
-                }
-            }
+            $this->DestroyFiles($Pago->Archivos, 'uploads/trash/pagos/', 'Archivos eliminados al eliminar un pago: $' . $tempPago->Total);
 
             $Pago->delete();
 

@@ -2,9 +2,7 @@
 
 namespace App\DataTables;
 
-use App\Models\Rol;
 use App\Models\User;
-use App\Models\UsuariosDatatable;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
@@ -12,8 +10,6 @@ use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
 class UsuariosDatatables extends DataTable
@@ -25,55 +21,38 @@ class UsuariosDatatables extends DataTable
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
-
         $count = 0;
-
         return (new EloquentDataTable($query))
-
+            ->addColumn('fila', function () use (&$count) {
+                $count++;
+                return $count;
+            })
             ->addColumn('id_rol', function ($query) {
-                // Obtener todos los roles del usuario
                 $roles = $query->roles->pluck('name')->toArray();
 
                 if (!empty($roles)) {
-                    return implode(', ', $roles); // Si hay múltiples roles, se mostrarán separados por coma
+                    return implode(', ', $roles);
                 } else {
                     return 'No existe rol asociado';
                 }
             })
 
             ->addColumn('action', function ($query) {
-
-
                 $ButtonGroup = '';
 
                 if ($query->id != 1) {
                     if (Auth::user()->can('modificar usuario')) {
-
-                        $ButtonGroup .= ' 
-                            <a href="' . route('editar-usuario', $query->id) . '" class="btn btn-default btn-sm">
-                                <i class="glyphicon glyphicon-edit"></i>
-                            </a>
-                        ';
+                        $ButtonGroup .= '<a href="' . route('editar-usuario', $query->id) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a>';
                     }
 
                     if (Auth::user()->can('eliminar usuario')) {
-
-                        $ButtonGroup .= ' 
-                            <a href="' . route('destroy-usuario', $query->id) . '" class="btn btn-danger btn-sm delete-item">
-                                <i class="fas fa-trash-alt"></i>
-                            </a>
-                        ';
+                        $ButtonGroup .= '<a href="' . route('destroy-usuario', $query->id) . '" class="btn btn-danger btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
                     }
                 }
 
-                return ' <div class="btn-group">
-                           ' . $ButtonGroup == "" ? "No permitido" : $ButtonGroup . '
-                        </div>';
+                return '<div class="btn-group">' . $ButtonGroup == "" ? "No permitido" : $ButtonGroup . '</div>';
             })
-            ->addColumn('fila', function () use (&$count) {
-                $count++;
-                return $count;
-            })
+
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
@@ -136,13 +115,12 @@ class UsuariosDatatables extends DataTable
     {
         return [
             Column::make('fila')->title('#'),
-            // Column::make('id')->title('#'),
             Column::make('NombreUsuario')->title('Nombre de usuario'),
             Column::make('email')->title('Email'),
             Column::make('id_rol')->title('Rol'),
             Column::make('created_at')->title('Fecha creación'),
             Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)
+            Column::computed('action')->printable(false)->exportable(false)->title('Acción')
         ];
     }
 

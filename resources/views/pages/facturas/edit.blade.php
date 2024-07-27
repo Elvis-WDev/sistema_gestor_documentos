@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Factura
+    Factura
 @endsection
 @section('content')
     <section class="content-header">

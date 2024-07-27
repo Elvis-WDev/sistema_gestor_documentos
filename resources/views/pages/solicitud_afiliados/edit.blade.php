@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Solicitud de afiliadoS
+    Solicitud de afiliadoS
 @endsection
 @section('content')
     <section class="content-header">
@@ -30,28 +30,28 @@
                                 <input type="hidden" name="old_archivos" value="{{ $SolicitudAfiliados->Archivos }}">
 
                                 <!-- NombreCLiente Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('NombreCliente') ? 'has-error' : '' }}">
                                     <label for="NombreCliente">Nombre de cliente:</label>
                                     <input class="form-control" name="NombreCliente" type="text" id="NombreCliente"
                                         value="{{ $SolicitudAfiliados->NombreCliente }}">
                                 </div>
 
                                 <!-- Prefijo Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('Prefijo') ? 'has-error' : '' }}">
                                     <label for="Prefijo">Prefijo:</label>
                                     <input class="form-control" name="Prefijo" type="number" id="Prefijo"
                                         value="{{ $SolicitudAfiliados->Prefijo }}">
                                 </div>
 
                                 <!-- FechaSolicitud Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('FechaSolicitud') ? 'has-error' : '' }}">
                                     <label for="FechaSolicitud">Fecha de solicitud:</label>
                                     <input class="form-control" name="FechaSolicitud" type="text"
                                         id="FechaSolicitudUpdate" value="{{ $SolicitudAfiliados->FechaSolicitud }}">
                                 </div>
 
                                 <!-- FechaSolicitud Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('updated_at') ? 'has-error' : '' }}">
                                     <label for="updated_at">Última modificación:</label>
                                     <input class="form-control" name="updated_at" type="text" id="updated_at"
                                         value="{{ $SolicitudAfiliados->updated_at }}" disabled>
@@ -67,7 +67,8 @@
                                     @foreach ($Files as $file)
                                         <div class="btn-group">
                                             <a href="{{ asset('storage/' . $file) }}" target="_blank"
-                                                data-tippy-content="{{ substr($file, 28) }}" class="btn btn-default btn-md">
+                                                data-tippy-content="{{ substr($file, 28) }}"
+                                                class="btn btn-default btn-md">
                                                 <i class="fas fa-print"></i>
                                             </a>
                                         </div>
@@ -83,7 +84,7 @@
 
                                 </div>
 
-                                <div class="form-group col-sm-12">
+                                <div class="form-group col-sm-12 {{ $errors->has('Archivos') ? 'has-error' : '' }}">
 
                                     <div class="dropzone" id="dropzone">
                                         <i class="far fa-copy icon"></i></br></br>

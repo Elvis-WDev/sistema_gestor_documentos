@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Archivos
+    Archivos
 @endsection
 @section('content')
     <div id="modal-space">
@@ -9,28 +9,6 @@
         <h1 class="pull-left">
             Documentos
         </h1>
-        {{-- <h1 class="pull-right" style="margin-bottom: 5px;">
-            <div class="dropdown" style="display: inline-block">
-                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"><i
-                        class="fa fa-download"></i> Download Zip
-                    <span class="caret"></span></button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <a href="#">All</a>
-                    </li>
-                    <li>
-                        <a href="#">Original</a>
-                    </li>
-                    <li>
-                        <a href="#">Varientw (Images Only)</a>
-                    </li>
-                </ul>
-            </div>
-            <a href="#" class="btn btn-primary"><i class="fa fa-edit"></i> Edit</a>
-            <form action="#" method="delete" style="display:inline;">
-                <button class="btn btn-danger" type="submit"><i class="fa fa-trash"></i> Delete</button>
-            </form>
-        </h1> --}}
     </section>
     <div class="content">
         <div class="clearfix"></div>
@@ -92,7 +70,7 @@
                                                     <img style="cursor:pointer;height:60px;object-fit:contain;width:100%"
                                                         src="{{ asset('images/icon_pdf.svg') }}" alt=""
                                                         onclick="showFileModal({
-                                                            url: '{{ asset('storage/' . $file->Archivo) }}',
+                                                            url: '{{ route('download', ['path' => $file->Archivo]) }}',
                                                             extension: '{{ $file->extension }}',
                                                             name: '{{ $file->Nombre }}',
                                                             created_at: '{{ $file->created_at }}',
@@ -102,7 +80,7 @@
                                                     <img style="cursor:pointer;height:60px;object-fit:contain;width:100%"
                                                         src="{{ asset('images/icon_word.png') }}" alt=""
                                                         onclick="showFileModal({
-                                                            url: '{{ asset('storage/' . $file->Archivo) }}',
+                                                            url: '{{ route('download', ['path' => $file->Archivo]) }}',
                                                             extension: '{{ $file->extension }}',
                                                             name: '{{ $file->Nombre }}',
                                                             created_at: '{{ $file->created_at }}',
@@ -112,7 +90,7 @@
                                                     <img style="cursor:pointer;height:60px;object-fit:contain;width:100%"
                                                         src="{{ asset('images/icon_excel.webp') }}" alt=""
                                                         onclick="showFileModal({
-                                                            url: '{{ asset('storage/' . $file->Archivo) }}',
+                                                            url: '{{ route('download', ['path' => $file->Archivo]) }}',
                                                             extension: '{{ $file->extension }}',
                                                             name: '{{ $file->Nombre }}',
                                                             created_at: '{{ $file->created_at }}',
@@ -120,9 +98,10 @@
                                                         })">
                                                 @else
                                                     <img style="cursor:pointer;height:60px;object-fit:contain;width:100%"
-                                                        src="{{ asset('storage/' . $file->Archivo) }}" alt=""
+                                                        src="{{ route('download', ['path' => $file->Archivo]) }}"
+                                                        alt=""
                                                         onclick="showFileModal({
-                                                            url: '{{ asset('storage/' . $file->Archivo) }}',
+                                                            url: '{{ route('download', ['path' => $file->Archivo]) }}',
                                                             extension: '{{ $file->extension }}',
                                                             name: '{{ $file->Nombre }}',
                                                             created_at: '{{ $file->created_at }}',
@@ -150,7 +129,7 @@
                                                     <ul class="dropdown-menu" role="menu">
                                                         <li><a href="javascript:void(0);"
                                                                 onclick="showFileModal({
-                                                            url: '{{ asset('storage/' . $file->Archivo) }}',
+                                                            url: '{{ route('download', ['path' => $file->Archivo]) }}',
                                                             extension: '{{ $file->extension }}',
                                                             name: '{{ $file->Nombre }}',
                                                             created_at: '{{ $file->created_at }}',
@@ -158,7 +137,7 @@
                                                         })">
                                                                 Detalles
                                                             </a></li>
-                                                        <li><a href="{{ asset('storage/' . $file->Archivo) }}"
+                                                        <li><a href="{{ route('download', ['path' => $file->Archivo]) }}"
                                                                 taget="blank_" download>Descargar</a>
                                                         </li>
                                                         <li>

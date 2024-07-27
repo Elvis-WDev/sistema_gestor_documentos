@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Punto de emisión
+    Punto de emisión
 @endsection
 @section('content')
     <section class="content-header">

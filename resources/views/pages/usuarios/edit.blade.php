@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Editar usuario
+    Editar usuario
 @endsection
 @section('content')
     <section class="content-header">

@@ -2,16 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Archivo;
 use App\Models\ArchivoModuloPersonalizado;
-use App\Models\Establecimiento;
 use App\Models\ModuloPersonalizado;
-use App\Models\PuntoEmision;
 use App\Traits\FilesUploadTrait;
 use App\Traits\RegistrarActividad;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\Rule;
 
 class ArchivosController extends Controller
 {
@@ -33,10 +31,12 @@ class ArchivosController extends Controller
     {
 
         $request->validate([
-            'Archivo' => 'file|mimes:' . config('config_general')['archivos']['archivos_permitidos'] . '|max:' . (config('config_general')['archivos']['tamano_maximo_permitido']) * 1024,
+            'Archivo' => 'required|file|mimes:' . config('config_general')['archivos']['archivos_permitidos'] . '|max:' . (config('config_general')['archivos']['tamano_maximo_permitido']) * 1024,
             'id_modulo' => 'required|integer',
             'id_usuario' => 'required|integer',
-            'Nombre' => ['required', 'string', 'unique:' . ArchivoModuloPersonalizado::class]
+            'Nombre' => ['required', 'string',  Rule::unique('archivos_modulos_personalizados')->where(function ($query) {
+                return $query->where('Estado', 'Activo');
+            })]
         ]);
 
         // Procesamiento de archivos utilizando uploadMultiFile
@@ -77,7 +77,7 @@ class ArchivosController extends Controller
 
             $this->Actividad(
                 Auth::user()->id,
-                "Ha eliminado un archivo", 
+                "Ha eliminado un archivo",
                 $archivo->Nombre
             );
 

@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Editar configuración general
+    Editar configuración general
 @endsection
 @section('content')
     <section class="content-header">
@@ -30,14 +30,15 @@
                                 <input type="hidden" name="id" value="{{ $Config_generales->id }}">
 
                                 <!-- nombre Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('nombre') ? 'has-error' : '' }}">
                                     <label for="nombre">Nombre:</label>
                                     <input class="form-control" value="{{ $Config_generales->nombre }}" name="nombre"
                                         type="text" id="nombre">
                                 </div>
 
                                 <!-- cantidad_permitidos Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div
+                                    class="form-group col-sm-6 {{ $errors->has('cantidad_permitidos') ? 'has-error' : '' }}">
                                     <label for="cantidad_permitidos">Cantidad de archivo permitidos por subida:</label>
                                     <input class="form-control" name="cantidad_permitidos" type="number"
                                         id="cantidad_permitidos" value="{{ $Config_generales->cantidad_permitidos }}"
@@ -45,7 +46,8 @@
                                 </div>
 
                                 <!-- tamano_maximo_permitido Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div
+                                    class="form-group col-sm-6 {{ $errors->has('tamano_maximo_permitido') ? 'has-error' : '' }}">
                                     <label for="tamano_maximo_permitido">Tamaño máximo permitido (MB):</label>
                                     <input class="form-control" name="tamano_maximo_permitido" type="number"
                                         id="tamano_maximo_permitido"
@@ -55,7 +57,8 @@
                                 @php
                                     $allowedFilesArray = explode(',', $Config_generales->archivos_permitidos);
                                 @endphp
-                                <div class="form-group col-sm-6">
+                                <div
+                                    class="form-group col-sm-6 {{ $errors->has('archivos_permitidos') ? 'has-error' : '' }}">
                                     <label>Archivos permitidos</label>
                                     <select class="form-control select2" style="width: 100%;" name="archivos_permitidos[]"
                                         multiple>

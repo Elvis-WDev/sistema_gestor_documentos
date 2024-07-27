@@ -43,7 +43,7 @@
                                 </div>
 
                                 <!-- Archivos Field -->
-                                <div class="form-group col-sm-12">
+                                <div class="form-group col-sm-12 {{ $errors->has('Archivo') ? 'has-error' : '' }}">
 
                                     <div class="dropzone" id="dropzone">
                                         <i class="far fa-copy icon"></i></br></br>

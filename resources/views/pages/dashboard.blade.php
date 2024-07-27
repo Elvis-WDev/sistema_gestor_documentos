@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Dashboard
+    Dashboard
 @endsection
 @section('content')
     <section class="content-header">
@@ -147,8 +147,6 @@
             Morris.Donut({
                 element: 'facturas-graph-donut',
                 resize: true,
-                //labelColor:"#cccccc", // text color
-                //backgroundColor: '#333333', // border color
                 data: [{
                         label: "Pagadas",
                         value: {{ $Data['CantidadFacturasPagadas'] }},

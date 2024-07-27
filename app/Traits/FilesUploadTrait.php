@@ -3,9 +3,11 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Storage;
+use PDO;
 
 trait FilesUploadTrait
 {
+    use MovePapelera;
 
     public function uploadFile($request, $inputName, $path)
     {
@@ -61,21 +63,41 @@ trait FilesUploadTrait
         return $filePaths;
     }
 
-    public function updateMultiFile($request, $inputName, $path, $old_archivos_txt)
+    public function updateMultiFile($request, $inputName, $path, $old_archivos_txt, $PathToTrash, $PapeleraDetalle)
     {
+        $FilesToPapelera = [];
         // Mover archivos antiguos a la carpeta de "trash" si hay nuevos archivos
         if ($request->filled($old_archivos_txt)) {
+
             $old_archivos = json_decode($request->old_archivos, true);
 
             foreach ($old_archivos as $old_archivo) {
-                $trashPath = 'uploads/trash/pagos/' . basename($old_archivo);
+                $trashPath = $PathToTrash . basename($old_archivo);
+                $FilesToPapelera[] = $trashPath;
                 Storage::disk('public')->move($old_archivo, $trashPath);
             }
+
+            $this->MoveToPapelera(json_encode($FilesToPapelera, JSON_UNESCAPED_SLASHES), $PapeleraDetalle);
         }
 
         // Subir nuevos archivos y actualizar el campo Archivos
         $archivos = $this->uploadMultiFile($request, $inputName, $path);
 
         return json_encode($archivos);
+    }
+
+    public function DestroyFiles($files, $PathToTrash, $PapeleraDetalle)
+    {
+        $FilesToPapelera = [];
+        if (!is_null($files)) {
+            $archivos = json_decode($files, true);
+
+            foreach ($archivos as $archivo) {
+                $trashPath = $PathToTrash . basename($archivo);
+                $FilesToPapelera[] = $trashPath;
+                Storage::disk('public')->move($archivo, $trashPath);
+            }
+            $this->MoveToPapelera(json_encode($FilesToPapelera, JSON_UNESCAPED_SLASHES), $PapeleraDetalle);
+        }
     }
 }

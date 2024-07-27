@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Facturas
+    Facturas
 @endsection
 @section('content')
     <section class="content-header">
@@ -25,24 +25,50 @@
                 <form method="post" action="{{ route('generar-reporte_anuladas') }}" formtarget="_blank" target="_blank">
                     @csrf
                     <div class="row">
-                        <!-- reporte_inicio Field -->
-                        <div class="form-group col-12 col-sm-6 col-md-4 col-lg-2">
-                            <input class="form-control reporte_daterange_fechaInicio" name="txt_fecha_reporte_inicio"
-                                type="text" id="reporte_daterange_fechaInicio" placeholder="Fecha inicio">
+                        <div class="col-sm-6">
+
+                            <div class="row">
+
+                                <!-- reporte_inicio Field -->
+                                <div
+                                    class="form-group col-sm-4 {{ $errors->has('txt_fecha_reporte_inicio') ? 'has-error' : '' }}">
+                                    <input class="form-control reporte_daterange_fechaInicio"
+                                        name="txt_fecha_reporte_inicio" type="text" id="reporte_daterange_fechaInicio"
+                                        placeholder="Fecha inicio">
+                                </div>
+
+                                <!-- reporte_final Field -->
+                                <div
+                                    class="form-group col-sm-4 {{ $errors->has('txt_fecha_reporte_final') ? 'has-error' : '' }}">
+                                    <input class="form-control reporte_daterange_fechaFinal" name="txt_fecha_reporte_final"
+                                        type="text" id="reporte_daterange_fechaFinal" placeholder="Fecha final">
+                                </div>
+
+                                <!-- Submit Button -->
+                                <div class="form-group col-sm-4">
+                                    <button type="submit" class="btn btn-success btn-md w-100">
+                                        Generar reporte
+                                    </button>
+                                </div>
+
+                            </div>
+
+                        </div>
+                        <div class="col-sm-6 text-right">
+
+                            <div class="btn-group">
+                                <a href="{{ route('facturas') }}" type="button" class="btn btn-xs btn-info">Facturas</a>
+                                <a href="{{ route('cuentas') }}" type="button" class="btn btn-xs btn-primary">Cuentas</a>
+                                <a href="{{ route('facturas-pagadas') }}" type="button"
+                                    class="btn btn-xs btn-success">Pagadas</a>
+                                <a href="{{ route('facturas-abonadas') }}" type="button"
+                                    class="btn btn-xs btn-warning">Abonadas</a>
+                                <a href="{{ route('facturas-anuladas') }}" type="button"
+                                    class="btn btn-xs btn-danger">Anuladas</a>
+                            </div>
+
                         </div>
 
-                        <!-- reporte_final Field -->
-                        <div class="form-group col-12 col-sm-6 col-md-4 col-lg-2">
-                            <input class="form-control reporte_daterange_fechaFinal" name="txt_fecha_reporte_final"
-                                type="text" id="reporte_daterange_fechaFinal" placeholder="Fecha final">
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="form-group col-12 col-sm-6 col-md-4 col-lg-2">
-                            <button type="submit" class="btn btn-success btn-md w-100">
-                                Generar reporte
-                            </button>
-                        </div>
                     </div>
                 </form>
             </div>

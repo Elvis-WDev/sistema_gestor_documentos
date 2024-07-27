@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Editar Establecimiento
+    Editar Establecimiento
 @endsection
 @section('content')
     <section class="content-header">
@@ -28,7 +28,7 @@
                                 <input type="hidden" name="id" value="{{ $Establecimiento->id }}">
 
                                 <!-- nombre Field -->
-                                <div class="form-group col-sm-12">
+                                <div class="form-group col-sm-12 {{ $errors->has('nombre') ? 'has-error' : '' }}">
                                     <label for="nombre">Nombre de establecimiento:</label>
                                     <input class="form-control" name="nombre" type="text" id="nombre"
                                         value="{{ $Establecimiento->nombre }}">

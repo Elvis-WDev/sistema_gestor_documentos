@@ -1,15 +1,12 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Abonos
+    Abonos
 @endsection
 @section('content')
     @php
         $saldoFormateado = 0;
         if ($Factura->Estado != 'Anulada') {
-            $ultimoAbono = \App\Models\Abonos::where('factura_id', $Factura->id_factura)
-                ->orderBy('fecha_abonado', 'desc')
-                ->orderBy('id', 'desc')
-                ->first();
+            $ultimoAbono = \App\Http\Controllers\AbonosController::UltimoAbono($Factura->id_factura);
 
             if ($ultimoAbono) {
                 $saldo = $ultimoAbono->saldo_factura;
@@ -29,12 +26,12 @@
         <h1>
 
             @php
-                $establecimiento = \App\Models\Establecimiento::where('id', $Factura->establecimiento_id)->first();
-                $puntoemision = \App\Models\PuntoEmision::where('id', $Factura->punto_emision_id)->first();
+                $establecimiento = $Factura->establecimiento->nombre;
+                $puntoemision = $Factura->puntoEmision->nombre;
             @endphp
 
             Factura No. <a
-                href="{{ route('editar-factura', $Factura->id_factura) }}">{{ $establecimiento->nombre }}-{{ $puntoemision->nombre }}-{{ $Factura->Secuencial }}</a>
+                href="{{ route('editar-factura', $Factura->id_factura) }}">{{ $establecimiento }}-{{ $puntoemision }}-{{ $Factura->Secuencial }}</a>
             ({{ $Factura->Estado == 'Pagada' ? 'Pagada' : '$' . $saldoFormateado }})
         </h1>
     </section>

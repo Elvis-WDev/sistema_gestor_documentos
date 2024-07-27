@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Crear solicitud de afiliado
+    Crear solicitud de afiliado
 @endsection
 @section('content')
     <section class="content-header">
@@ -26,26 +26,26 @@
                             <div class="row">
 
                                 <!-- NombreCLiente Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('NombreCliente') ? 'has-error' : '' }}">
                                     <label for="NombreCliente">Nombre de cliente:</label>
                                     <input class="form-control" name="NombreCliente" type="text" id="NombreCliente">
                                 </div>
 
                                 <!-- Prefijo Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('Prefijo') ? 'has-error' : '' }}">
                                     <label for="Prefijo">Prefijo:</label>
                                     <input class="form-control" name="Prefijo" type="number" id="Prefijo">
                                 </div>
 
                                 <!-- FechaSolicitud Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('FechaSolicitud') ? 'has-error' : '' }}">
                                     <label for="FechaSolicitud">Fecha de solicitud:</label>
                                     <input class="form-control" name="FechaSolicitud" type="text"
                                         id="FechaSolicitudCreate">
                                 </div>
 
                                 <!-- FechaSolicitud Field -->
-                                <div class="form-group col-sm-6 ">
+                                <div class="form-group col-sm-6 {{ $errors->has('created_at') ? 'has-error' : '' }}">
                                     <label for="created_at">Fecha de carga:</label>
                                     <input class="form-control created_at" name="created_at" type="text" id="created_at"
                                         disabled>
@@ -56,7 +56,7 @@
                                     <div class="fileList" id="fileList"></div>
                                 </div>
 
-                                <div class="form-group col-sm-12">
+                                <div class="form-group col-sm-12 {{ $errors->has('Archivos') ? 'has-error' : '' }}">
                                     <label for="fileList">Archivos:</label>
                                     <div class="dropzone" id="dropzone">
                                         <i class="far fa-copy icon"></i></br></br>
@@ -134,8 +134,7 @@
                     dataTransfer.items.add(file);
                 }
 
-                // Opcional: Mostrar los archivos en fileList
-                fileList.innerHTML = ''; // Limpiar la lista antes de mostrar los archivos
+                fileList.innerHTML = '';
                 for (let i = 0; i < files.length; i++) {
                     const file = files[i];
                     const fileItem = document.createElement('div');

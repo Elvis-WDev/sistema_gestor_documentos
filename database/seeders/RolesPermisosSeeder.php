@@ -48,6 +48,7 @@ class RolesPermisosSeeder extends Seeder
             'eliminar SolicitudAfiliado',
             'eliminar custom_module',
             'configuraciones',
+            'papelera',
 
         ];
 

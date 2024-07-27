@@ -2,19 +2,19 @@
 
 namespace App\DataTables;
 
-use App\Models\ModuloPersonalizado;
+use App\Models\Papelera;
+use App\Traits\Datatables;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
 use Yajra\DataTables\Html\Builder as HtmlBuilder;
 use Yajra\DataTables\Html\Button;
 use Yajra\DataTables\Html\Column;
-use Yajra\DataTables\Html\Editor\Editor;
-use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class ModuloPersonalizadoDataTable extends DataTable
+class PapeleraDataTable extends DataTable
 {
+    use Datatables;
     /**
      * Build the DataTable class.
      *
@@ -24,37 +24,30 @@ class ModuloPersonalizadoDataTable extends DataTable
     {
         $count = 0;
         return (new EloquentDataTable($query))
-            ->addColumn('action', function ($query) {
-                $ButtonGroup = '
-             <div class="btn-group">
-                <a href="#" class="btn btn-default btn-sm">
-                <i class="glyphicon glyphicon-eye-open"></i>
-                </a>
-                <a href="#" class="btn btn-default btn-sm">
-                    <i class="glyphicon glyphicon-edit"></i>
-                </a>
-             </div>';
-
-                return $ButtonGroup;
-            })
             ->addColumn('fila', function () use (&$count) {
                 $count++;
                 return $count;
             })
+            ->addColumn('Archivos', function ($query) {
+                return $this->DatatableArchivos($query->Archivos);
+            })
             ->editColumn('created_at', function ($row) {
                 return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
             })
-            ->editColumn('updated_at', function ($row) {
-                return Carbon::parse($row->created_at)->translatedFormat('Y-m-d H:i');
+            ->addColumn('action', function ($query) {
+
+                $ButtonGroup = '<a href="' . route('destroy-papelera', $query->id) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar permanentemente estos archivos?"><i class="fas fa-trash-alt"></i></a>';
+
+                return $ButtonGroup;
             })
-            ->rawColumns(['action'])
+            ->rawColumns(['action', 'Archivos'])
             ->setRowId('id');
     }
 
     /**
      * Get the query source of dataTable.
      */
-    public function query(ModuloPersonalizado $model): QueryBuilder
+    public function query(Papelera $model): QueryBuilder
     {
         return $model->newQuery();
     }
@@ -65,10 +58,9 @@ class ModuloPersonalizadoDataTable extends DataTable
     public function html(): HtmlBuilder
     {
         return $this->builder()
-            ->setTableId('modulopersonalizado-table')
+            ->setTableId('papelera-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            //->dom('Bfrtip')
             ->orderBy(1)
             ->scrollX(true)
             ->selectStyleSingle()
@@ -93,6 +85,12 @@ class ModuloPersonalizadoDataTable extends DataTable
                 'language' => [
                     'url' => url('vendor/datatables/es-ES.json')
                 ],
+                'initComplete' => 'function(settings, json) {
+                    initializeTippy();
+                }',
+                'drawCallback' => 'function(settings) {
+                    initializeTippy();
+                }',
             ]);
     }
 
@@ -102,14 +100,11 @@ class ModuloPersonalizadoDataTable extends DataTable
     public function getColumns(): array
     {
         return [
-            Column::make('fila')->title('#'),
-            // Column::make('id_modulo')->title('#'),
-            Column::make('Archivo')->title('Archivo'),
-            Column::make('Fecha')->title('Fecha'),
-            Column::make('TipoArchivo')->title('Tipo de archivo'),
-            Column::make('created_at')->title('Fecha creación'),
-            Column::make('updated_at')->title('última modificación'),
-            Column::computed('action')->title('Acción')->printable(false)->addClass('text-center')
+            Column::make('id')->title('#'),
+            Column::make('Archivos')->title('Archivos eliminados')->exportable(false)->printable(false)->addClass('text-center'),
+            Column::make('Detalle')->title('Descripción'),
+            Column::make('created_at')->title('Fecha de eliminación'),
+            Column::computed('action')->exportable(false)->printable(false)->addClass('text-center'),
         ];
     }
 
@@ -118,6 +113,6 @@ class ModuloPersonalizadoDataTable extends DataTable
      */
     protected function filename(): string
     {
-        return 'ModuloPersonalizado_' . date('YmdHis');
+        return 'Papelera_' . date('YmdHis');
     }
 }

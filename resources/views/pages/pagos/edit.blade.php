@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Pagos
+    Pagos
 @endsection
 @section('content')
     <section class="content-header">
@@ -27,7 +27,8 @@
                             <input type="hidden" name="id_pago" value="{{ $Pago->id_pago }}">
                             <input type="hidden" name="old_archivos" value="{{ $Pago->Archivos }}">
 
-                            <div class="form-group col-sm-6" data-select2-id="13">
+                            <div class="form-group col-sm-6 {{ $errors->has('id_factura') ? 'has-error' : '' }}"
+                                data-select2-id="13">
                                 <label>Factura #:</label>
                                 <select class="form-control select2 select2-hidden-accessible" style="width: 100%;"
                                     data-select2-id="1" tabindex="-1" aria-hidden="true" name="id_factura">
@@ -50,21 +51,21 @@
                             </div>
 
                             <!--  FechaPago -->
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {{ $errors->has('FechaPago') ? 'has-error' : '' }}">
                                 <label for="FechaPago">Fecha de pago:</label>
                                 <input class="form-control" name="FechaPago" type="text" id="FechaPagoUpdate"
                                     value="{{ $Pago->FechaPago }}">
                             </div>
 
                             <!-- Monto Field -->
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {{ $errors->has('Total') ? 'has-error' : '' }}">
                                 <label for="Cantidad">Cantidad:</label>
                                 <input class="form-control" name="Total" type="number" id="Cantidad" min="0"
                                     step="any" value="{{ $Pago->Total }}">
                             </div>
 
                             <!-- Fecha Field -->
-                            <div class="form-group col-sm-6">
+                            <div class="form-group col-sm-6 {{ $errors->has('Fecha') ? 'has-error' : '' }}">
                                 <label for="updated_at">Última modificación:</label>
                                 <input class="form-control" name="Fecha" type="text" id="updated_at"
                                     value="{{ $Pago->updated_at }}" disabled>
@@ -95,7 +96,7 @@
 
                             </div>
 
-                            <div class="form-group col-sm-12">
+                            <div class="form-group col-sm-12 {{ $errors->has('FechaPago') ? 'has-error' : '' }}">
 
                                 <div class="dropzone" id="dropzone">
                                     <i class="far fa-copy icon"></i></br></br>

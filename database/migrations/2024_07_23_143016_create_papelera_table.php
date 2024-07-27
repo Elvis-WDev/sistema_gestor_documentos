@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('papelera', function (Blueprint $table) {
             $table->id();
-            $table->string('Archivos');
-            $table->string('Detalle');
+            $table->string('Archivos', 1000)->default('[]');
+            $table->string('Detalle', 255)->default('');
             $table->timestamps();
         });
     }

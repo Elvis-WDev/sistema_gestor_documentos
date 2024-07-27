@@ -10,8 +10,10 @@ use App\Http\Controllers\{
     DashboardController,
     EstablecimientosController,
     FacturasController,
+    FilesController,
     ModulosPersonalizadoController,
     PagosController,
+    PapeleraController,
     ProfileController,
     PuntosEmisionController,
     ReportesController,
@@ -30,6 +32,8 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
     Route::get('/perfil', [ProfileController::class, 'edit'])->name('perfil.edit');
 
     Route::patch('/perfil', [UsuariosController::class, 'updateProfile'])->name('perfil.update');
+
+    Route::get('download/{path}', [FilesController::class, 'download'])->where('path', '.*')->name('download');
 });
 
 //USUARIOS Y ROLES
@@ -37,142 +41,152 @@ Route::group(['middleware' => ['can:ver usuario']], function () {
     Route::get('usuarios', [UsuariosController::class, 'index'])->name('usuarios');
     Route::get('roles', [RolesController::class, 'index'])->name('roles');
 });
+
 Route::group(['middleware' => ['can:crear usuario']], function () {
-    Route::get('crear-usuario', [UsuariosController::class, 'create'])->name('crear-usuario');
+    Route::get('usuarios/crear', [UsuariosController::class, 'create'])->name('crear-usuario');
 
-    Route::post('store-usuario', [RegisteredUserController::class, 'store'])->name('store-usuario');
+    Route::post('usuarios/store', [RegisteredUserController::class, 'store'])->name('store-usuario');
 
-    Route::get('crear-rol', [RolesController::class, 'create'])->name('crear-rol');
+    Route::get('roles/crear', [RolesController::class, 'create'])->name('crear-rol');
 
-    Route::post('store-rol', [RolesController::class, 'store'])->name('store-rol');
+    Route::post('roles/store', [RolesController::class, 'store'])->name('store-rol');
 });
+
 Route::group(['middleware' => ['can:modificar usuario']], function () {
-    Route::get('editar-usuario/{id}', [UsuariosController::class, 'edit'])->name('editar-usuario');
+    Route::get('usuarios/editar/{id}', [UsuariosController::class, 'edit'])->name('editar-usuario');
 
-    Route::put('update-usuario', [RegisteredUserController::class, 'update'])->name('update-usuario');
+    Route::put('usuarios/update', [RegisteredUserController::class, 'update'])->name('update-usuario');
 
-    Route::get('editar-rol/{id}', [RolesController::class, 'edit'])->name('editar-rol');
+    Route::get('roles/editar/{id}', [RolesController::class, 'edit'])->name('editar-rol');
 
-    Route::put('update-rol', [RolesController::class, 'update'])->name('update-rol');
+    Route::put('roles/update', [RolesController::class, 'update'])->name('update-rol');
 });
 
 Route::group(['middleware' => ['can:eliminar usuario']], function () {
-    Route::delete('eliminar-usuario/{id}', [UsuariosController::class, 'destroy'])->name('destroy-usuario');
-    Route::delete('eliminar-rol/{id}', [RolesController::class, 'destroy'])->name('destroy-rol');
+    Route::delete('usuarios/eliminar/{id}', [UsuariosController::class, 'destroy'])->name('destroy-usuario');
+    Route::delete('roles/eliminar/{id}', [RolesController::class, 'destroy'])->name('destroy-rol');
 });
 
 //FACTURAS
 Route::group(['middleware' => ['can:ver facturas']], function () {
-    Route::get('lista-facturas-pagadas', [FacturasController::class, 'FacturasPagadas_index'])->name('facturas-pagadas');
-    Route::get('lista-facturas-abonadas', [FacturasController::class, 'FacturasAbonada_index'])->name('facturas-abonadas');
-    Route::get('lista-facturas-anuladas', [FacturasController::class, 'FacturasAnulada_index'])->name('facturas-anuladas');
-    Route::get('lista-facturas', [FacturasController::class, 'index'])->name('facturas');
-    Route::get('lista-cuentas', [CuentasPorCobrarController::class, 'index'])->name('cuentas');
+    Route::get('facturas', [FacturasController::class, 'index'])->name('facturas');
+    Route::get('facturas/cuentas', [CuentasPorCobrarController::class, 'index'])->name('cuentas');
+    Route::get('facturas/pagadas', [FacturasController::class, 'FacturasPagadas_index'])->name('facturas-pagadas');
+    Route::get('facturas/abonadas', [FacturasController::class, 'FacturasAbonada_index'])->name('facturas-abonadas');
+    Route::get('facturas/anuladas', [FacturasController::class, 'FacturasAnulada_index'])->name('facturas-anuladas');
 });
+
 Route::group(['middleware' => ['can:crear facturas']], function () {
-    Route::get('crear-factura', [FacturasController::class, 'create'])->name('crear-factura');
-    Route::post('store-factura', [FacturasController::class, 'store'])->name('store-factura');
-    Route::post('store-abono', [AbonosController::class, 'store'])->name('store-abono');
-    Route::get('get-punto_emision', [FacturasController::class, 'get_punto_emision'])->name('get-punto_emision');
-    Route::post('generar-reporte', [ReportesController::class, 'generar_reportes'])->name('generar-reporte');
-    Route::post('generar-reporte_anuladas', [ReportesController::class, 'generar_reportes_anuladas'])->name('generar-reporte_anuladas');
+    Route::get('facturas/crear', [FacturasController::class, 'create'])->name('crear-factura');
+    Route::post('facturas/store', [FacturasController::class, 'store'])->name('store-factura');
+    Route::post('facturas/generar-reporte', [ReportesController::class, 'generar_reportes'])->name('generar-reporte');
+    Route::post('facturas/generar-reporte-anuladas', [ReportesController::class, 'generar_reportes_anuladas'])->name('generar-reporte_anuladas');
+    Route::post('abonos/store', [AbonosController::class, 'store'])->name('store-abono');
+    Route::get('punto_emision/get', [FacturasController::class, 'get_punto_emision'])->name('get-punto_emision');
 });
 Route::group(['middleware' => ['can:modificar facturas']], function () {
-    Route::get('editar-factura/{id_factura}', [FacturasController::class, 'edit'])->name('editar-factura');
-    Route::put('update-factura', [FacturasController::class, 'update'])->name('update-factura');
-    Route::get('editar-cuentas/{id}', [CuentasPorCobrarController::class, 'edit'])->name('editar-cuentas');
+    Route::get('facturas/editar/{id}', [FacturasController::class, 'edit'])->name('editar-factura');
+    Route::put('facturas/update', [FacturasController::class, 'update'])->name('update-factura');
+    Route::get('cuentas/editar/{id}', [CuentasPorCobrarController::class, 'edit'])->name('editar-cuentas');
     Route::get('abonos/{id}', [AbonosController::class, 'edit'])->name('abonos');
-    Route::put('update-cuentas', [CuentasPorCobrarController::class, 'update'])->name('update-cuentas');
+    Route::put('cuentas/update', [CuentasPorCobrarController::class, 'update'])->name('update-cuentas');
 });
 Route::group(['middleware' => ['can:eliminar facturas']], function () {
-    Route::delete('anular-factura/{id}', [FacturasController::class, 'anular_factura'])->name('anular-factura');
-    Route::delete('eliminar-factura/{id}', [FacturasController::class, 'destroy'])->name('destroy-factura');
-    // Route::delete('eliminar-abono/{id}', [AbonosController::class, 'destroy'])->name('destroy-abono');
+    Route::delete('facturas/anular/{id}', [FacturasController::class, 'anular_factura'])->name('anular-factura');
+    Route::delete('facturas/eliminar/{id}', [FacturasController::class, 'destroy'])->name('destroy-factura');
 });
 //FACTURAS ---- establecimiento
 Route::group(['middleware' => ['can:ver establecimiento']], function () {
-    Route::get('lista-establecimientos', [EstablecimientosController::class, 'index'])->name('establecimientos');
+    Route::get('establecimientos', [EstablecimientosController::class, 'index'])->name('establecimientos');
 });
 Route::group(['middleware' => ['can:crear establecimiento']], function () {
-    Route::get('crear-establecimiento', [EstablecimientosController::class, 'create'])->name('crear-establecimiento');
-    Route::post('store-establecimiento', [EstablecimientosController::class, 'store'])->name('store-establecimiento');
+    Route::get('establecimientos/crear', [EstablecimientosController::class, 'create'])->name('crear-establecimiento');
+    Route::post('establecimientos/store', [EstablecimientosController::class, 'store'])->name('store-establecimiento');
 });
 Route::group(['middleware' => ['can:modificar establecimiento']], function () {
-    Route::get('editar-establecimiento/{id}', [EstablecimientosController::class, 'edit'])->name('editar-establecimiento');
-    Route::put('update-establecimiento', [EstablecimientosController::class, 'update'])->name('update-establecimiento');
+    Route::get('establecimientos/editar/{id}', [EstablecimientosController::class, 'edit'])->name('editar-establecimiento');
+    Route::put('establecimientos/update', [EstablecimientosController::class, 'update'])->name('update-establecimiento');
 });
 Route::group(['middleware' => ['can:eliminar establecimiento']], function () {
-    Route::delete('eliminar-establecimiento/{id}', [EstablecimientosController::class, 'destroy'])->name('destroy-establecimiento');
+    Route::delete('establecimientos/eliminar/{id}', [EstablecimientosController::class, 'destroy'])->name('destroy-establecimiento');
 });
 //FACTURAS ---- punto_emision
 Route::group(['middleware' => ['can:ver punto_emision']], function () {
-    Route::get('lista-punto_emision', [PuntosEmisionController::class, 'index'])->name('punto_emision');
+    Route::get('punto_emision', [PuntosEmisionController::class, 'index'])->name('punto_emision');
 });
 Route::group(['middleware' => ['can:crear punto_emision']], function () {
-    Route::get('crear-punto_emision', [PuntosEmisionController::class, 'create'])->name('crear-punto_emision');
-    Route::post('store-punto_emision', [PuntosEmisionController::class, 'store'])->name('store-punto_emision');
+    Route::get('punto_emision/crear', [PuntosEmisionController::class, 'create'])->name('crear-punto_emision');
+    Route::post('punto_emision/store', [PuntosEmisionController::class, 'store'])->name('store-punto_emision');
 });
 Route::group(['middleware' => ['can:modificar punto_emision']], function () {
-    Route::get('editar-punto_emision/{id}', [PuntosEmisionController::class, 'edit'])->name('editar-punto_emision');
-    Route::put('update-punto_emision', [PuntosEmisionController::class, 'update'])->name('update-punto_emision');
+    Route::get('punto_emision/editar/{id}', [PuntosEmisionController::class, 'edit'])->name('editar-punto_emision');
+    Route::put('punto_emision/update', [PuntosEmisionController::class, 'update'])->name('update-punto_emision');
 });
 Route::group(['middleware' => ['can:eliminar punto_emision']], function () {
-    Route::delete('eliminar-punto_emision/{id}', [PuntosEmisionController::class, 'destroy'])->name('destroy-punto_emision');
+    Route::delete('punto_emision/eliminar/{id}', [PuntosEmisionController::class, 'destroy'])->name('destroy-punto_emision');
 });
 
 //PAGOS
 Route::group(['middleware' => ['can:ver pagos']], function () {
-    Route::get('lista-pagos', [PagosController::class, 'index'])->name('pagos');
+    Route::get('pagos', [PagosController::class, 'index'])->name('pagos');
 });
 Route::group(['middleware' => ['can:crear pagos']], function () {
-    Route::get('crear-pago', [PagosController::class, 'create'])->name('crear-pago');
-    Route::post('store-pago', [PagosController::class, 'store'])->name('store-pago');
+    Route::get('pagos/crear', [PagosController::class, 'create'])->name('crear-pago');
+    Route::post('pagos/store', [PagosController::class, 'store'])->name('store-pago');
 });
 Route::group(['middleware' => ['can:modificar pagos']], function () {
-    Route::get('editar-pago/{id}', [PagosController::class, 'edit'])->name('editar-pago');
-    Route::put('update-pago', [PagosController::class, 'update'])->name('update-pago');
+    Route::get('pagos/editar/{id}', [PagosController::class, 'edit'])->name('editar-pago');
+    Route::put('pagos/update', [PagosController::class, 'update'])->name('update-pago');
 });
 Route::group(['middleware' => ['can:eliminar pagos']], function () {
-    Route::delete('destroy-pago/{id}', [PagosController::class, 'destroy'])->name('destroy-pago');
+    Route::delete('pagos/destroy/{id}', [PagosController::class, 'destroy'])->name('destroy-pago');
 });
 
 //SolicitudAfiliado
 Route::group(['middleware' => ['can:ver SolicitudAfiliado']], function () {
-    Route::get('lista-solicitud-afiliados', [SolicitudAfiliadosController::class, 'index'])->name('solicitud-afiliados');
+    Route::get('solicitud-afiliados', [SolicitudAfiliadosController::class, 'index'])->name('solicitud-afiliados');
 });
 Route::group(['middleware' => ['can:crear SolicitudAfiliado']], function () {
-    Route::get('crear-solicitud-afiliados', [SolicitudAfiliadosController::class, 'create'])->name('crear-solicitud-afiliados');
-    Route::post('store-solicitud', [SolicitudAfiliadosController::class, 'store'])->name('store-solicitud');
+    Route::get('solicitud-afiliados/crear', [SolicitudAfiliadosController::class, 'create'])->name('crear-solicitud-afiliados');
+    Route::post('solicitud-afiliados/store', [SolicitudAfiliadosController::class, 'store'])->name('store-solicitud');
 });
 Route::group(['middleware' => ['can:modificar SolicitudAfiliado']], function () {
-    Route::get('editar-solicitud-afiliado/{id}', [SolicitudAfiliadosController::class, 'edit'])->name('editar-solicitud-afiliado');
-    Route::put('update-solicitud', [SolicitudAfiliadosController::class, 'update'])->name('update-solicitud');
+    Route::get('solicitud-afiliados/editar/{id}', [SolicitudAfiliadosController::class, 'edit'])->name('editar-solicitud-afiliado');
+    Route::put('solicitud-afiliados/update', [SolicitudAfiliadosController::class, 'update'])->name('update-solicitud');
 });
 Route::group(['middleware' => ['can:eliminar SolicitudAfiliado']], function () {
-    Route::delete('destroy-solicitud/{id}', [SolicitudAfiliadosController::class, 'destroy'])->name('destroy-solicitud');
+    Route::delete('solicitud-afiliados/destroy/{id}', [SolicitudAfiliadosController::class, 'destroy'])->name('destroy-solicitud');
+});
+
+// Papelera
+Route::group(['middleware' => ['can:papelera']], function () {
+    Route::get('papelera', [PapeleraController::class, 'index'])->name('pepelera');
+    Route::delete('papelera/destroy/{id}', [PapeleraController::class, 'destroy'])->name('destroy-papelera');
 });
 
 // Documentos
 Route::group(['middleware' => ['can:ver custom_module']], function () {
-    Route::get('lista-custom-module', [ModulosPersonalizadoController::class, 'index'])->name('custom-module');
-    Route::get('carpeta/{id}', [ArchivosController::class, 'index'])->name('carpeta');
+    Route::get('carpetas', [ModulosPersonalizadoController::class, 'index'])->name('custom-module');
+    Route::get('carpetas/archivos/{id}', [ArchivosController::class, 'index'])->name('carpeta');
 });
 
 Route::group(['middleware' => ['can:crear custom_module']], function () {
-    Route::get('crear-custom-module', [ModulosPersonalizadoController::class, 'create'])->name('crear-custom-module');
-    Route::get('subir-archivo/{id}', [ArchivosController::class, 'create'])->name('subir-archivo');
-    Route::post('store-archivo', [ArchivosController::class, 'store'])->name('store-archivo');
-    Route::post('store-custom_module', [ModulosPersonalizadoController::class, 'store'])->name('store-custom_module');
+    Route::get('carpetas/crear', [ModulosPersonalizadoController::class, 'create'])->name('crear-custom-module');
+    Route::post('carpetas/store', [ModulosPersonalizadoController::class, 'store'])->name('store-custom_module');
+    Route::get('carpetas/archivos/subir/{id}', [ArchivosController::class, 'create'])->name('subir-archivo');
+    Route::post('carpetas/archivos/store', [ArchivosController::class, 'store'])->name('store-archivo');
 });
-Route::group(['middleware' => ['can:modificar custom_module']], function () {
 
-    Route::get('edit-custom_module/{id}', [ModulosPersonalizadoController::class, 'edit'])->name('edit-custom_module');
-    Route::put('update-custom_module', [ModulosPersonalizadoController::class, 'update'])->name('update-custom_module');
-    Route::put('change-status-custom_module', [ModulosPersonalizadoController::class, 'chage_status'])->name('change-status-custom_module');
-    Route::put('change-status-archivo', [ArchivosController::class, 'update'])->name('change-status-archivo');
+Route::group(['middleware' => ['can:modificar custom_module']], function () {
+    Route::get('carpetas/edit/{id}', [ModulosPersonalizadoController::class, 'edit'])->name('edit-custom_module');
+    Route::put('carpetas/update', [ModulosPersonalizadoController::class, 'update'])->name('update-custom_module');
+    Route::put('carpetas/change-status', [ModulosPersonalizadoController::class, 'chage_status'])->name('change-status-custom_module');
+    Route::put('carpetas/archivos/change-status', [ArchivosController::class, 'update'])->name('change-status-archivo');
 });
+
+// Configuracione generales
 Route::group(['middleware' => ['can:configuraciones']], function () {
-    Route::get('lista-configuraciones', [ConfiguracionesGeneralesController::class, 'index'])->name('configuraciones');
-    Route::get('editar-configuracion/{id}', [ConfiguracionesGeneralesController::class, 'edit'])->name('editar-configuracion');
-    Route::put('update-configuracion', [ConfiguracionesGeneralesController::class, 'update'])->name('update-configuracion');
+    Route::get('configuraciones', [ConfiguracionesGeneralesController::class, 'index'])->name('configuraciones');
+    Route::get('configuraciones/editar/{id}', [ConfiguracionesGeneralesController::class, 'edit'])->name('editar-configuracion');
+    Route::put('configuraciones/update', [ConfiguracionesGeneralesController::class, 'update'])->name('update-configuracion');
 });

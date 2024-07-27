@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Crear usuario
+    Crear usuario
 @endsection
 @section('content')
     <section class="content-header">
@@ -100,10 +100,6 @@
                     </form>
                 </div>
                 <!-- /.box -->
-
-
-
-
             </div>
         </div>
     </div>
