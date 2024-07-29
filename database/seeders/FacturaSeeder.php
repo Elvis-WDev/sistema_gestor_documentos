@@ -24,14 +24,17 @@ class FacturaSeeder extends Seeder
             DB::table('facturas')->insert([
                 [
                     'id_factura' => $idFacturaIncremental,
-                    'Archivos' => Str::random(10),
-                    'FechaEmision' => date('Y-m-d'),
-                    'Establecimiento' => Str::random(10),
-                    'PuntoEmision' => Str::random(10),
-                    'Secuencial' => Str::random(10),
+                    'Archivos' => "[]",
+                    'Prefijo' => Str::random(5),
+                    'FechaEmision' => $this->generarFechaAleatoria('2001-01-01', '2024-07-29'),
+                    'establecimiento_id' => rand(1, 2),
+                    'punto_emision_id' => rand(1, 4),
+                    'RetencionIva' => 0,
+                    'RetencionFuente' => 0,
+                    'Secuencial' => Str::random(9),
                     'RazonSocial' => Str::random(10),
-                    'Total' => 50,
-                    'Estado' => 1,
+                    'Total' => rand(1, 1000),
+                    'Estado' =>  4,
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),
                 ]
@@ -39,5 +42,15 @@ class FacturaSeeder extends Seeder
 
             $idFacturaIncremental++;
         }
+    }
+
+    function generarFechaAleatoria($inicio, $fin)
+    {
+        $inicioTimestamp = strtotime($inicio);
+        $finTimestamp = strtotime($fin);
+
+        $fechaAleatoriaTimestamp = rand($inicioTimestamp, $finTimestamp);
+
+        return date('Y-m-d', $fechaAleatoriaTimestamp);
     }
 }

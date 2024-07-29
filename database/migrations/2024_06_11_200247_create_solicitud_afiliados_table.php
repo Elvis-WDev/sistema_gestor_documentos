@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('Archivos', 1000)->default('[]');
             $table->string('Prefijo', 50)->default('');
-            $table->text('NombreCliente', 255)->default('');
+            $table->string('NombreCliente', 255)->default('');
             $table->datetime('FechaSolicitud');
             $table->timestamps();
         });

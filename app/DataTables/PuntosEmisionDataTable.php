@@ -46,13 +46,11 @@ class PuntosEmisionDataTable extends DataTable
                     $ButtonGroup .= '<a href="' . route('destroy-punto_emision', $query->id) . '" class="btn btn-danger btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
                 }
 
-                return '
-                <div class="btn-group">
-                        ' . $ButtonGroup == "" ? 'No permitido' : $ButtonGroup . '
-                </div>
-                ';
-
-                return $ButtonGroup;
+                if ($ButtonGroup == "") {
+                    return "No permitido";
+                } else {
+                    return '<div class="btn-group">'  . $ButtonGroup . '</div>';
+                }
             })
             ->rawColumns(['action'])
             ->setRowId('id');
@@ -75,7 +73,7 @@ class PuntosEmisionDataTable extends DataTable
             ->setTableId('puntosemision-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

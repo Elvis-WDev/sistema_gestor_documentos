@@ -19,7 +19,7 @@ class AdminSeeder extends Seeder
 
             'Nombres' => 'Andrea',
             'Apellidos' => 'Live',
-            'NombreUsuario' => 'SuperAdmin',
+            'NombreUsuario' => 'Super',
             'email' => 'super@gmail.com',
             'password' => bcrypt('password'),
             'url_img' => '',

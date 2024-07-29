@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
         $this->call(ConfiguracionesGeneralesSeeder::class);
         $this->call(RolesPermisosSeeder::class);
         $this->call(AdminSeeder::class);
-        $this->call(EstablecimientoSeeder::class);
-        $this->call(PuntoEmisionSeeder::class);
+        // $this->call(EstablecimientoSeeder::class);
+        // $this->call(PuntoEmisionSeeder::class);
         // $this->call([
         //     FacturaSeeder::class,
         //     PagosSeeder::class,

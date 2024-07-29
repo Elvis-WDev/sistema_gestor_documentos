@@ -45,7 +45,13 @@ class RolesDataTable extends DataTable
                         $ButtonGroup .= '<a href="' . route('destroy-rol', $query->id) . '" class="btn btn-danger btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
                     }
                 }
-                return '<div class="btn-group">' . $ButtonGroup == "" ? "No permitido" : $ButtonGroup . '</div>';
+
+
+                if ($ButtonGroup == "") {
+                    return "No permitido";
+                } else {
+                    return '<div class="btn-group">'  . $ButtonGroup . '</div>';
+                }
             })
             ->rawColumns(['action'])
             ->setRowId('id');
@@ -70,7 +76,7 @@ class RolesDataTable extends DataTable
             ->minifiedAjax()
             //->dom('Bfrtip')
             ->orderBy(1)
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

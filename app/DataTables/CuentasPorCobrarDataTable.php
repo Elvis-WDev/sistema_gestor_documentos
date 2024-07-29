@@ -61,20 +61,28 @@ class CuentasPorCobrarDataTable extends DataTable
             })
             ->addColumn('action', function ($query) {
 
+                $ButtonGroup = '';
+
                 if (Auth::user()->can('modificar facturas')) {
-
-                    $ButtonGroup = '<a href="' . route('editar-cuentas', $query->id_factura) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a><a href="' . route('abonos', $query->id_factura) . '" class="btn btn-info btn-sm"><i class="fa-solid fa-money-bill-wave"></i></a>';
-
+                    $ButtonGroup .= '<a href="' . route('editar-cuentas', $query->id_factura) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a>';
+                }
+                if (Auth::user()->can('abonar facturas')) {
+                    $ButtonGroup .= '<a href="' . route('abonos', $query->id_factura) . '" class="btn btn-info btn-sm"><i class="fa-solid fa-money-bill-wave"></i></a>';
+                }
+                if (Auth::user()->can('anular facturas')) {
                     if ($query->Estado == "Registrada" || $query->Estado == "Abonada") {
-                        $ButtonGroup .= '<a href="' . route('anular-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Desea anular factura?"><i class="fas fa-ban"></i></a>';
+                        $ButtonGroupAbonadaState = '<a href="' . route('anular-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Desea anular factura?"><i class="fas fa-ban"></i></a>';
                     } else {
-                        $ButtonGroup .= '<button class="btn btn-danger btn-sm disabled"><i class="fas fa-ban"></i></button>';
+                        $ButtonGroupAbonadaState = '<button class="btn btn-danger btn-sm disabled"><i class="fas fa-ban"></i></button>';
                     }
-                } else {
-                    $ButtonGroup = 'No permitido';
+                    $ButtonGroup .=  $ButtonGroupAbonadaState;
                 }
 
-                return $ButtonGroup;
+                if ($ButtonGroup == "") {
+                    return "No permitido";
+                } else {
+                    return '<div class="btn-group">'  . $ButtonGroup . '</div>';
+                }
             })
             ->rawColumns(['Estado', 'action', 'Archivos', 'Total', 'RetencionIva', 'RetencionFuente', 'ValorAnulado', 'saldo'])
             ->setRowId('id');
@@ -97,7 +105,7 @@ class CuentasPorCobrarDataTable extends DataTable
             ->setTableId('cuentasporcobrar-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

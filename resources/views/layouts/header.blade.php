@@ -34,7 +34,7 @@
                     <!-- Menu Toggle Button -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <!-- The user image in the navbar-->
-                        <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset('storage/' . Auth::user()->url_img) }}"
+                        <img src="{{ Auth::user()->url_img == '' ? asset('images/Default_user.png') : route('download', ['path' => Auth::user()->url_img]) }}"
                             class="user-image" alt="User Image" />
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
                         <span class="hidden-xs">
@@ -44,7 +44,7 @@
                     <ul class="dropdown-menu">
                         <!-- The user image in the menu -->
                         <li class="user-header">
-                            <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset('storage/' . Auth::user()->url_img) }}"
+                            <img src="{{ Auth::user()->url_img == '' ? asset('images/Default_user.png') : route('download', ['path' => Auth::user()->url_img]) }}"
                                 class="img-circle" alt="User Image" />
                             <p>
                                 {!! Auth::user()->NombreUsuario !!}

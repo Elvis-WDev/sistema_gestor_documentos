@@ -50,7 +50,11 @@ class UsuariosDatatables extends DataTable
                     }
                 }
 
-                return '<div class="btn-group">' . $ButtonGroup == "" ? "No permitido" : $ButtonGroup . '</div>';
+                if ($ButtonGroup == "") {
+                    return "No permitido";
+                } else {
+                    return '<div class="btn-group">'  . $ButtonGroup . '</div>';
+                }
             })
 
             ->editColumn('created_at', function ($row) {
@@ -82,7 +86,7 @@ class UsuariosDatatables extends DataTable
             ->minifiedAjax()
             //->dom('Bfrtip')
             ->orderBy(1)
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

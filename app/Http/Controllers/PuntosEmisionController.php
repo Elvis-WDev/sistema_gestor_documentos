@@ -6,10 +6,14 @@ use App\DataTables\PuntosEmisionDataTable;
 use App\Models\PuntoEmision;
 use App\Rules\UniqueEstablecimientoPuntoEmision;
 use App\Traits\RegistrarActividad;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
+use InvalidArgumentException;
 
 class PuntosEmisionController extends Controller
 {
@@ -24,13 +28,25 @@ class PuntosEmisionController extends Controller
      */
     public function index(PuntosEmisionDataTable $PuntosEmisionDataTable)
     {
-        // $this->isSuperAdmin();
-        return $PuntosEmisionDataTable->render('pages.facturas.punto_emision.index');
+        try {
+
+            return $PuntosEmisionDataTable->render('pages.facturas.punto_emision.index');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al renderizar el DataTable de puntos de emisión', ['exception' => $e]);
+            flash()->error('Hubo un problema al mostrar los puntos de emisión.');
+            return redirect()->route('dashboard');
+        }
     }
     public function create()
     {
-
-        return view('pages.facturas.punto_emision.create');
+        try {
+            return view('pages.facturas.punto_emision.create');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al renderizar la vista de punto emisión', ['exception' => $e]);
+            return redirect()->route('dashboard');
+        }
     }
     public function store(Request $request)
     {
@@ -46,27 +62,47 @@ class PuntosEmisionController extends Controller
 
         ]);
 
-        PuntoEmision::create([
-            'establecimiento_id' => $request->establecimiento_id,
-            'nombre' => $request->nombre,
-        ]);
+        try {
 
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha registrado un punto emisión",
-            "Punto emisión: " .  $request->nombre
-        );
+            PuntoEmision::create([
+                'establecimiento_id' => $request->establecimiento_id,
+                'nombre' => $request->nombre,
+            ]);
 
-        flash('Punto emision registrado correctamente!');
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha registrado un punto emisión",
+                "Punto emisión: " .  $request->nombre
+            );
 
-        return redirect()->route('punto_emision');
+            flash('Punto emision registrado correctamente!');
+
+            return redirect()->route('punto_emision');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al registrar punto de emisión', ['exception' => $e]);
+            flash()->error('Hubo un problema al registrar el punto de emisión.');
+        }
     }
 
     public function edit(int $id)
     {
-        $PuntoEmision = PuntoEmision::findOrFail($id);
+        try {
 
-        return view('pages.facturas.punto_emision.edit', compact('PuntoEmision'));
+            $PuntoEmision = PuntoEmision::findOrFail($id);
+
+            return view('pages.facturas.punto_emision.edit', compact('PuntoEmision'));
+        } catch (ModelNotFoundException $e) {
+            // Manejo de error si el punto de emisión no se encuentra
+            Log::error('Punto de emisión no encontrado', ['id' => $id, 'exception' => $e]);
+            flash()->error('El punto de emisión solicitado no existe.');
+            return redirect()->route('puntos_emision');
+        } catch (Exception $e) {
+            // Manejo de cualquier otro error general
+            Log::error('Error al cargar el punto de emisión para edición', ['id' => $id, 'exception' => $e]);
+            flash()->error('Hubo un problema al cargar el punto de emisión.');
+            return redirect()->route('puntos_emision');
+        }
     }
 
     public function update(Request $request)
@@ -84,25 +120,39 @@ class PuntosEmisionController extends Controller
 
         ]);
 
-        $PuntoEmision = PuntoEmision::findOrFail($request->id);
+        try {
+
+            $PuntoEmision = PuntoEmision::findOrFail($request->id);
 
 
-        $PuntoEmision->establecimiento_id = $request->establecimiento_id;
-        $PuntoEmision->nombre = $request->nombre;
+            $PuntoEmision->establecimiento_id = $request->establecimiento_id;
+            $PuntoEmision->nombre = $request->nombre;
 
 
-        $PuntoEmision->save();
+            $PuntoEmision->save();
 
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha editado un punto emisión",
-            "Punto emisión: " .  $request->nombre
-        );
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha editado un punto emisión",
+                "Punto emisión: " .  $request->nombre
+            );
 
-        flash('Punto emisión actualizado correctamente!');
+            flash('Punto emisión actualizado correctamente!');
 
-        return redirect()->route('punto_emision');
+            return redirect()->route('punto_emision');
+        } catch (ModelNotFoundException $e) {
+            // Manejo de error si el punto de emisión no se encuentra
+            Log::error('Punto de emisión no encontrado', ['id' => $request->id, 'exception' => $e]);
+            flash()->error('El punto de emisión solicitado no existe.');
+            return redirect()->route('punto_emision');
+        } catch (Exception $e) {
+            // Manejo de cualquier otro error general
+            Log::error('Error al actualizar el punto de emisión', ['id' => $request->id, 'exception' => $e]);
+            flash()->error('Hubo un problema al actualizar el punto de emisión.');
+            return redirect()->route('punto_emision');
+        }
     }
+
     public function destroy(string $id)
     {
         try {

@@ -8,8 +8,7 @@
         <h1 class="pull-right">
 
             @can('crear facturas')
-                <a class="btn btn-primary pull-right mx-2" style="margin-top: -10px;margin-bottom: 5px"
-                    href="{{ route('crear-factura') }}">
+                <a class="btn btn-primary pull-right mx-2" href="{{ route('crear-factura') }}">
                     <i class="fa fa-plus"></i>
                     Nueva factura
                 </a>

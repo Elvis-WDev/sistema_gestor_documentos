@@ -41,10 +41,14 @@ class EstablecimientosDataTable extends DataTable
                     $ButtonGroup .= '<a href="' . route('editar-establecimiento', $query->id) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a>';
                 }
                 if (Auth::user()->can('eliminar establecimiento')) {
-                    $ButtonGroup .= '<a href="' . route('destroy-establecimiento', $query->id) . '" class="btn btn-default btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
+                    $ButtonGroup .= '<a href="' . route('destroy-establecimiento', $query->id) . '" class="btn btn-danger btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
                 }
 
-                return '<div class="btn-group">' . $ButtonGroup == "" ? 'No permitido' : $ButtonGroup . '</div>';
+                if ($ButtonGroup == "") {
+                    return "No permitido";
+                } else {
+                    return '<div class="btn-group">'  . $ButtonGroup . '</div>';
+                }
             })
             ->rawColumns(['action'])
             ->setRowId('id');;
@@ -67,7 +71,7 @@ class EstablecimientosDataTable extends DataTable
             ->setTableId('establecimientos-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

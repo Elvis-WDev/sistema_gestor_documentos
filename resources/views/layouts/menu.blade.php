@@ -83,29 +83,36 @@
         </ul>
     </li>
 @endif
-<li class="treeview active">
-    <a href="#">
-        <i class="fa-solid fa-folder-open"></i>
-        <span>Otros</span>
-        <span class="pull-right-container">
-            <i class="fa fa-angle-left pull-right"></i>
-        </span>
-    </a>
-    <ul class="treeview-menu">
-        <li class="{{ setActive(['pepelera']) }}">
-            <a href="{{ route('pepelera') }}">
-                <i class="fas fa-trash-alt"></i><span> Papelera</span></a>
-        </li>
-        <li class="{{ setActive(['custom-module']) }}">
-            <a href="{{ route('custom-module') }}"><i class="fas fa-folder-open"></i>
-                <span>
-                    Archivos
-                </span>
-            </a>
-        </li>
+@if (Auth::user()->can('papelera') || Auth::user()->can('ver custom_module'))
+    <li class="treeview active">
+        <a href="#">
+            <i class="fa-solid fa-folder-open"></i>
+            <span>Otros</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+        </a>
+        <ul class="treeview-menu">
+            <li class="{{ setActive(['pepelera']) }}">
+                @can('papelera')
+                    <a href="{{ route('pepelera') }}">
+                        <i class="fas fa-trash-alt"></i><span>Papelera</span></a>
+                @endcan
 
-    </ul>
-</li>
+            </li>
+            <li class="{{ setActive(['custom-module', 'crear-custom-module', 'carpeta', 'subir-archivo']) }}">
+                @can('ver custom_module')
+                    <a href="{{ route('custom-module') }}"><i class="fas fa-folder-open"></i>
+                        <span>
+                            Archivos
+                        </span>
+                    </a>
+                @endcan
+            </li>
+
+        </ul>
+    </li>
+@endif
 
 @if (Auth::user()->can('ver usuario') ||
         Auth::user()->can('ver establecimiento') ||

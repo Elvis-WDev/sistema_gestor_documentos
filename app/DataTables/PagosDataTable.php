@@ -54,7 +54,7 @@ class PagosDataTable extends DataTable
                     $ButtonGroup .= '<a href="' . route('editar-pago', $query->id_pago) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a>';
                 }
                 if (Auth::user()->can('eliminar pagos')) {
-                    $ButtonGroup .= '<a href="' . route('destroy-pago', $query->id_pago) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar pago?"><i class="fas fa-trash-alt"></i></a>';
+                    $ButtonGroup .= '<a href="' . route('destroy-pago', $query->id_pago) . '" class="btn btn-danger btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
                 }
 
                 return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
@@ -82,7 +82,7 @@ class PagosDataTable extends DataTable
             ->minifiedAjax()
             //->dom('Bfrtip')
             ->orderBy(1)
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

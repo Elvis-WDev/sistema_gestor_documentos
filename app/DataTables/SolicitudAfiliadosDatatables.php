@@ -43,10 +43,10 @@ class SolicitudAfiliadosDatatables extends DataTable
                 $ButtonGroup = "";
 
                 if (Auth::user()->can('modificar SolicitudAfiliado')) {
-                    $ButtonGroup .= '<a href="' . route('editar-solicitud-afiliado', $query->id) . '" class="btn btn-default btn-sm"><i class="glyphicon-edit"></i></a>';
+                    $ButtonGroup .= '<a href="' . route('editar-solicitud-afiliado', $query->id) . '" class="btn btn-default btn-sm"><i class="glyphicon glyphicon-edit"></i></a>';
                 }
                 if (Auth::user()->can('eliminar pagos')) {
-                    $ButtonGroup .= '<a href="' . route('destroy-solicitud', $query->id) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar solicitud?"><i class="fas fa-trash-alt"></i></a>';
+                    $ButtonGroup .= '<a href="' . route('destroy-solicitud', $query->id) . '" class="btn btn-danger btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
                 }
 
                 return $ButtonGroup == "" ? 'No permitido' : $ButtonGroup;
@@ -74,7 +74,7 @@ class SolicitudAfiliadosDatatables extends DataTable
             ->minifiedAjax()
             //->dom('Bfrtip')
             ->orderBy(1)
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

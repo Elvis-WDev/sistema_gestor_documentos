@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\DataTables\ModuloPersonalizadoDataTable;
 use App\Models\ModuloPersonalizado;
 use App\Traits\RegistrarActividad;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 
 class ModulosPersonalizadoController extends Controller
@@ -17,12 +19,26 @@ class ModulosPersonalizadoController extends Controller
 
     public function index()
     {
-        return view('pages.modulospesonalizados.index');
+        try {
+            return view('pages.modulospesonalizados.index');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al renderizar la vista de módulos personalizados', ['exception' => $e]);
+            return redirect()->route('dashboard');
+        }
     }
+
     public function create()
     {
-        return view('pages.modulospesonalizados.create');
+        try {
+            return view('pages.modulospesonalizados.create');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al renderizar la vista de módulos personalizados', ['exception' => $e]);
+            return redirect()->route('dashboard');
+        }
     }
+
     public function store(Request $request)
     {
 
@@ -33,29 +49,50 @@ class ModulosPersonalizadoController extends Controller
             'id_usuario' => ['required', 'integer']
         ]);
 
-        ModuloPersonalizado::create([
-            'NombreModulo' => $request->NombreModulo,
-            'id_usuario' => $request->id_usuario,
-            'Estado' => 1,
-        ]);
+        try {
 
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha creado una carpeta",
-            "Carpeta: " .  $request->NombreModulo
-        );
+            ModuloPersonalizado::create([
+                'NombreModulo' => $request->NombreModulo,
+                'id_usuario' => $request->id_usuario,
+                'Estado' => 1,
+            ]);
 
-        flash('Carpeta creada correctamente!');
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha creado una carpeta",
+                "Carpeta: " .  $request->NombreModulo
+            );
 
-        return redirect()->route('custom-module');
+            flash('Carpeta creada correctamente!');
+
+            return redirect()->route('custom-module');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al crear un módulo personalizado', ['exception' => $e]);
+            flash('Hubo un problema al crear la carpeta. Por favor, inténtalo de nuevo.')->error();
+            return redirect()->back()->withInput();
+        }
     }
 
     public function edit(int $id)
     {
 
-        $Modulo = ModuloPersonalizado::findOrFail($id);
+        try {
 
-        return view('pages.modulospesonalizados.edit', compact('Modulo'));
+            $Modulo = ModuloPersonalizado::findOrFail($id);
+
+            return view('pages.modulospesonalizados.edit', compact('Modulo'));
+        } catch (ModelNotFoundException $e) {
+            // Manejo de errores cuando el módulo no se encuentra
+            Log::error('Módulo personalizado no encontrado', ['id' => $id, 'exception' => $e]);
+            flash('El módulo personalizado solicitado no existe.')->error();
+            return redirect()->route('custom-module');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al intentar editar el módulo personalizado', ['exception' => $e]);
+            flash('Hubo un problema al intentar acceder al módulo personalizado. Por favor, inténtalo de nuevo.')->error();
+            return redirect()->route('custom-module');
+        }
     }
 
     public function update(Request $request)
@@ -71,22 +108,33 @@ class ModulosPersonalizadoController extends Controller
             ],
         ]);
 
+        try {
 
-        $modulo = ModuloPersonalizado::findOrFail($request->id_modulo);
+            $modulo = ModuloPersonalizado::findOrFail($request->id_modulo);
 
-        $modulo->NombreModulo = $request->NombreModulo;
+            $modulo->NombreModulo = $request->NombreModulo;
 
-        $modulo->save();
+            $modulo->save();
 
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha editado una carpeta",
-            "Carpeta: " .  $request->NombreModulo
-        );
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha editado una carpeta",
+                "Carpeta: " .  $request->NombreModulo
+            );
 
-        flash('Carpeta actualizada correctamente!');
+            flash('Carpeta actualizada correctamente!');
 
-        return redirect()->route('custom-module');
+            return redirect()->route('custom-module');
+        } catch (ModelNotFoundException $e) {
+            // Manejo de errores cuando el módulo no se encuentra
+            Log::error('Módulo personalizado no encontrado', ['id_modulo' => $request->id_modulo, 'exception' => $e]);
+            flash('El módulo personalizado solicitado no existe.')->error();
+            return redirect()->route('custom-module');
+        } catch (Exception $e) {
+            Log::error('Error al intentar actualizar el módulo personalizado', ['exception' => $e]);
+            flash('Hubo un problema al intentar actualizar el módulo personalizado. Por favor, inténtalo de nuevo.')->error();
+            return redirect()->route('custom-module');
+        }
     }
 
     public function chage_status(Request $request)

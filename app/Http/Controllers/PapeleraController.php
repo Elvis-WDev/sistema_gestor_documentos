@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\DataTables\PapeleraDataTable;
 use App\Models\Papelera;
 use App\Traits\RegistrarActividad;
+use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 class PapeleraController extends Controller
@@ -16,7 +18,14 @@ class PapeleraController extends Controller
 
     public function index(PapeleraDataTable $PapeleraDataTable)
     {
-        return $PapeleraDataTable->render('pages.papelera.index');
+        try {
+            return $PapeleraDataTable->render('pages.papelera.index');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al renderizar el DataTable de la papelera', ['exception' => $e]);
+            flash()->error('Hubo un problema al mostrar la papelera.');
+            return redirect()->route('dashboard');
+        }
     }
 
     public function destroy(Int $id)
@@ -50,7 +59,7 @@ class PapeleraController extends Controller
 
             return response()->json(['status' => 'success', 'message' => 'Archivos de papelera eliminados correctamente.']);
         } catch (QueryException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Ah ocurrido un problema al eliminar archivos.']);
+            return response()->json(['status' => 'error', 'message' => 'Hubo un problema al eliminar la papelera.']);
         }
     }
 }

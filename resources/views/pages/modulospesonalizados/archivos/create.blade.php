@@ -1,6 +1,6 @@
 @extends('layouts.master')
 @section('title')
-    DigiDocs || Archivo
+    Archivo
 @endsection
 @section('content')
     <section class="content-header">

@@ -3,7 +3,6 @@
 namespace App\Traits;
 
 use Illuminate\Support\Facades\Storage;
-use PDO;
 
 trait FilesUploadTrait
 {

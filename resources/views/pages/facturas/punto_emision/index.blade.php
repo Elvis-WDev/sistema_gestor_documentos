@@ -7,8 +7,7 @@
         <h1 class="pull-left"> Punto de Emisión</h1>
         <h1 class="pull-right">
             @can('crear punto_emision')
-                <a class="btn btn-primary pull-right mx-2" style="margin-top: -10px;margin-bottom: 5px"
-                    href="{{ route('crear-punto_emision') }}">
+                <a class="btn btn-primary pull-right" href="{{ route('crear-punto_emision') }}">
                     <i class="fa fa-plus"></i>
                     Nuevo Punto emisión
                 </a>

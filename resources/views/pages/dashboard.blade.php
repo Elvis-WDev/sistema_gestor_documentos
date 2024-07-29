@@ -113,8 +113,8 @@
                                         title="{{ $activity->usuario->NombreUsuario }}"></i>
 
                                     <div class="timeline-item">
-                                        <span class="time" data-toggle="tooltip" title="{{ $activity->created_at }}"><i
-                                                class="fa fa-clock-o"></i>
+                                        <span class="time" data-toggle="tooltip" title="{{ $activity->created_at }}">
+                                            <i class="fa fa-clock-o"></i>
                                             {{ \Carbon\Carbon::parse($activity->created_at)->diffForHumans() }}</span>
 
                                         <h4 class="timeline-header no-border" data-toggle="tooltip"

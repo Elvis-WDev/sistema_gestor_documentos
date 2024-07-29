@@ -19,7 +19,6 @@ class PagosSeeder extends Seeder
         $facturas = DB::table('facturas')->pluck('id_factura')->toArray();
 
         foreach ($facturas as $idFactura) {
-            // Controla la inserción de un solo pago por factura para evitar duplicación
             DB::table('pagos')->insert([
                 [
                     'id_factura' => $idFactura,

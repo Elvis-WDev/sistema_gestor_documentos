@@ -6,11 +6,14 @@ use App\DataTables\SolicitudAfiliadosDatatables;
 use App\Models\SolicitudAfiliados;
 use App\Traits\FilesUploadTrait;
 use App\Traits\RegistrarActividad;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class SolicitudAfiliadosController extends Controller
 {
@@ -24,11 +27,25 @@ class SolicitudAfiliadosController extends Controller
      */
     public function index(SolicitudAfiliadosDatatables $SolicitudAfiliadosDatatables)
     {
-        return $SolicitudAfiliadosDatatables->render('pages.solicitud_afiliados.index');
+        try {
+            return $SolicitudAfiliadosDatatables->render('pages.solicitud_afiliados.index');
+        } catch (Exception $e) {
+            // Manejar excepciones y registrar el error
+            Log::error('Error al cargar el DataTable de solicitud_afiliados', ['exception' => $e]);
+            flash()->error('Hubo un problema al cargar las solicitudes de afiliados. Por favor, inténtalo de nuevo.');
+            return redirect()->route('dashboard');
+        }
     }
     public function create()
     {
-        return view('pages.solicitud_afiliados.create');
+        try {
+            return view('pages.solicitud_afiliados.create');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al cargar la vista de solicitud_afiliados', ['exception' => $e]);
+            flash()->error('Hubo un problema al cargar la página de solicitud de afiliados. Por favor, inténtalo de nuevo.');
+            return redirect()->route('solicitud-afiliados');
+        }
     }
 
     public function store(Request $request)
@@ -41,31 +58,51 @@ class SolicitudAfiliadosController extends Controller
             'FechaSolicitud' => 'required|date',
         ]);
 
-        $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/solicitud_afiliados');
+        try {
 
-        SolicitudAfiliados::create([
-            'Archivos' => json_encode($archivos, JSON_UNESCAPED_SLASHES),
-            'Prefijo' => $request->Prefijo,
-            'NombreCliente' => $request->NombreCliente,
-            'FechaSolicitud' => $request->FechaSolicitud,
-        ]);
+            $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/solicitud_afiliados');
 
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha registrado una solicitud afiliado",
-            "Prefijo: " .  $request->Prefijo
-        );
+            SolicitudAfiliados::create([
+                'Archivos' => json_encode($archivos, JSON_UNESCAPED_SLASHES),
+                'Prefijo' => $request->Prefijo,
+                'NombreCliente' => $request->NombreCliente,
+                'FechaSolicitud' => $request->FechaSolicitud,
+            ]);
 
-        flash('Solicitud registrada correctamente!');
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha registrado una solicitud afiliado",
+                "Prefijo: " .  $request->Prefijo
+            );
 
-        return redirect()->route('solicitud-afiliados');
+            flash('Solicitud registrada correctamente!');
+
+            return redirect()->route('solicitud-afiliados');
+        } catch (Exception $e) {
+            // Manejo de otros errores inesperados
+            Log::error('Error al registrar solicitud de afiliado', ['exception' => $e]);
+            flash()->error('Hubo un problema al registrar la solicitud.');
+            return redirect()->route('solicitud-afiliados');
+        }
     }
 
     public function edit(int $id)
     {
-        $SolicitudAfiliados = SolicitudAfiliados::findOrFail($id);
+        try {
+            $SolicitudAfiliados = SolicitudAfiliados::findOrFail($id);
 
-        return view('pages.solicitud_afiliados.edit', compact('SolicitudAfiliados'));
+            return view('pages.solicitud_afiliados.edit', compact('SolicitudAfiliados'));
+        } catch (ModelNotFoundException $e) {
+            // Manejo de excepción si no se encuentra el modelo
+            Log::error('Solicitud de afiliado no encontrada', ['id' => $id, 'exception' => $e]);
+            flash()->error('La solicitud de afiliado no fue encontrada.');
+            return redirect()->route('solicitud-afiliados');
+        } catch (Exception $e) {
+            // Manejo de otros errores inesperados
+            Log::error('Error al obtener solicitud de afiliado', ['id' => $id, 'exception' => $e]);
+            flash()->error('Hubo un problema al obtener la solicitud de afiliado.');
+            return redirect()->route('solicitud-afiliados');
+        }
     }
 
     public function update(Request $request)
@@ -79,37 +116,45 @@ class SolicitudAfiliadosController extends Controller
             'FechaSolicitud' => 'required|date',
         ]);
 
-        $solicitud = SolicitudAfiliados::findOrFail($request->id);
+        try {
 
-        if ($request->hasFile('Archivos')) {
+            $solicitud = SolicitudAfiliados::findOrFail($request->id);
 
-            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/solicitud_afiliados', 'old_archivos', 'uploads/trash/solicitud_afiliados/', "Archivos eliminados al editar una solicitud afiliados con prefijo: # " . $request->Prefijo);
+            if ($request->hasFile('Archivos')) {
 
-            $solicitud->Archivos = $archivos;
-        } elseif ($request->filled('old_archivos')) {
+                $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/solicitud_afiliados', 'old_archivos', 'uploads/trash/solicitud_afiliados/', "Archivos eliminados al editar una solicitud afiliados con prefijo: # " . $request->Prefijo);
 
-            $solicitud->Archivos = $request->old_archivos;
-        } else {
+                $solicitud->Archivos = $archivos;
+            } elseif ($request->filled('old_archivos')) {
 
-            $solicitud->Archivos = null;
+                $solicitud->Archivos = $request->old_archivos;
+            } else {
+
+                $solicitud->Archivos = null;
+            }
+
+
+            $solicitud->Prefijo = $request->Prefijo;
+            $solicitud->NombreCliente = $request->NombreCliente;
+            $solicitud->FechaSolicitud = $request->FechaSolicitud;
+            $solicitud->save();
+
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha editado una solicitud afiliado",
+                "Prefijo: " .  $request->Prefijo
+            );
+
+            flash('Solicitud actualizada correctamente!');
+
+            return redirect()->route('solicitud-afiliados');
+        } catch (Exception $e) {
+            // Manejo de otros errores inesperados
+            Log::error('Error al actualizar solicitud de afiliado', ['exception' => $e]);
+            flash()->error('Hubo un problema al actualizar la solicitud.');
+            return redirect()->route('solicitud-afiliados');
         }
-
-
-        $solicitud->Prefijo = $request->Prefijo;
-        $solicitud->NombreCliente = $request->NombreCliente;
-        $solicitud->FechaSolicitud = $request->FechaSolicitud;
-        $solicitud->save();
-
-
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha editado una solicitud afiliado",
-            "Prefijo: " .  $request->Prefijo
-        );
-
-        flash('Solicitud actualizada correctamente!');
-
-        return redirect()->route('solicitud-afiliados');
     }
 
     public function destroy(Int $id)
@@ -134,7 +179,7 @@ class SolicitudAfiliadosController extends Controller
 
             return response()->json(['status' => 'success', 'message' => 'Solicitud eliminada correctamente.']);
         } catch (QueryException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Ah ocurrido un problema al eliminar la solicitud.']);
+            return response()->json(['status' => 'error', 'message' => 'Hubo un problema al eliminar la solicitud.']);
         }
     }
 }

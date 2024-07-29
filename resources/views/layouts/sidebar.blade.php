@@ -6,7 +6,7 @@
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel">
             <div class="pull-left image">
-                <img src="{{ Auth::user()->url_img == '' ? 'https://www.uniquemedical.com.au/wp-content/uploads/2024/03/Default_pfp.svg.png' : asset('storage/' . Auth::user()->url_img) }}"
+                <img src="{{ Auth::user()->url_img == '' ? asset('images/Default_user.png') : route('download', ['path' => Auth::user()->url_img]) }}"
                     class="img-circle" alt="User Image" />
             </div>
             <div class="pull-left info">

@@ -7,8 +7,7 @@
         <h1 class="pull-left"> Establecimiento</h1>
         <h1 class="pull-right">
             @can('crear establecimiento')
-                <a class="btn btn-primary pull-right mx-2" style="margin-top: -10px;margin-bottom: 5px"
-                    href="{{ route('crear-establecimiento') }}">
+                <a class="btn btn-primary pull-right mx-2" href="{{ route('crear-establecimiento') }}">
                     <i class="fa fa-plus"></i>
                     Nuevo establecimiento
                 </a>

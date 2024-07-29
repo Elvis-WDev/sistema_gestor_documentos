@@ -66,7 +66,7 @@ class TodasFacturasDataTable extends DataTable
                 }
                 if (Auth::user()->can('eliminar facturas')) {
                     $ButtonGroup .= '
-                    <a href="' . route('destroy-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar factura?">
+                    <a href="' . route('destroy-factura', $query->id_factura) . '" class="btn btn-danger btn-sm delete-item">
                     <i class="fas fa-trash-alt"></i></a>';
                 }
 
@@ -92,8 +92,8 @@ class TodasFacturasDataTable extends DataTable
         return $this->builder()
             ->setTableId('Todasfacturas-table')
             ->columns($this->getColumns())
+            ->responsive(true)
             ->minifiedAjax()
-            ->scrollX(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

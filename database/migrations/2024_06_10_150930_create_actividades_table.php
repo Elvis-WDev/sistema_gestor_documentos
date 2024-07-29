@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('actividades', function (Blueprint $table) {
             $table->id('id_actividad');
-            $table->foreignId('id_usuario')->constrained('users', 'id')->onDelete('restrict');
+            $table->foreignId('id_usuario')->constrained('users', 'id')->onDelete('cascade');
             $table->string('Accion', 50);
             $table->string('Detalles', 255)->nullable();
             $table->timestamp('FechaHora')->useCurrent();

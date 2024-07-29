@@ -36,7 +36,7 @@ class PapeleraDataTable extends DataTable
             })
             ->addColumn('action', function ($query) {
 
-                $ButtonGroup = '<a href="' . route('destroy-papelera', $query->id) . '" class="btn btn-danger btn-sm delete-item" message="Eliminar permanentemente estos archivos?"><i class="fas fa-trash-alt"></i></a>';
+                $ButtonGroup = '<a href="' . route('destroy-papelera', $query->id) . '" class="btn btn-danger btn-sm delete-item"><i class="fas fa-trash-alt"></i></a>';
 
                 return $ButtonGroup;
             })
@@ -62,7 +62,7 @@ class PapeleraDataTable extends DataTable
             ->columns($this->getColumns())
             ->minifiedAjax()
             ->orderBy(1)
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),

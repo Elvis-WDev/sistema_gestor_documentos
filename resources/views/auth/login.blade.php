@@ -4,25 +4,24 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Login
-        {{-- {{ config('settings.system_title') }} --}}
-
+    <title>
+        Login
     </title>
-
+    <link rel="shortcut icon" href="{{ asset('images/GS1-logo.png') }}">
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
     <!-- Bootstrap 3.3.7 -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}" />
 
     <!-- Theme style -->
     <link rel="stylesheet" href="{{ asset('css/lte/AdminLTE.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/lte/skins/skin-blue-light.min.css') }}">
     <!-- iCheck -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/skins/square/_all.css">
+    <link rel="stylesheet" href="{{ asset('vendor/icheck/_all.css') }}">
 
     <style>
         .login-box-body {
@@ -52,7 +51,8 @@
                 <div class="form-group has-feedback {{ $errors->has('email') ? ' has-error' : '' }}">
                     <input type="text" class="form-control" name="email" value="{{ old('email') }}"
                         placeholder="Correo electrónico">
-                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
+                    <span class="form-control-feedback"><i class="fas fa-user"></i></span>
+
                     @if ($errors->has('email'))
                         <span class="help-block">
                             <strong>{{ $errors->first('email') }}</strong>
@@ -62,7 +62,7 @@
 
                 <div class="form-group has-feedback{{ $errors->has('password') ? ' has-error' : '' }}">
                     <input type="password" class="form-control" placeholder="Contraseña" name="password">
-                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                    <span class="form-control-feedback"><i class="fas fa-lock"></i></span>
                     @if ($errors->has('password'))
                         <span class="help-block">
                             <strong>{{ $errors->first('password') }}</strong>
@@ -86,13 +86,13 @@
     </div>
     <!-- /.login-box -->
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('vendor/font-awesome/js/all.min.js') }}"></script>
     <!-- AdminLTE App -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/2.4.3/js/adminlte.min.js"></script>
+    <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/icheck.min.js"></script>
+    <script src="{{ asset('vendor/icheck/js/icheck.min.js') }}"></script>
     <script>
         $(function() {
             $('input').iCheck({

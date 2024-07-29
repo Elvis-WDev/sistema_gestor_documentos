@@ -66,10 +66,12 @@
             Carpetas
         </h1>
         <h1 class="pull-right">
-            <a href="{{ route('crear-custom-module') }}" class="btn btn-primary">
-                <i class="fa fa-plus"></i>
-                Nueva carpeta
-            </a>
+            @can('crear custom_module')
+                <a href="{{ route('crear-custom-module') }}" class="btn btn-primary">
+                    <i class="fa fa-plus"></i>
+                    Nueva carpeta
+                </a>
+            @endcan
         </h1>
     </section>
     <div class="content" style="margin-top: 22px;">
@@ -102,13 +104,19 @@
                                                 <ul class="dropdown-menu dropdown-menu-left" role="menu">
                                                     <li><a href="{{ route('carpeta', $modulo->id_modulo) }}">Ver</a>
                                                     </li>
-                                                    <li><a
-                                                            href="{{ route('edit-custom_module', $modulo->id_modulo) }}">Editar</a>
-                                                    </li>
-                                                    <li>
-                                                        <a class="btn_eliminar_module"
-                                                            id="{{ $modulo->id_modulo }}">Eliminar</a>
-                                                    </li>
+                                                    @can('modificar custom_module')
+                                                        <li>
+                                                            <a
+                                                                href="{{ route('edit-custom_module', $modulo->id_modulo) }}">Editar</a>
+                                                        </li>
+                                                    @endcan
+
+                                                    @can('eliminar custom_module')
+                                                        <li>
+                                                            <a class="btn_eliminar_module"
+                                                                id="{{ $modulo->id_modulo }}">Eliminar</a>
+                                                        </li>
+                                                    @endcan
 
                                                 </ul>
                                             </div>

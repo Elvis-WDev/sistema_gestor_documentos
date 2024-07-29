@@ -47,8 +47,12 @@ class RolesPermisosSeeder extends Seeder
             'eliminar pagos',
             'eliminar SolicitudAfiliado',
             'eliminar custom_module',
+            'reporte facturas',
+            'anular facturas',
+            'abonar facturas',
             'configuraciones',
             'papelera',
+
 
         ];
 

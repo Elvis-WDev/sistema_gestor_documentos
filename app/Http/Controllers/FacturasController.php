@@ -12,9 +12,13 @@ use App\Models\PuntoEmision;
 use App\Rules\UniqueSecuencial;
 use App\Traits\FilesUploadTrait;
 use App\Traits\RegistrarActividad;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class FacturasController extends Controller
 {
@@ -22,24 +26,58 @@ class FacturasController extends Controller
 
     public function index(TodasFacturasDataTable $TodasFacturasDataTable)
     {
-        return $TodasFacturasDataTable->render('pages.facturas.index');
+        try {
+            return $TodasFacturasDataTable->render('pages.facturas.index');
+        } catch (Exception $e) {
+            Log::error('Error al renderizar todas las facturas', ['exception' => $e]);
+            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            return redirect()->route('dashboard');
+        }
     }
+
     public function FacturasPagadas_index(PagadasFacturasDataTable $PagadasFacturasDataTable)
     {
-        return $PagadasFacturasDataTable->render('pages.facturas.pagadas');
+        try {
+            return $PagadasFacturasDataTable->render('pages.facturas.pagadas');
+        } catch (Exception $e) {
+            Log::error('Error al renderizar facturas pagadas', ['exception' => $e]);
+            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            return redirect()->route('dashboard');
+        }
     }
+
     public function FacturasAbonada_index(AbonadasFacturasDataTable $AbonadasFacturasDataTable)
     {
-        return $AbonadasFacturasDataTable->render('pages.facturas.abonadas');
+        try {
+            return $AbonadasFacturasDataTable->render('pages.facturas.abonadas');
+        } catch (Exception $e) {
+            Log::error('Error al renderizar facturas abonadas', ['exception' => $e]);
+            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            return redirect()->route('dashboard');
+        }
     }
+
     public function FacturasAnulada_index(AnuladasFacturasDataTable $AnuladasFacturasDataTable)
     {
-        return $AnuladasFacturasDataTable->render('pages.facturas.anuladas');
+        try {
+            return $AnuladasFacturasDataTable->render('pages.facturas.anuladas');
+        } catch (Exception $e) {
+            Log::error('Error al renderizar facturas anuladas', ['exception' => $e]);
+            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            return redirect()->route('dashboard');
+        }
     }
+
 
     public function create()
     {
-        return view('pages.facturas.create');
+        try {
+            return view('pages.facturas.create');
+        } catch (Exception $e) {
+            Log::error('Error al renderizar la vista de creación de factura');
+            flash()->error('Hubo un problema al cargar la página de creación de factura. Por favor, inténtalo de nuevo.');
+            return redirect()->route('facturas.index');
+        }
     }
 
     public function store(Request $request)
@@ -63,48 +101,68 @@ class FacturasController extends Controller
             'RazonSocial' => 'required|string|max:255',
             'Total' => 'required|numeric|gt:0',
         ]);
+        try {
+            $retenciones = $request->RetencionIva + $request->RetencionFuente;
 
-        $retenciones = $request->RetencionIva + $request->RetencionFuente;
+            $Saldo =  $request->Total - $retenciones;
 
-        if ($request->Total < $retenciones) {
+            if ($request->Total < $retenciones) {
 
-            flash()->error('Retenciones exceden el total de la factura');
+                flash()->error('Retenciones exceden el total de la factura');
 
-            return redirect()->route('crear-factura');
+                return redirect()->route('crear-factura');
+            }
+
+            $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/facturas');
+
+            Factura::create([
+                'FechaEmision' => $request->FechaEmision,
+                'establecimiento_id' => $request->establecimiento_id,
+                'punto_emision_id' => $request->punto_emision_id,
+                'Secuencial' => $request->Secuencial,
+                'Prefijo' => $request->Prefijo,
+                'RazonSocial' => $request->RazonSocial,
+                'RetencionIva' => $request->RetencionIva,
+                'RetencionFuente' => $request->RetencionFuente,
+                'Total' => $request->Total,
+                'Estado' => $Saldo == 0 ? 1 : 4,
+                'Archivos' => json_encode($archivos, JSON_UNESCAPED_SLASHES),
+            ]);
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha registrado una factura",
+                "Factura #: " . Establecimiento::findOrFail($request->establecimiento_id)->nombre . PuntoEmision::findOrFail($request->punto_emision_id)->nombre . $request->Secuencial
+            );
+
+            flash('Factura registrada correctamente!');
+
+            return redirect()->route('facturas');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al registrar la factura', ['exception' => $e]);
+            flash()->error('Hubo un problema al registrar la factura. Por favor, inténtalo de nuevo.');
+            return redirect()->route('crear-factura')->withInput();
         }
-
-        $archivos = $this->uploadMultiFile($request, 'Archivos', 'uploads/facturas');
-
-        Factura::create([
-            'FechaEmision' => $request->FechaEmision,
-            'establecimiento_id' => $request->establecimiento_id,
-            'punto_emision_id' => $request->punto_emision_id,
-            'Secuencial' => $request->Secuencial,
-            'Prefijo' => $request->Prefijo,
-            'RazonSocial' => $request->RazonSocial,
-            'RetencionIva' => $request->RetencionIva,
-            'RetencionFuente' => $request->RetencionFuente,
-            'Total' => $request->Total,
-            'Estado' => 4,
-            'Archivos' => json_encode($archivos, JSON_UNESCAPED_SLASHES),
-        ]);
-
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha registrado una factura",
-            "Factura #: " . Establecimiento::findOrFail($request->establecimiento_id)->nombre . PuntoEmision::findOrFail($request->punto_emision_id)->nombre . $request->Secuencial
-        );
-
-        flash('Factura registrada correctamente!');
-
-        return redirect()->route('facturas');
     }
 
     public function edit(int $id)
     {
-        $Factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($id);
+        try {
+            $Factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($id);
 
-        return view('pages.facturas.edit', compact('Factura'));
+            return view('pages.facturas.edit', compact('Factura'));
+        } catch (ModelNotFoundException $e) {
+            // Manejo del caso en que la factura no se encuentre
+            Log::error('Factura no encontrada', ['id' => $id, 'exception' => $e]);
+            flash()->error('La factura que estás tratando de editar no existe.');
+            return redirect()->route('facturas.index');
+        } catch (Exception $e) {
+            // Manejo de cualquier otro tipo de excepción
+            Log::error('Error al intentar editar la factura', ['id' => $id, 'exception' => $e]);
+            flash()->error('Hubo un problema al intentar editar la factura. Por favor, inténtalo de nuevo.');
+            return redirect()->route('facturas.index');
+        }
     }
 
     public function update(Request $request)
@@ -127,37 +185,50 @@ class FacturasController extends Controller
             'RazonSocial' => 'required|string|max:255',
         ]);
 
-        $factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($request->id);
+        try {
 
-        if ($request->hasFile('Archivos')) {
+            $factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($request->id);
 
-            $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/facturas', 'old_archivos', 'uploads/trash/facturas/', "Archivos eliminados al editar factura con prefijo: # " . $request->Prefijo);
+            if ($request->hasFile('Archivos')) {
 
-            $factura->Archivos = $archivos;
-        } elseif ($request->filled('old_archivos')) {
-            $factura->Archivos = $request->old_archivos;
-        } else {
-            $factura->Archivos = null;
+                $archivos = $this->updateMultiFile($request, 'Archivos', 'uploads/facturas', 'old_archivos', 'uploads/trash/facturas/', "Archivos eliminados al editar factura con prefijo: # " . $request->Prefijo);
+
+                $factura->Archivos = $archivos;
+            } elseif ($request->filled('old_archivos')) {
+                $factura->Archivos = $request->old_archivos;
+            } else {
+                $factura->Archivos = null;
+            }
+
+            $factura->Prefijo = $request->Prefijo;
+            $factura->FechaEmision = $request->FechaEmision;
+            $factura->establecimiento_id = $request->establecimiento_id;
+            $factura->punto_emision_id = $request->punto_emision_id;
+            $factura->Secuencial = $request->Secuencial;
+            $factura->RazonSocial = $request->RazonSocial;
+
+            $factura->save();
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha editado una factura",
+                "Factura #: " .  $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial
+            );
+
+            flash('Factura actualizada correctamente!');
+
+            return redirect()->route('facturas');
+        } catch (ModelNotFoundException $e) {
+            // Manejo del caso en que la factura no se encuentre
+            Log::error('Factura no encontrada para actualizar', ['id' => $request->id, 'exception' => $e]);
+            flash()->error('La factura que intentas actualizar no existe.');
+            return redirect()->route('facturas');
+        } catch (Exception $e) {
+            // Manejo de cualquier otro tipo de excepción
+            Log::error('Error al actualizar factura', ['id' => $request->id, 'exception' => $e]);
+            flash()->error('Hubo un problema al intentar actualizar la factura. Por favor, inténtalo de nuevo.');
+            return redirect()->back()->withInput();
         }
-
-        $factura->Prefijo = $request->Prefijo;
-        $factura->FechaEmision = $request->FechaEmision;
-        $factura->establecimiento_id = $request->establecimiento_id;
-        $factura->punto_emision_id = $request->punto_emision_id;
-        $factura->Secuencial = $request->Secuencial;
-        $factura->RazonSocial = $request->RazonSocial;
-
-        $factura->save();
-
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha editado una factura",
-            "Factura #: " .  $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial
-        );
-
-        flash('Factura actualizada correctamente!');
-
-        return redirect()->route('facturas');
     }
 
     public function destroy(int $id)
@@ -185,17 +256,20 @@ class FacturasController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Factura eliminada correctamente.']);
         } catch (QueryException $e) {
 
-            return response()->json(['status' => 'error', 'message' => 'Error al eliminar la factura.']);
+            return response()->json(['status' => 'error', 'message' => 'Hubo un problema al intentar eliminar la factura. Por favor, inténtalo de nuevo.']);
         }
     }
 
     public function anular_factura(int $id)
     {
+
+        DB::beginTransaction();
+
         try {
             $factura = Factura::findOrFail($id);
 
-            // Verificar si la factura ya está pagada
             if ($factura->Estado == 1) {
+                DB::rollBack();
                 return response()->json(['status' => 'error', 'message' => 'No se puede anular una factura que ya está pagada.']);
             }
 
@@ -225,16 +299,31 @@ class FacturasController extends Controller
                 "Ha anulado una factura",
                 "Factura #: " . $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial
             );
-
+            DB::commit();
             return response()->json(['status' => 'success', 'message' => 'Factura anulada correctamente.']);
         } catch (QueryException $e) {
-            return response()->json(['status' => 'error', 'message' => 'Error al anular la factura.']);
+            DB::rollBack();
+            return response()->json(['status' => 'error', 'message' => 'Hubo un problema al intentar anular la factura. Por favor, inténtalo de nuevo.']);
         }
     }
 
     public function get_punto_emision(Request $request)
     {
-        $PuntoEmision = PuntoEmision::where('establecimiento_id', $request->id)->get();
-        return $PuntoEmision;
+        $request->validate([
+            'id' => 'required|integer|exists:establecimientos,id',
+        ]);
+
+        try {
+
+            $PuntoEmision = PuntoEmision::where('establecimiento_id', $request->id)->get();
+            return $PuntoEmision;
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al obtener puntos de emisión', ['id' => $request->id, 'exception' => $e]);
+
+            return response()->json([
+                'error' => 'Hubo un problema al intentar obtener los puntos de emisión.'
+            ], 500);
+        }
     }
 }

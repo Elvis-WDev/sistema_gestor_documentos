@@ -6,32 +6,60 @@
     <title>
         @yield('title')
     </title>
-    <link rel="shortcut icon" href="{{ asset('images/GS1-logo.png') }}">
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link rel="shortcut icon" href="{{ asset('images/GS1-logo.png') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap-toggle.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/font-awesome/css/all.min.css') }}" />
+    <link rel="stylesheet" href="{{ asset('vendor/select2/select2.min.css') }}" />
     <link rel="stylesheet" href="{{ asset('css/lte/AdminLTE.min.css') }}">
     <link rel="stylesheet" href="{{ asset('css/lte/skins/skin-blue-light.min.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/skins/square/_all.css">
-    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+    <link rel="stylesheet" href="{{ asset('vendor/icheck/skins/all.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/daterangepicker/daterangepicker.css') }}" />
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-wysihtml5/css/bootstrap3-wysihtml5.min.css') }}">
     <link rel="stylesheet" href="{{ asset('vendor/bootstrap-tagsinput/css/bootstrap-tagsinput.css') }}">
     <link rel="stylesheet" href="{{ asset('css/digidocu-custom.css') }}">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-
+    <link rel="stylesheet" href="{{ asset('vendor/flatpickr/flatpickr.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/responsive.bootstrap.css') }}">
     {{-- MorrisChart.js --}}
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.css">
-
+    <link rel="stylesheet" href="{{ asset('vendor/morrisjs/morris.css') }}">
 
     @yield('css')
+
+    <style>
+        /* Ajustar el tamaño y la posición del ícono */
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control::before,
+        table.dataTable.dtr-inline.collapsed>tbody>tr>th.dtr-control::before {
+            content: "\f0d7";
+            font-family: "Font Awesome 5 Free";
+            font-weight: 900;
+            font-size: 5px;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+            text-align: center;
+            margin-top: 6px
+        }
+
+        /* Asegurar que el botón esté centrado en la celda */
+        table.dataTable.dtr-inline.collapsed>tbody>tr>td.dtr-control {
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* Ajustar el espaciado en dispositivos móviles */
+        @media (max-width: 767px) {
+            table.dataTable.dtr-inline {
+                font-size: 16px;
+            }
+        }
+    </style>
+
 </head>
 
 <body class="skin-blue-light sidebar-mini">
 
-    {{-- @if (!Auth::guest()) --}}
     <div class="wrapper">
         <!-- Main Header -->
         @include('layouts.header')
@@ -42,83 +70,35 @@
             @yield('content')
         </div>
     </div>
-    {{-- @else --}}
-    {{-- <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
-                <div class="navbar-header">
 
-                    <!-- Collapsed Hamburger -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#app-navbar-collapse">
-                        <span class="sr-only">Toggle Navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-
-                    <!-- Branding Image -->
-                    <a class="navbar-brand" href="{!! url('/') !!}">
-                        InfyOm Generator
-                    </a>
-                </div>
-
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        <li><a href="{!! url('/home') !!}">Home</a></li>
-                    </ul>
-
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
-                        <li><a href="{!! url('/login') !!}">Login</a></li>
-                        <li><a href="{!! url('/register') !!}">Register</a></li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-
-        <div id="page-content-wrapper">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-lg-12">
-                        @yield('content')
-                    </div>
-                </div>
-            </div>
-        </div>
-    @endif --}}
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.15.1/moment.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
-    <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+    <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('vendor/moment/moment.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('vendor/daterangepicker/js/daterangepicker.min.js') }}"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap-toggle.min.js') }}"></script>
     <script src="{{ asset('dist/js/adminlte.min.js') }}"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/iCheck/1.0.2/icheck.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{{ asset('vendor/icheck/js/icheck.min.js') }}"></script>
+    <script src="{{ asset('vendor/select2/js/select2.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap-typeahead/js/bootstrap3-typeahead.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap-tagsinput/js/bootstrap-tagsinput.min.js') }}"></script>
     <script src="{{ asset('vendor/bootstrap-wysihtml5/js/bootstrap3-wysihtml5.all.min.js') }}"></script>
     {{-- SweetAlert --}}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.4.2/handlebars.min.js"></script>
+    <script src="{{ asset('vendor/sweetalert/js/sweetalert2@11.js') }}"></script>
+    <script src="{{ asset('vendor/handlebars/js/handlebars.min.js') }}"></script>
     <script src="{{ asset('js/handlebar-helpers.js') }}"></script>
     <script src="{{ asset('js/digidocu-custom.js') }}"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr@4.6.13/dist/l10n/es.js"></script>
+    <script src="{{ asset('vendor/flatpickr/js/flatpickr.js') }}"></script>
+    <script src="{{ asset('vendor/flatpickr/js/es.js') }}"></script>
     {{-- Tooltip --}}
-    <script src="https://unpkg.com/@popperjs/core@2/dist/umd/popper.min.js"></script>
-    <script src="https://unpkg.com/tippy.js@6/dist/tippy-bundle.umd.js"></script>
+    <script src="{{ asset('vendor/tooltip/popper.min.js') }}"></script>
+    <script src="{{ asset('vendor/tooltip/tippy-bundle.umd.js') }}"></script>
 
     {{-- MorrisChart.js --}}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+    <script src="{{ asset('vendor/morrisjs/js/raphael-min.js') }}"></script>
+    <script src="{{ asset('vendor/morrisjs/js/morris.min.js') }}"></script>
 
     {{-- InputMask.js --}}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.9/jquery.inputmask.min.js"
-        integrity="sha512-F5Ul1uuyFlGnIT1dk2c4kB4DBdi5wnBJjVhL7gQlGh46Xn0VhvD8kgxLtjdZ5YN83gybk/aASUAlpdoWUjRR3g=="
-        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="{{ asset('vendor/inputmask/js/jquery.inputmask.min.js') }}"></script>
 
     <script>
         $.ajaxSetup({
@@ -167,7 +147,10 @@
                         }
                     })
                 }
-            })
+            }).catch(error => {
+                console.error('Error:', error);
+                alert('Ocurrió un problema al procesar tu solicitud.');
+            });
         })
     </script>
     <script>
@@ -297,9 +280,6 @@
             initializeTippy();
         });
     </script>
-
-    <script></script>
-
 
 </body>
 

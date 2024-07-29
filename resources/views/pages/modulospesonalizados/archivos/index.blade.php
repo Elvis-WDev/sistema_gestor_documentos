@@ -140,10 +140,12 @@
                                                         <li><a href="{{ route('download', ['path' => $file->Archivo]) }}"
                                                                 taget="blank_" download>Descargar</a>
                                                         </li>
-                                                        <li>
-                                                            <a class="btn_eliminar_archivo"
-                                                                id="{{ $file->id_archivo }}">Eliminar</a>
-                                                        </li>
+                                                        @can('eliminar custom_module')
+                                                            <li>
+                                                                <a class="btn_eliminar_archivo"
+                                                                    id="{{ $file->id_archivo }}">Eliminar</a>
+                                                            </li>
+                                                        @endcan
                                                     </ul>
                                                 </div>
                                             </div>
@@ -151,8 +153,10 @@
                                     </div>
                                 @endforeach
                             </div>
-                            <a href="{{ route('subir-archivo', $Carpeta->id_modulo) }}" class="btn btn-primary btn-sm"><i
-                                    class="fa fa-plus"></i> Nuevo</a>
+                            @can('crear custom_module')
+                                <a href="{{ route('subir-archivo', $Carpeta->id_modulo) }}" class="btn btn-primary btn-sm"><i
+                                        class="fa fa-plus"></i> Nuevo</a>
+                            @endcan
                         </div>
                     </div>
                 </div>

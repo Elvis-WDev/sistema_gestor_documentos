@@ -79,21 +79,29 @@ Route::group(['middleware' => ['can:ver facturas']], function () {
 Route::group(['middleware' => ['can:crear facturas']], function () {
     Route::get('facturas/crear', [FacturasController::class, 'create'])->name('crear-factura');
     Route::post('facturas/store', [FacturasController::class, 'store'])->name('store-factura');
-    Route::post('facturas/generar-reporte', [ReportesController::class, 'generar_reportes'])->name('generar-reporte');
-    Route::post('facturas/generar-reporte-anuladas', [ReportesController::class, 'generar_reportes_anuladas'])->name('generar-reporte_anuladas');
-    Route::post('abonos/store', [AbonosController::class, 'store'])->name('store-abono');
     Route::get('punto_emision/get', [FacturasController::class, 'get_punto_emision'])->name('get-punto_emision');
 });
 Route::group(['middleware' => ['can:modificar facturas']], function () {
     Route::get('facturas/editar/{id}', [FacturasController::class, 'edit'])->name('editar-factura');
     Route::put('facturas/update', [FacturasController::class, 'update'])->name('update-factura');
     Route::get('cuentas/editar/{id}', [CuentasPorCobrarController::class, 'edit'])->name('editar-cuentas');
-    Route::get('abonos/{id}', [AbonosController::class, 'edit'])->name('abonos');
+
     Route::put('cuentas/update', [CuentasPorCobrarController::class, 'update'])->name('update-cuentas');
 });
 Route::group(['middleware' => ['can:eliminar facturas']], function () {
-    Route::delete('facturas/anular/{id}', [FacturasController::class, 'anular_factura'])->name('anular-factura');
     Route::delete('facturas/eliminar/{id}', [FacturasController::class, 'destroy'])->name('destroy-factura');
+});
+Route::group(['middleware' => ['can:anular facturas']], function () {
+    Route::delete('facturas/anular/{id}', [FacturasController::class, 'anular_factura'])->name('anular-factura');
+});
+Route::group(['middleware' => ['can:abonar facturas']], function () {
+    Route::get('abonos/{id}', [AbonosController::class, 'edit'])->name('abonos');
+    Route::post('abonos/store', [AbonosController::class, 'store'])->name('store-abono');
+});
+
+Route::group(['middleware' => ['can:reporte facturas']], function () {
+    Route::post('facturas/generar-reporte', [ReportesController::class, 'generar_reportes'])->name('generar-reporte');
+    Route::post('facturas/generar-reporte-anuladas', [ReportesController::class, 'generar_reportes_anuladas'])->name('generar-reporte_anuladas');
 });
 //FACTURAS ---- establecimiento
 Route::group(['middleware' => ['can:ver establecimiento']], function () {

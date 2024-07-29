@@ -9,7 +9,10 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Barryvdh\DomPDF\Facade\Pdf as PDF;
+use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 use setasign\Fpdi\PdfParser\StreamReader;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
@@ -24,37 +27,45 @@ class ReportesController extends Controller
             'txt_fecha_reporte_final' => 'required|date|after_or_equal:txt_fecha_reporte_inicio',
         ]);
 
-        $fechaInicio = Carbon::parse($request->input('txt_fecha_reporte_inicio'));
-        $fechaFinal = Carbon::parse($request->input('txt_fecha_reporte_final'))->endOfDay();
+        try {
 
-        $reportData = $this->getReportData($fechaInicio, $fechaFinal);
+            $fechaInicio = Carbon::parse($request->input('txt_fecha_reporte_inicio'));
+            $fechaFinal = Carbon::parse($request->input('txt_fecha_reporte_final'))->endOfDay();
 
-        // Formatear las fechas
-        $fechaInicioFormatted = $fechaInicio->isoFormat('D [de] MMMM');
-        $fechaFinalFormatted = $fechaFinal->isoFormat('D [de] MMMM');
+            $reportData = $this->getReportData($fechaInicio, $fechaFinal);
 
-        // Determinar el título del mes
-        $tituloMes = $this->getTitleMonth($fechaInicio, $fechaFinal);
+            // Formatear las fechas
+            $fechaInicioFormatted = $fechaInicio->isoFormat('D [de] MMMM');
+            $fechaFinalFormatted = $fechaFinal->isoFormat('D [de] MMMM');
 
-        // Obtener todos los establecimientos y sus respectivos reportes
-        $reportesPorEstablecimiento = $this->getReportsPorEstablecimiento($fechaInicio, $fechaFinal);
+            // Determinar el título del mes
+            $tituloMes = $this->getTitleMonth($fechaInicio, $fechaFinal);
 
-        $data = array_merge($reportData, [
-            'fechaInicio' => $fechaInicioFormatted,
-            'fechaFinal' => $fechaFinalFormatted,
-            'tituloMes' => $tituloMes,
-            'reportesPorEstablecimiento' => $reportesPorEstablecimiento,
-        ]);
+            // Obtener todos los establecimientos y sus respectivos reportes
+            $reportesPorEstablecimiento = $this->getReportsPorEstablecimiento($fechaInicio, $fechaFinal);
 
-        $pdf = PDF::loadView('pages.facturas.reportes.pdf.reporte_general', $data);
+            $data = array_merge($reportData, [
+                'fechaInicio' => $fechaInicioFormatted,
+                'fechaFinal' => $fechaFinalFormatted,
+                'tituloMes' => $tituloMes,
+                'reportesPorEstablecimiento' => $reportesPorEstablecimiento,
+            ]);
 
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha generado un reporte general",
-            "Modúlo facturas: " . $fechaInicioFormatted . " a " . $fechaFinalFormatted
-        );
+            $pdf = PDF::loadView('pages.facturas.reportes.pdf.reporte_general', $data);
 
-        return $pdf->stream('Reporte_general_facturas.pdf', array('Attachment' => 0));
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha generado un reporte general",
+                "Modúlo facturas: " . $fechaInicioFormatted . " a " . $fechaFinalFormatted
+            );
+
+            return $pdf->stream('Reporte_general_facturas.pdf', array('Attachment' => 0));
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al generar el reporte', ['exception' => $e]);
+            flash()->error('Hubo un problema al generar el reporte.');
+            return redirect()->back();
+        }
     }
 
     private function getReportData($fechaInicio, $fechaFinal)
@@ -245,61 +256,69 @@ class ReportesController extends Controller
             'txt_fecha_reporte_final' => 'required|date|after_or_equal:txt_fecha_reporte_inicio',
         ]);
 
-        $fechaInicio = Carbon::parse($request->input('txt_fecha_reporte_inicio'));
-        $fechaFinal = Carbon::parse($request->input('txt_fecha_reporte_final'))->endOfDay();
+        try {
 
-        $fechaInicioFormatted = $fechaInicio->isoFormat('D [de] MMMM');
-        $fechaFinalFormatted = $fechaFinal->isoFormat('D [de] MMMM');
+            $fechaInicio = Carbon::parse($request->input('txt_fecha_reporte_inicio'));
+            $fechaFinal = Carbon::parse($request->input('txt_fecha_reporte_final'))->endOfDay();
 
-        $allFacturas = Factura::with(['establecimiento', 'puntoEmision'])
-            ->where('Estado', 'Anulada')
-            ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
-            ->get();
+            $fechaInicioFormatted = $fechaInicio->isoFormat('D [de] MMMM');
+            $fechaFinalFormatted = $fechaFinal->isoFormat('D [de] MMMM');
 
-        if ($allFacturas->isEmpty()) {
-            flash()->error('No hay facturas anuladas en estas fechas');
-            return redirect()->route('facturas-anuladas');
-        }
+            $allFacturas = Factura::with(['establecimiento', 'puntoEmision'])
+                ->where('Estado', 'Anulada')
+                ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
+                ->get();
 
-        $totalValorAnulados = Factura::where('Estado', 'Anulada')
-            ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
-            ->sum('ValorAnulado');
-
-        $pdfFiles = [];
-        $chunkedFacturas = $allFacturas->chunk(100);
-
-        foreach ($chunkedFacturas as $index => $facturasChunk) {
-            $pdfContent = view('pages.facturas.reportes.pdf.reporte_anuladas', [
-                'Facturas' => $facturasChunk,
-                'TotalValorAnulados' => $totalValorAnulados,
-                'fechaInicio' => $fechaInicioFormatted,
-                'fechaFinal' => $fechaFinalFormatted,
-                'loop' => (object) ['first' => $index === 0]  // Determina si es el primer chunk
-            ])->render();
-
-            $pdf = PDF::loadHTML($pdfContent);
-            $pdfFiles[] = $pdf->output();
-        }
-
-        $combinedPdf = new Fpdi();
-
-        foreach ($pdfFiles as $pdfFile) {
-            $pageCount = $combinedPdf->setSourceFile(StreamReader::createByString($pdfFile));
-
-            for ($i = 1; $i <= $pageCount; $i++) {
-                $tplId = $combinedPdf->importPage($i);
-                $combinedPdf->AddPage();
-                $combinedPdf->useTemplate($tplId);
+            if ($allFacturas->isEmpty()) {
+                flash()->error('No hay facturas anuladas en estas fechas');
+                return redirect()->route('facturas-anuladas');
             }
+
+            $totalValorAnulados = Factura::where('Estado', 'Anulada')
+                ->whereBetween('FechaEmision', [$fechaInicio, $fechaFinal])
+                ->sum('ValorAnulado');
+
+            $pdfFiles = [];
+            $chunkedFacturas = $allFacturas->chunk(100);
+
+            foreach ($chunkedFacturas as $index => $facturasChunk) {
+                $pdfContent = view('pages.facturas.reportes.pdf.reporte_anuladas', [
+                    'Facturas' => $facturasChunk,
+                    'TotalValorAnulados' => $totalValorAnulados,
+                    'fechaInicio' => $fechaInicioFormatted,
+                    'fechaFinal' => $fechaFinalFormatted,
+                    'loop' => (object) ['first' => $index === 0]  // Determina si es el primer chunk
+                ])->render();
+
+                $pdf = PDF::loadHTML($pdfContent);
+                $pdfFiles[] = $pdf->output();
+            }
+
+            $combinedPdf = new Fpdi();
+
+            foreach ($pdfFiles as $pdfFile) {
+                $pageCount = $combinedPdf->setSourceFile(StreamReader::createByString($pdfFile));
+
+                for ($i = 1; $i <= $pageCount; $i++) {
+                    $tplId = $combinedPdf->importPage($i);
+                    $combinedPdf->AddPage();
+                    $combinedPdf->useTemplate($tplId);
+                }
+            }
+
+            $this->Actividad(
+                Auth::user()->id,
+                "Ha generado un reporte de anulaciones",
+                "Modúlo facturas: " . $fechaInicioFormatted . " a " . $fechaFinalFormatted
+            );
+
+            return response($combinedPdf->Output('Reporte_total_anuladas.pdf'), 200)
+                ->header('Content-Type', 'application/pdf');
+        } catch (Exception $e) {
+            // Manejo de errores generales
+            Log::error('Error al generar el reporte de anulaciones', ['exception' => $e]);
+            flash()->error('Hubo un problema al generar el reporte de anulaciones.');
+            return redirect()->back();
         }
-
-        $this->Actividad(
-            Auth::user()->id,
-            "Ha generado un reporte de anulaciones",
-            "Modúlo facturas: " . $fechaInicioFormatted . " a " . $fechaFinalFormatted
-        );
-
-        return response($combinedPdf->Output('Reporte_total_anuladas.pdf'), 200)
-            ->header('Content-Type', 'application/pdf');
     }
 }

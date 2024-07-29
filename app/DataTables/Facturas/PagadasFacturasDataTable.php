@@ -58,7 +58,7 @@ class PagadasFacturasDataTable extends DataTable
             })
             ->addColumn('action', function ($query) {
 
-                if (Auth::user()->can('modificar facturas')) {
+                if (Auth::user()->can('abonar facturas')) {
 
                     $ButtonGroup = '<a href="' . route('abonos', $query->id_factura) . '" class="btn btn-info btn-sm"><i class="fa-solid fa-money-bill-wave"></i></a>';
                 } else {
@@ -88,7 +88,7 @@ class PagadasFacturasDataTable extends DataTable
             ->setTableId('pagadasfacturas-table')
             ->columns($this->getColumns())
             ->minifiedAjax()
-            ->scrollX(true)
+            ->responsive(true)
             ->selectStyleSingle()
             ->buttons([
                 Button::make('excel'),
