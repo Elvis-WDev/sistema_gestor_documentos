@@ -136,4 +136,19 @@ class ArchivosController extends Controller
             return response()->json(['status' => 'error', 'message' => 'Ocurrió un problema al procesar tu solicitud. Por favor, inténtalo de nuevo.'], 500);
         }
     }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'id_modulo' => ['required', 'integer'],
+            'Nombre' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $Carpeta = ModuloPersonalizado::findOrFail($request->id_modulo);
+        $searchTerm = $request->input('Nombre', '');
+
+        $Archivos_encontrados = ArchivoModuloPersonalizado::where('id_modulo', $request->id_modulo)->where('Estado', 'Activo')->where('Nombre', 'LIKE', "%{$searchTerm}%")->get();
+
+        return view('pages.modulospesonalizados.archivos.index', compact('Carpeta', 'Archivos_encontrados'));
+    }
 }

@@ -137,6 +137,21 @@ class ModulosPersonalizadoController extends Controller
         }
     }
 
+    public function search(Request $request)
+    {
+        $request->validate([
+            'NombreModulo' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $searchTerm = $request->input('NombreModulo', '');
+
+        $Carpetas_encontradas = ModuloPersonalizado::where('Estado', 'Activo')
+            ->where('NombreModulo', 'LIKE', "%{$searchTerm}%")
+            ->get();
+
+        return view('pages.modulospesonalizados.index', compact('Carpetas_encontradas'));
+    }
+
     public function chage_status(Request $request)
     {
         try {

@@ -175,7 +175,9 @@ Route::group(['middleware' => ['can:papelera']], function () {
 // Documentos
 Route::group(['middleware' => ['can:ver custom_module']], function () {
     Route::get('carpetas', [ModulosPersonalizadoController::class, 'index'])->name('custom-module');
+    Route::post('carpetas/search', [ModulosPersonalizadoController::class, 'search'])->name('carpeta-search');
     Route::get('carpetas/archivos/{id}', [ArchivosController::class, 'index'])->name('carpeta');
+    Route::post('carpetas/archivos/search', [ArchivosController::class, 'search'])->name('archivo-search');
 });
 
 Route::group(['middleware' => ['can:crear custom_module']], function () {

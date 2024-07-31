@@ -78,12 +78,25 @@
         <div class="clearfix"></div>
         <div class="clearfix"></div>
         <div class="box box-primary">
+            <div class="box-header">
+                <form method="POST" action="{{ route('carpeta-search') }}" accept-charset="UTF-8" class="form-inline"
+                    id="filterForm">
+                    @csrf
+                    <div class="form-group">
+                        <label for="search" class="sr-only">Buscar</label>
+                        <input class="form-control input-sm" placeholder="Buscar..." name="NombreModulo" type="text">
+                    </div>
+
+                    <button type="submit" class="btn btn-default btn-sm"><i class="fas fa-search"></i> Buscar</button>
+
+                </form>
+            </div>
             <div class="box-body">
                 <div class="row">
                     @php
                         $Modulo = \App\Models\ModuloPersonalizado::where('Estado', 'Activo')->get();
                     @endphp
-                    @foreach ($Modulo as $modulo)
+                    @foreach (isset($Carpetas_encontradas) ? $Carpetas_encontradas : $Modulo as $modulo)
                         <div class="col-lg-2 col-md-2 col-sm-4 col-xs-6 m-t-20" style="cursor:pointer;">
                             <div class="doc-box box box-widget widget-user-2">
                                 <div class="widget-user-header bg-gray bg-folder-shaper no-padding">
@@ -92,7 +105,6 @@
                                         <a href="{{ route('carpeta', $modulo->id_modulo) }}" style="color: black;">
                                             <h3 class="box-title"><i class="fa fa-folder text-yellow"></i></h3>
                                         </a>
-
                                         <div class="box-tools pull-right">
                                             <div class="btn-group">
                                                 <button type="button" class="btn btn-default btn-flat dropdown-toggle"
@@ -150,6 +162,11 @@
                     <div class="alert alert-info alert-dismissible">
                         <h4><i class="icon fa fa-info"></i>No existen carpetas</h4>
                         Crea una nueva carpeta
+                    </div>
+                @endif
+                @if (isset($Carpetas_encontradas) && $Carpetas_encontradas->isEmpty())
+                    <div class="alert alert-info alert-dismissible">
+                        <h4><i class="icon fa fa-info"></i>No hay resultados</h4>
                     </div>
                 @endif
             </div>

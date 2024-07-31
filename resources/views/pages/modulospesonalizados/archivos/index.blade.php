@@ -43,6 +43,19 @@
                             <label>Última modificación:</label>
                             <p>{{ $Carpeta->updated_at }}</p>
                         </div>
+                        <form method="POST" action="{{ route('archivo-search') }}" accept-charset="UTF-8"
+                            class="form-inline" id="filterForm">
+                            @csrf
+                            <input type="hidden" name="id_modulo" value="{{ $Carpeta->id_modulo }}">
+                            <div class="form-group">
+                                <label for="search" class="sr-only">Buscar</label>
+                                <input class="form-control input-sm" placeholder="Buscar..." name="Nombre" type="text">
+                            </div>
+
+                            <button type="submit" class="btn btn-default btn-sm"><i class="fas fa-search"></i>
+                                Buscar</button>
+
+                        </form>
                     </div>
                 </div>
             </div>
@@ -62,7 +75,7 @@
                                         ->where('Estado', 'Activo')
                                         ->get();
                                 @endphp
-                                @foreach ($archivos as $file)
+                                @foreach (isset($Archivos_encontrados) ? $Archivos_encontrados : $archivos as $file)
                                     <div class="col-xs-6 col-md-6 col-lg-4">
                                         <div class="box custom-box">
                                             <div class="box-body" style="display:flex;justify-content:center">
