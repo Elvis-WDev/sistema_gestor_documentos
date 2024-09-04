@@ -81,7 +81,8 @@ class TodasFacturasDataTable extends DataTable
      */
     public function query(Factura $model): QueryBuilder
     {
-        return $model->newQuery();
+        // return $model->newQuery();
+        return $model->newQuery()->with(['establecimiento', 'puntoEmision']);
     }
 
     /**

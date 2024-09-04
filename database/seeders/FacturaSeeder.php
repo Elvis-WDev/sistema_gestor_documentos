@@ -20,7 +20,7 @@ class FacturaSeeder extends Seeder
 
         $idFacturaIncremental = 1;
 
-        for ($x = 1; $x <= 20; $x++) {
+        for ($x = 1; $x <= 1000; $x++) {
             DB::table('facturas')->insert([
                 [
                     'id_factura' => $idFacturaIncremental,
@@ -34,7 +34,7 @@ class FacturaSeeder extends Seeder
                     'Secuencial' => Str::random(9),
                     'RazonSocial' => Str::random(10),
                     'Total' => rand(1, 1000),
-                    'Estado' =>  4,
+                    'Estado' =>   rand(1, 4),
                     'created_at' => Carbon::now()->toDateTimeString(),
                     'updated_at' => Carbon::now()->toDateTimeString(),
                 ]
