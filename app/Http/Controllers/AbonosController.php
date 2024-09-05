@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use InvalidArgumentException;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class AbonosController extends Controller
 {
@@ -33,7 +34,7 @@ class AbonosController extends Controller
             $factura = Factura::with(['establecimiento', 'puntoEmision'])->findOrFail($validatedData['factura_id']);
 
             if (in_array($factura->Estado, ['Pagada', 'Anulada'])) {
-                flash()->error('No se pueden registrar abonos en una factura ya pagada o anulada.');
+                Alert::error('No se pueden registrar abonos en una factura ya pagada o anulada.');
                 return redirect()->route('abonos', $factura->id_factura);
             }
 
@@ -44,7 +45,7 @@ class AbonosController extends Controller
             $saldoInicial = $factura->Total - $totalRetenciones;
 
             if ($totalRetenciones > $factura->Total) {
-                flash()->error('Las retenciones no pueden exceder el valor total de la factura.');
+                Alert::error('Las retenciones no pueden exceder el valor total de la factura.');
                 DB::rollBack();
                 return redirect()->route('abonos', $factura->id_factura);
             }
@@ -56,7 +57,7 @@ class AbonosController extends Controller
                 : $saldoInicial - $validatedData['valor_abono'];
 
             if ($nuevoSaldo < 0) {
-                flash()->error('El valor del abono excede el saldo de la factura.');
+                Alert::error('El valor del abono excede el saldo de la factura.');
                 DB::rollBack();
                 return redirect()->route('abonos', $factura->id_factura);
             }
@@ -77,19 +78,19 @@ class AbonosController extends Controller
             $factura->update(['Estado' => $nuevoSaldo == 0 ? 1 : 3]);
 
             if ($nuevoSaldo == 0) {
-                flash('Factura pagada con éxito!');
+                toast('Factura pagada con éxito!', 'success');
                 DB::commit();
                 return redirect()->route('cuentas');
             }
 
-            flash('Abono registrado correctamente!');
+            toast('Abono registrado correctamente!', 'success');
             DB::commit();
             return redirect()->route('abonos', $factura->id_factura);
         } catch (Exception $e) {
             // Manejo de errores generales
             DB::rollBack();
             Log::error('Error al registrar el abono', ['exception' => $e]);
-            flash()->error('Hubo un problema al procesar tu solicitud. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al procesar tu solicitud. Por favor, inténtalo de nuevo.');
             return redirect()->route('abonos', $request->factura_id);
         }
     }
@@ -110,12 +111,12 @@ class AbonosController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejo específico para cuando no se encuentra la factura
             Log::error('Factura no encontrada', ['id' => $id_factura, 'exception' => $e]);
-            flash()->error('No se pudo encontrar la factura solicitada.');
+            Alert::error('No se pudo encontrar la factura solicitada.');
             return redirect()->route('pages.facturas.index');
         } catch (Exception $e) {
             // Manejo general para cualquier otro error
             Log::error('Error al cargar los abonos', ['id' => $id_factura, 'exception' => $e]);
-            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
             return redirect()->route('pages.facturas.index');
         }
     }

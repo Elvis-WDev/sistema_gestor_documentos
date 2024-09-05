@@ -10,6 +10,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class DashboardController extends Controller
 {
@@ -59,7 +60,7 @@ class DashboardController extends Controller
         } catch (Exception $e) {
             // Manejo de excepciones en caso de error al recuperar datos
             Log::error('Error en el método index del dashboard', ['exception' => $e]);
-            flash()->error('Ocurrió un problema al cargar los datos del dashboard. Por favor, inténtelo de nuevo.');
+            Alert::error('Ocurrió un problema al cargar los datos del dashboard. Por favor, inténtelo de nuevo.');
             return redirect()->route('dashboard');
         }
     }

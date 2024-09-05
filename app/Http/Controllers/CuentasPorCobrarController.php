@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class CuentasPorCobrarController extends Controller
 {
@@ -29,7 +30,7 @@ class CuentasPorCobrarController extends Controller
         } catch (Exception $e) {
             // Manejar excepciones y registrar el error
             Log::error('Error al cargar el DataTable de cuentas por cobrar', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar las cuentas por cobrar. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar las cuentas por cobrar. Por favor, inténtalo de nuevo.');
             return redirect()->route('facturas');
         }
     }
@@ -40,7 +41,7 @@ class CuentasPorCobrarController extends Controller
         try {
 
             if (!is_numeric($id_factura) || $id_factura <= 0) {
-                flash()->error('ID inválido.');
+                Alert::error('ID inválido.');
                 return redirect()->route('cuentas');
             }
 
@@ -50,12 +51,12 @@ class CuentasPorCobrarController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejar el caso en que la factura no se encuentra
             Log::error('Factura no encontrada', ['id_factura' => $id_factura, 'exception' => $e]);
-            flash()->error('La factura solicitada no existe.');
+            Alert::error('La factura solicitada no existe.');
             return redirect()->route('cuentas');
         } catch (Exception $e) {
             // Manejar otras excepciones generales
             Log::error('Error al cargar la factura para edición', ['id_factura' => $id_factura, 'exception' => $e]);
-            flash()->error('Hubo un problema al cargar la factura para edición. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la factura para edición. Por favor, inténtalo de nuevo.');
             return redirect()->route('cuentas');
         }
     }
@@ -75,7 +76,7 @@ class CuentasPorCobrarController extends Controller
 
             if ($factura->Estado != "Registrada") {
 
-                flash()->error('No se puede editar cuenta ya abonada, anulada o pagada');
+                Alert::error('No se puede editar cuenta ya abonada, anulada o pagada');
                 return redirect()->route('editar-cuentas', $request->id);
             }
 
@@ -85,7 +86,7 @@ class CuentasPorCobrarController extends Controller
             $saldo -= $request->RetencionFuente;
 
             if ($saldo < 0) {
-                flash()->error('Retención iva o retención fuente superan el total de la factura');
+                Alert::error('Retención iva o retención fuente superan el total de la factura');
                 return redirect()->route('editar-cuentas', $request->id);
             }
 
@@ -100,20 +101,20 @@ class CuentasPorCobrarController extends Controller
                 "Factura Nro: " . $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial
             );
 
-            flash('Cuenta actualizada correctamente!');
+            toast('Cuenta actualizada correctamente!', 'success');
 
             return redirect()->route('cuentas');
         } catch (ModelNotFoundException $e) {
 
             // Manejar caso cuando no se encuentra la factura o establecimiento/punto de emisión
             Log::error('Factura, establecimiento o punto de emisión no encontrados', ['exception' => $e]);
-            flash()->error('No se pudo encontrar la factura o datos relacionados.');
+            Alert::error('No se pudo encontrar la factura o datos relacionados.');
             return redirect()->route('editar-cuentas', $request->id);
         } catch (Exception $e) {
 
             // Manejar cualquier otro error
             Log::error('Error al actualizar cuenta', ['exception' => $e]);
-            flash()->error('Ocurrió un problema al actualizar la cuenta. Por favor, inténtalo de nuevo.');
+            Alert::error('Ocurrió un problema al actualizar la cuenta. Por favor, inténtalo de nuevo.');
             return redirect()->route('editar-cuentas', $request->id);
         }
     }

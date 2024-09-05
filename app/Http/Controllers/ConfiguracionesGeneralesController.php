@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ConfiguracionesGeneralesController extends Controller
 {
@@ -27,7 +28,7 @@ class ConfiguracionesGeneralesController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al cargar la DataTable de configuraciones generales', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar las configuraciones generales. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar las configuraciones generales. Por favor, inténtalo de nuevo.');
             return redirect()->route('configuraciones.generales.index');
         }
     }
@@ -38,7 +39,7 @@ class ConfiguracionesGeneralesController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al cargar la vista de configuración general', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la página de configuración. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la página de configuración. Por favor, inténtalo de nuevo.');
             return redirect()->route('configuraciones.index');
         }
     }
@@ -48,7 +49,7 @@ class ConfiguracionesGeneralesController extends Controller
 
         try {
             if (!is_numeric($id) || $id <= 0) {
-                flash()->error('ID de configuración inválido.');
+                Alert::error('ID de configuración inválido.');
                 return redirect()->route('configuraciones.index');
             }
 
@@ -57,12 +58,12 @@ class ConfiguracionesGeneralesController extends Controller
             return view('pages.config_general.edit', compact('Config_generales'));
         } catch (ModelNotFoundException $e) {
             // Manejar el caso en que no se encuentra el modelo
-            flash()->error('Configuración general no encontrada.');
+            Alert::error('Configuración general no encontrada.');
             return redirect()->route('configuraciones.index');
         } catch (Exception $e) {
             // Manejar cualquier otro tipo de excepción
             Log::error('Error al cargar la configuración general para edición', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la configuración general. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la configuración general. Por favor, inténtalo de nuevo.');
             return redirect()->route('configuraciones.index');
         }
     }
@@ -81,7 +82,7 @@ class ConfiguracionesGeneralesController extends Controller
         try {
 
             if (!$request->archivos_permitidos) {
-                flash()->error('Campos incompletos!');
+                Alert::error('Campos incompletos!');
                 return redirect()->route('configuraciones');
             }
 
@@ -111,18 +112,18 @@ class ConfiguracionesGeneralesController extends Controller
                 "Archivos permitidos: " . $mimesPermitidos . " Tamaño: " . $request->tamano_maximo_permitido
             );
 
-            flash('Configuracion general actualizada correctamente!');
+            toast('Configuracion general actualizada correctamente!', 'success');
 
             return redirect()->route('configuraciones');
         } catch (ModelNotFoundException $e) {
             // Manejar caso cuando no se encuentra la configuración
             Log::error('Configuración no encontrada', ['exception' => $e]);
-            flash()->error('La configuración solicitada no fue encontrada.');
+            Alert::error('La configuración solicitada no fue encontrada.');
             return redirect()->route('configuraciones');
         } catch (\Exception $e) {
             // Manejar cualquier otro error
             Log::error('Error al actualizar configuración', ['exception' => $e]);
-            flash()->error('Ocurrió un problema al actualizar la configuración. Por favor, inténtalo de nuevo.');
+            Alert::error('Ocurrió un problema al actualizar la configuración. Por favor, inténtalo de nuevo.');
             return redirect()->route('configuraciones');
         }
     }

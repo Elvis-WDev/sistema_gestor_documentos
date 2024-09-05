@@ -4,9 +4,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Validation\ValidationException;
 use Flasher\Notyf\Prime\NotyfInterface;
-use Flasher\Prime\Factory\NotificationFactory;
 
 class HandleFlashValidationErrors
 {

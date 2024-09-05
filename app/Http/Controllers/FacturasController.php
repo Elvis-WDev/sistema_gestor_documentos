@@ -19,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class FacturasController extends Controller
 {
@@ -30,7 +31,7 @@ class FacturasController extends Controller
             return $TodasFacturasDataTable->render('pages.facturas.index');
         } catch (Exception $e) {
             Log::error('Error al renderizar todas las facturas', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard');
         }
     }
@@ -41,7 +42,7 @@ class FacturasController extends Controller
             return $PagadasFacturasDataTable->render('pages.facturas.pagadas');
         } catch (Exception $e) {
             Log::error('Error al renderizar facturas pagadas', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard');
         }
     }
@@ -52,7 +53,7 @@ class FacturasController extends Controller
             return $AbonadasFacturasDataTable->render('pages.facturas.abonadas');
         } catch (Exception $e) {
             Log::error('Error al renderizar facturas abonadas', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard');
         }
     }
@@ -63,7 +64,7 @@ class FacturasController extends Controller
             return $AnuladasFacturasDataTable->render('pages.facturas.anuladas');
         } catch (Exception $e) {
             Log::error('Error al renderizar facturas anuladas', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard');
         }
     }
@@ -75,7 +76,7 @@ class FacturasController extends Controller
             return view('pages.facturas.create');
         } catch (Exception $e) {
             Log::error('Error al renderizar la vista de creación de factura');
-            flash()->error('Hubo un problema al cargar la página de creación de factura. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la página de creación de factura. Por favor, inténtalo de nuevo.');
             return redirect()->route('facturas.index');
         }
     }
@@ -108,7 +109,7 @@ class FacturasController extends Controller
 
             if ($request->Total < $retenciones) {
 
-                flash()->error('Retenciones exceden el total de la factura');
+                Alert::error('Retenciones exceden el total de la factura');
 
                 return redirect()->route('crear-factura');
             }
@@ -135,13 +136,13 @@ class FacturasController extends Controller
                 "Factura #: " . Establecimiento::findOrFail($request->establecimiento_id)->nombre . PuntoEmision::findOrFail($request->punto_emision_id)->nombre . $request->Secuencial
             );
 
-            flash('Factura registrada correctamente!');
+            toast('Factura registrada correctamente!', 'success');
 
             return redirect()->route('facturas');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al registrar la factura', ['exception' => $e]);
-            flash()->error('Hubo un problema al registrar la factura. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al registrar la factura. Por favor, inténtalo de nuevo.');
             return redirect()->route('crear-factura')->withInput();
         }
     }
@@ -155,12 +156,12 @@ class FacturasController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejo del caso en que la factura no se encuentre
             Log::error('Factura no encontrada', ['id' => $id, 'exception' => $e]);
-            flash()->error('La factura que estás tratando de editar no existe.');
+            Alert::error('La factura que estás tratando de editar no existe.');
             return redirect()->route('facturas.index');
         } catch (Exception $e) {
             // Manejo de cualquier otro tipo de excepción
             Log::error('Error al intentar editar la factura', ['id' => $id, 'exception' => $e]);
-            flash()->error('Hubo un problema al intentar editar la factura. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al intentar editar la factura. Por favor, inténtalo de nuevo.');
             return redirect()->route('facturas.index');
         }
     }
@@ -215,18 +216,18 @@ class FacturasController extends Controller
                 "Factura #: " .  $factura->establecimiento->nombre . $factura->puntoEmision->nombre . $factura->Secuencial
             );
 
-            flash('Factura actualizada correctamente!');
+            toast('Factura actualizada correctamente!', 'success');
 
             return redirect()->route('facturas');
         } catch (ModelNotFoundException $e) {
             // Manejo del caso en que la factura no se encuentre
             Log::error('Factura no encontrada para actualizar', ['id' => $request->id, 'exception' => $e]);
-            flash()->error('La factura que intentas actualizar no existe.');
+            Alert::error('La factura que intentas actualizar no existe.');
             return redirect()->route('facturas');
         } catch (Exception $e) {
             // Manejo de cualquier otro tipo de excepción
             Log::error('Error al actualizar factura', ['id' => $request->id, 'exception' => $e]);
-            flash()->error('Hubo un problema al intentar actualizar la factura. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al intentar actualizar la factura. Por favor, inténtalo de nuevo.');
             return redirect()->back()->withInput();
         }
     }
@@ -250,8 +251,6 @@ class FacturasController extends Controller
                 "Ha eliminado una factura",
                 "Factura #: " . $tempFactura->establecimiento->nombre . $tempFactura->puntoEmision->nombre . $tempFactura->Secuencial
             );
-
-            flash('Factura eliminada correctamente.');
 
             return response()->json(['status' => 'success', 'message' => 'Factura eliminada correctamente.']);
         } catch (QueryException $e) {
@@ -291,8 +290,6 @@ class FacturasController extends Controller
 
             // Actualizar el estado de la factura a anulada
             $factura->update(['Estado' => 2]);
-
-            flash('Factura anulada.');
 
             $this->Actividad(
                 Auth::user()->id,

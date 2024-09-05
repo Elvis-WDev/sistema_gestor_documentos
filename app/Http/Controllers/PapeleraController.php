@@ -10,6 +10,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class PapeleraController extends Controller
 {
@@ -23,7 +24,7 @@ class PapeleraController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al renderizar el DataTable de la papelera', ['exception' => $e]);
-            flash()->error('Hubo un problema al mostrar la papelera.');
+            Alert::erorr('Hubo un problema al mostrar la papelera.');
             return redirect()->route('dashboard');
         }
     }
@@ -54,8 +55,6 @@ class PapeleraController extends Controller
                 "Ha eliminado archivos de la papelera",
                 "Descripción: " .  $tempPapelera->Total
             );
-
-            flash('Archivos de papelera eliminados correctamente!');
 
             return response()->json(['status' => 'success', 'message' => 'Archivos de papelera eliminados correctamente.']);
         } catch (QueryException $e) {

@@ -12,7 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf as PDF;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\ValidationException;
+use RealRashid\SweetAlert\Facades\Alert;
 use setasign\Fpdi\PdfParser\StreamReader;
 use setasign\Fpdi\Tcpdf\Fpdi;
 
@@ -63,7 +63,7 @@ class ReportesController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al generar el reporte', ['exception' => $e]);
-            flash()->error('Hubo un problema al generar el reporte.');
+            Alert::erorr('Hubo un problema al generar el reporte.');
             return redirect()->back();
         }
     }
@@ -270,7 +270,7 @@ class ReportesController extends Controller
                 ->get();
 
             if ($allFacturas->isEmpty()) {
-                flash()->error('No hay facturas anuladas en estas fechas');
+                Alert::error('No hay facturas anuladas en estas fechas');
                 return redirect()->route('facturas-anuladas');
             }
 
@@ -317,7 +317,7 @@ class ReportesController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al generar el reporte de anulaciones', ['exception' => $e]);
-            flash()->error('Hubo un problema al generar el reporte de anulaciones.');
+            Alert::erorr('Hubo un problema al generar el reporte de anulaciones.');
             return redirect()->back();
         }
     }

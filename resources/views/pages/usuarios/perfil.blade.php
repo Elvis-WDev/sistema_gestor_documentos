@@ -73,12 +73,6 @@
                                                 value="{{ Auth::user()->Apellidos }}">
                                         </div>
 
-                                        <!-- Image Field -->
-                                        {{-- <div class="form-group col-sm-12 {{ $errors->has('image') ? 'has-error' : '' }}">
-                                            <label for="image">Foto de perfil:</label>
-                                            <input class="form-control" name="image" type="file" id="image">
-                                        </div> --}}
-
                                         <!-- Email Field -->
                                         <div class="form-group col-sm-12 {{ $errors->has('email') ? 'has-error' : '' }}">
                                             <label for="email">Email:</label>
@@ -90,15 +84,7 @@
                                         <div
                                             class="form-group col-sm-12 {{ $errors->has('password') ? 'has-error' : '' }}">
                                             <label for="password">Contraseña:</label>
-                                            <input class="form-control" name="password" type="text" id="password">
-
-                                        </div>
-
-                                        <!-- Password Field -->
-                                        <div
-                                            class="form-group col-sm-12 {{ $errors->has('password') ? 'has-error' : '' }}">
-                                            <label for="password">Confirmar contraseña:</label>
-                                            <input class="form-control" name="password" type="text" id="password">
+                                            <input class="form-control" name="password" type="password" id="password">
 
                                         </div>
 

@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ModulosPersonalizadoController extends Controller
 {
@@ -63,13 +64,13 @@ class ModulosPersonalizadoController extends Controller
                 "Carpeta: " .  $request->NombreModulo
             );
 
-            flash('Carpeta creada correctamente!');
+            toast('Carpeta creada correctamente!', 'success');
 
             return redirect()->route('custom-module');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al crear un módulo personalizado', ['exception' => $e]);
-            flash('Hubo un problema al crear la carpeta. Por favor, inténtalo de nuevo.')->error();
+            Alert::error('Hubo un problema al crear la carpeta. Por favor, inténtalo de nuevo.')->error();
             return redirect()->back()->withInput();
         }
     }
@@ -85,12 +86,12 @@ class ModulosPersonalizadoController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejo de errores cuando el módulo no se encuentra
             Log::error('Módulo personalizado no encontrado', ['id' => $id, 'exception' => $e]);
-            flash('El módulo personalizado solicitado no existe.')->error();
+            Alert::error('El módulo personalizado solicitado no existe.')->error();
             return redirect()->route('custom-module');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al intentar editar el módulo personalizado', ['exception' => $e]);
-            flash('Hubo un problema al intentar acceder al módulo personalizado. Por favor, inténtalo de nuevo.')->error();
+            Alert::error('Hubo un problema al intentar acceder al módulo personalizado. Por favor, inténtalo de nuevo.')->error();
             return redirect()->route('custom-module');
         }
     }
@@ -122,17 +123,17 @@ class ModulosPersonalizadoController extends Controller
                 "Carpeta: " .  $request->NombreModulo
             );
 
-            flash('Carpeta actualizada correctamente!');
+            toast('Carpeta actualizada correctamente!', 'success');
 
             return redirect()->route('custom-module');
         } catch (ModelNotFoundException $e) {
             // Manejo de errores cuando el módulo no se encuentra
             Log::error('Módulo personalizado no encontrado', ['id_modulo' => $request->id_modulo, 'exception' => $e]);
-            flash('El módulo personalizado solicitado no existe.')->error();
+            Alert::error('El módulo personalizado solicitado no existe.')->error();
             return redirect()->route('custom-module');
         } catch (Exception $e) {
             Log::error('Error al intentar actualizar el módulo personalizado', ['exception' => $e]);
-            flash('Hubo un problema al intentar actualizar el módulo personalizado. Por favor, inténtalo de nuevo.')->error();
+            Alert::error('Hubo un problema al intentar actualizar el módulo personalizado. Por favor, inténtalo de nuevo.')->error();
             return redirect()->route('custom-module');
         }
     }
@@ -171,7 +172,7 @@ class ModulosPersonalizadoController extends Controller
                 "Carpeta: " .  $module->NombreModulo
             );
 
-            flash('Eliminado correctamente!');
+            toast('Eliminado correctamente!', 'success');
 
             return response()->json(['status' => 'success', 'message' => 'Eliminado correctamente.']);
         } catch (QueryException $e) {

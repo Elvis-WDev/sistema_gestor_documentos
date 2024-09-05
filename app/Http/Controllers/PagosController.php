@@ -12,6 +12,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class PagosController extends Controller
 {
@@ -29,7 +30,7 @@ class PagosController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al renderizar la tabla de pagos', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la lista de pagos. Por favor, inténtalo de nuevo.');
+            Alert::erorr('Hubo un problema al cargar la lista de pagos. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard'); // Asegúrate de tener una ruta 'error.page' o redirige a la página adecuada
         }
     }
@@ -74,13 +75,13 @@ class PagosController extends Controller
                 "Monto: $" . $request->Total
             );
 
-            flash('Pago registrado correctamente!');
+            toast('Pago registrado correctamente!', 'success');
 
             return redirect()->route('pagos');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al registrar el pago', ['exception' => $e]);
-            flash()->error('Hubo un problema al registrar el pago. Por favor, inténtalo de nuevo.');
+            Alert::erorr('Hubo un problema al registrar el pago. Por favor, inténtalo de nuevo.');
             return redirect()->back()->withInput();
         }
     }
@@ -95,12 +96,12 @@ class PagosController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejo de errores cuando no se encuentra el registro
             Log::error('Pago no encontrado', ['exception' => $e]);
-            flash()->error('El pago que intentas editar no existe.');
+            Alert::erorr('El pago que intentas editar no existe.');
             return redirect()->route('pagos');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al cargar el formulario de edición de pago', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar el formulario de edición. Por favor, inténtalo de nuevo.');
+            Alert::erorr('Hubo un problema al cargar el formulario de edición. Por favor, inténtalo de nuevo.');
             return redirect()->route('pagos');
         }
     }
@@ -144,18 +145,18 @@ class PagosController extends Controller
                 "Monto: $" . $request->Total
             );
 
-            flash('Pago actualizado correctamente!');
+            toast('Pago actualizado correctamente!', 'success');
 
             return redirect()->route('pagos');
         } catch (ModelNotFoundException $e) {
             // Manejo específico para no encontrar el pago
             Log::error('Pago no encontrado', ['exception' => $e]);
-            flash()->error('El pago que intentas editar no existe.');
+            Alert::erorr('El pago que intentas editar no existe.');
             return redirect()->route('pagos');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al actualizar el pago', ['exception' => $e]);
-            flash()->error('Hubo un problema al actualizar el pago. Por favor, inténtalo de nuevo.');
+            Alert::erorr('Hubo un problema al actualizar el pago. Por favor, inténtalo de nuevo.');
             return redirect()->back()->withInput();
         }
     }
@@ -177,8 +178,6 @@ class PagosController extends Controller
                 "Ha eliminado un pago",
                 "Monto: $" .  $tempPago->Total
             );
-
-            flash('Pago eliminado correctamente!');
 
             return response()->json(['status' => 'success', 'message' => 'Pago eliminado correctamente.']);
         } catch (QueryException $e) {

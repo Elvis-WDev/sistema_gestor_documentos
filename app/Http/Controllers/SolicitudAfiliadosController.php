@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class SolicitudAfiliadosController extends Controller
 {
@@ -32,7 +33,7 @@ class SolicitudAfiliadosController extends Controller
         } catch (Exception $e) {
             // Manejar excepciones y registrar el error
             Log::error('Error al cargar el DataTable de solicitud_afiliados', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar las solicitudes de afiliados. Por favor, inténtalo de nuevo.');
+            Alert::erorr('Hubo un problema al cargar las solicitudes de afiliados. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard');
         }
     }
@@ -43,7 +44,7 @@ class SolicitudAfiliadosController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al cargar la vista de solicitud_afiliados', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la página de solicitud de afiliados. Por favor, inténtalo de nuevo.');
+            Alert::erorr('Hubo un problema al cargar la página de solicitud de afiliados. Por favor, inténtalo de nuevo.');
             return redirect()->route('solicitud-afiliados');
         }
     }
@@ -75,13 +76,13 @@ class SolicitudAfiliadosController extends Controller
                 "Prefijo: " .  $request->Prefijo
             );
 
-            flash('Solicitud registrada correctamente!');
+            toast('Solicitud registrada correctamente!', 'success');
 
             return redirect()->route('solicitud-afiliados');
         } catch (Exception $e) {
             // Manejo de otros errores inesperados
             Log::error('Error al registrar solicitud de afiliado', ['exception' => $e]);
-            flash()->error('Hubo un problema al registrar la solicitud.');
+            Alert::erorr('Hubo un problema al registrar la solicitud.');
             return redirect()->route('solicitud-afiliados');
         }
     }
@@ -95,12 +96,12 @@ class SolicitudAfiliadosController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejo de excepción si no se encuentra el modelo
             Log::error('Solicitud de afiliado no encontrada', ['id' => $id, 'exception' => $e]);
-            flash()->error('La solicitud de afiliado no fue encontrada.');
+            Alert::erorr('La solicitud de afiliado no fue encontrada.');
             return redirect()->route('solicitud-afiliados');
         } catch (Exception $e) {
             // Manejo de otros errores inesperados
             Log::error('Error al obtener solicitud de afiliado', ['id' => $id, 'exception' => $e]);
-            flash()->error('Hubo un problema al obtener la solicitud de afiliado.');
+            Alert::erorr('Hubo un problema al obtener la solicitud de afiliado.');
             return redirect()->route('solicitud-afiliados');
         }
     }
@@ -146,13 +147,13 @@ class SolicitudAfiliadosController extends Controller
                 "Prefijo: " .  $request->Prefijo
             );
 
-            flash('Solicitud actualizada correctamente!');
+            toast('Solicitud actualizada correctamente!', 'success');
 
             return redirect()->route('solicitud-afiliados');
         } catch (Exception $e) {
             // Manejo de otros errores inesperados
             Log::error('Error al actualizar solicitud de afiliado', ['exception' => $e]);
-            flash()->error('Hubo un problema al actualizar la solicitud.');
+            Alert::error('Hubo un problema al actualizar la solicitud.');
             return redirect()->route('solicitud-afiliados');
         }
     }
@@ -174,8 +175,6 @@ class SolicitudAfiliadosController extends Controller
                 "Ha eliminado una solicitud afiliado",
                 "Prefijo: $" .  $tempSolicitud->Prefijo
             );
-
-            flash('Solicitud eliminada correctamente!');
 
             return response()->json(['status' => 'success', 'message' => 'Solicitud eliminada correctamente.']);
         } catch (QueryException $e) {

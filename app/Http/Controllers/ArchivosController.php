@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use InvalidArgumentException;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ArchivosController extends Controller
 {
@@ -31,12 +32,12 @@ class ArchivosController extends Controller
             return view('pages.modulospesonalizados.archivos.index', compact('Carpeta'));
         } catch (ModelNotFoundException $e) {
             // Manejo del error cuando el módulo personalizado no se encuentra
-            flash()->error('El módulo personalizado no fue encontrado.');
+            Alert::error('El módulo personalizado no fue encontrado.');
             return redirect()->route('modulos.personalizados.index');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al acceder al módulo personalizado', ['exception' => $e]);
-            flash()->error('Hubo un problema al acceder al módulo personalizado. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al acceder al módulo personalizado. Por favor, inténtalo de nuevo.');
             return redirect()->route('modulos.personalizados.index');
         }
     }
@@ -53,12 +54,12 @@ class ArchivosController extends Controller
             return view('pages.modulospesonalizados.archivos.create', compact('Carpeta'));
         } catch (ModelNotFoundException $e) {
             // Manejo del error cuando el módulo personalizado no se encuentra
-            flash()->error('El módulo personalizado no fue encontrado.');
+            Alert::error('El módulo personalizado no fue encontrado.');
             return redirect()->route('modulos.personalizados.index');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al acceder al módulo personalizado para crear archivo', ['exception' => $e]);
-            flash()->error('Hubo un problema al acceder al módulo personalizado. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al acceder al módulo personalizado. Por favor, inténtalo de nuevo.');
             return redirect()->route('modulos.personalizados.index');
         }
     }
@@ -94,7 +95,7 @@ class ArchivosController extends Controller
                 $request->Nombre
             );
 
-            flash('Archivo subido registrada correctamente!');
+            toast('Archivo subido registrada correctamente!', 'success');
 
             return redirect()->route('carpeta', $request->id_modulo);
         } catch (Exception $e) {
@@ -123,7 +124,7 @@ class ArchivosController extends Controller
                 $archivo->Nombre
             );
 
-            flash('Eliminado correctamente!');
+            toast('Eliminado correctamente!', 'success');
 
             return response()->json(['status' => 'success', 'message' => 'Eliminado correctamente.']);
         } catch (QueryException $e) {

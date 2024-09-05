@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 use InvalidArgumentException;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class PuntosEmisionController extends Controller
 {
@@ -34,7 +35,7 @@ class PuntosEmisionController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al renderizar el DataTable de puntos de emisión', ['exception' => $e]);
-            flash()->error('Hubo un problema al mostrar los puntos de emisión.');
+            Alert::erorr('Hubo un problema al mostrar los puntos de emisión.');
             return redirect()->route('dashboard');
         }
     }
@@ -75,13 +76,13 @@ class PuntosEmisionController extends Controller
                 "Punto emisión: " .  $request->nombre
             );
 
-            flash('Punto emision registrado correctamente!');
+            toast('Punto emision registrado correctamente!', 'success');
 
             return redirect()->route('punto_emision');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al registrar punto de emisión', ['exception' => $e]);
-            flash()->error('Hubo un problema al registrar el punto de emisión.');
+            Alert::erorr('Hubo un problema al registrar el punto de emisión.');
         }
     }
 
@@ -95,12 +96,12 @@ class PuntosEmisionController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejo de error si el punto de emisión no se encuentra
             Log::error('Punto de emisión no encontrado', ['id' => $id, 'exception' => $e]);
-            flash()->error('El punto de emisión solicitado no existe.');
+            Alert::erorr('El punto de emisión solicitado no existe.');
             return redirect()->route('puntos_emision');
         } catch (Exception $e) {
             // Manejo de cualquier otro error general
             Log::error('Error al cargar el punto de emisión para edición', ['id' => $id, 'exception' => $e]);
-            flash()->error('Hubo un problema al cargar el punto de emisión.');
+            Alert::erorr('Hubo un problema al cargar el punto de emisión.');
             return redirect()->route('puntos_emision');
         }
     }
@@ -137,18 +138,18 @@ class PuntosEmisionController extends Controller
                 "Punto emisión: " .  $request->nombre
             );
 
-            flash('Punto emisión actualizado correctamente!');
+            toast('Punto emisión actualizado correctamente!', 'success');
 
             return redirect()->route('punto_emision');
         } catch (ModelNotFoundException $e) {
             // Manejo de error si el punto de emisión no se encuentra
             Log::error('Punto de emisión no encontrado', ['id' => $request->id, 'exception' => $e]);
-            flash()->error('El punto de emisión solicitado no existe.');
+            Alert::erorr('El punto de emisión solicitado no existe.');
             return redirect()->route('punto_emision');
         } catch (Exception $e) {
             // Manejo de cualquier otro error general
             Log::error('Error al actualizar el punto de emisión', ['id' => $request->id, 'exception' => $e]);
-            flash()->error('Hubo un problema al actualizar el punto de emisión.');
+            Alert::erorr('Hubo un problema al actualizar el punto de emisión.');
             return redirect()->route('punto_emision');
         }
     }
@@ -165,8 +166,6 @@ class PuntosEmisionController extends Controller
                 "Ha eliminado un punto emisión",
                 "Punto emisión: " .  $tempPuntoEmision->nombre
             );
-
-            flash('Punto emisión eliminado correctamente!');
 
             return response()->json(['status' => 'success', 'message' => 'Punto de emisión eliminado correctamente.']);
         } catch (QueryException $e) {

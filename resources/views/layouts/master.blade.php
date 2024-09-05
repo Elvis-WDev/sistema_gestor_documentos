@@ -56,6 +56,9 @@
         }
     </style>
 
+
+
+
 </head>
 
 <body class="skin-blue-light sidebar-mini">
@@ -132,6 +135,11 @@
 
                             if (data.status == 'success') {
                                 window.location.reload();
+                                Swal.fire({
+                                    icon: "success",
+                                    title: `${message ? 'Anulada' : 'Eliminado'} correctamente`,
+
+                                })
                             } else if (data.status == 'error') {
                                 Swal.fire({
                                     icon: "error",
@@ -147,10 +155,7 @@
                         }
                     })
                 }
-            }).catch(error => {
-                console.error('Error:', error);
-                alert('Ocurrió un problema al procesar tu solicitud.');
-            });
+            }).catch(error => {});
         })
     </script>
     <script>
@@ -280,7 +285,7 @@
             initializeTippy();
         });
     </script>
-
+    @include('sweetalert::alert', ['cdn' => 'https://cdn.jsdelivr.net/npm/sweetalert2@9'])
 </body>
 
 </html>

@@ -14,9 +14,9 @@ use Illuminate\View\View;
 use App\Traits\ImageUploadTrait;
 use App\Traits\RegistrarActividad;
 use File;
-use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use RealRashid\SweetAlert\Facades\Alert;
 use Spatie\Permission\Models\Role;
 
 class RegisteredUserController extends Controller
@@ -69,7 +69,7 @@ class RegisteredUserController extends Controller
             ""
         );
 
-        flash('Usuario creado correctamente!');
+        Alert::success('Usuario creado correctamente!');
 
         return redirect()->route('usuarios');
     }
@@ -122,7 +122,7 @@ class RegisteredUserController extends Controller
             ""
         );
 
-        flash('Usuario actualizado correctamente!');
+        Alert::success('Usuario actualizado correctamente!');
 
         return redirect()->route('usuarios');
     }

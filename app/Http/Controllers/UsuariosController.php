@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
 use Spatie\Permission\Traits\HasRoles;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class UsuariosController extends Controller
 {
@@ -32,7 +32,7 @@ class UsuariosController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al cargar la DataTable de usuarios', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar usuarios. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar usuarios. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard');
         }
     }
@@ -44,7 +44,7 @@ class UsuariosController extends Controller
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al cargar la vista de usuarios', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la página de usuarios. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la página de usuarios. Por favor, inténtalo de nuevo.');
             return redirect()->route('usuarios');
         }
     }
@@ -59,12 +59,12 @@ class UsuariosController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejo de excepción si no se encuentra el modelo
             Log::error('Usuario no encontrado', ['id' => $id, 'exception' => $e]);
-            flash()->error('El usuario solicitado no fue encontrado.');
+            Alert::error('El usuario solicitado no fue encontrado.');
             return redirect()->route('usuarios');
         } catch (Exception $e) {
             // Manejo de otros errores inesperados
             Log::error('Error al obtener usuario', ['id' => $id, 'exception' => $e]);
-            flash()->error('Hubo un problema al obtener los datos del usuario.');
+            Alert::error('Hubo un problema al obtener los datos del usuario.');
             return redirect()->route('usuarios');
         }
     }
@@ -106,13 +106,13 @@ class UsuariosController extends Controller
 
             $usuario->save();
 
-            flash('Perfil actualizado correctamente.');
+            toast('Perfil actualizado correctamente', 'success');
 
             return redirect()->route('perfil.update');
         } catch (Exception $e) {
             // Manejo de errores inesperados
             Log::error('Error al actualizar perfil', ['exception' => $e]);
-            flash()->error('Hubo un problema al actualizar el perfil.');
+            Alert::error('Hubo un problema al actualizar el perfil.');
             return redirect()->route('perfil.update');
         }
     }
@@ -135,11 +135,8 @@ class UsuariosController extends Controller
                 ""
             );
 
-            flash('Usuario eliminado correctamente!');
-
             return response()->json(['status' => 'success', 'message' => 'Usuario eliminado correctamente.']);
         } catch (QueryException $e) {
-            dd($e);
             return response()->json(['status' => 'error', 'message' => 'Hubo un problema al eliminar el perfil.']);
         }
     }

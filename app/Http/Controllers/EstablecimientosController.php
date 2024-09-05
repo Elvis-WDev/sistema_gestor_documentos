@@ -12,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class EstablecimientosController extends Controller
 {
@@ -31,7 +32,7 @@ class EstablecimientosController extends Controller
             return $EstablecimientosDataTable->render('pages.facturas.establecimiento.index');
         } catch (Exception $e) {
             Log::error('Error al cargar DataTable de establecimientos', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la información. Por favor, inténtalo de nuevo.');
             return redirect()->route('dashboard');
         }
     }
@@ -42,7 +43,7 @@ class EstablecimientosController extends Controller
         } catch (Exception $e) {
             // Manejar cualquier excepción que pueda ocurrir
             Log::error('Error al renderizar la vista de creación', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la página de creación. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la página de creación. Por favor, inténtalo de nuevo.');
             return redirect()->route('establecimientos');
         }
     }
@@ -65,13 +66,13 @@ class EstablecimientosController extends Controller
                 "Establecimiento: " .  $request->nombre
             );
 
-            flash('Establecimiento registrado correctamente!');
+            toast('Establecimiento registrado correctamente!', 'success');
 
             return redirect()->route('establecimientos');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al registrar establecimiento', ['exception' => $e]);
-            flash()->error('Hubo un problema al registrar el establecimiento. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al registrar el establecimiento. Por favor, inténtalo de nuevo.');
             return redirect()->back()->withInput();
         }
     }
@@ -85,12 +86,12 @@ class EstablecimientosController extends Controller
         } catch (ModelNotFoundException $e) {
             // Manejar el caso en que el establecimiento no se encuentra
             Log::error('Establecimiento no encontrado', ['id' => $id, 'exception' => $e]);
-            flash()->error('El establecimiento solicitado no fue encontrado.');
+            Alert::error('El establecimiento solicitado no fue encontrado.');
             return redirect()->route('establecimientos');
         } catch (Exception $e) {
             // Manejar cualquier otra excepción que pueda ocurrir
             Log::error('Error al renderizar la vista de edición', ['exception' => $e]);
-            flash()->error('Hubo un problema al cargar la página de edición. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al cargar la página de edición. Por favor, inténtalo de nuevo.');
             return redirect()->route('establecimientos');
         }
     }
@@ -116,13 +117,13 @@ class EstablecimientosController extends Controller
                 "Establecimiento: " .  $request->nombre
             );
 
-            flash('Establecimiento actualizado correctamente!');
+            toast('Establecimiento actualizado correctamente!', 'success');
 
             return redirect()->route('establecimientos');
         } catch (Exception $e) {
             // Manejo de errores generales
             Log::error('Error al actualizar establecimiento', ['exception' => $e]);
-            flash()->error('Hubo un problema al actualizar el establecimiento. Por favor, inténtalo de nuevo.');
+            Alert::error('Hubo un problema al actualizar el establecimiento. Por favor, inténtalo de nuevo.');
             return redirect()->back()->withInput();
         }
     }
@@ -133,6 +134,7 @@ class EstablecimientosController extends Controller
 
             $establecimiento = Establecimiento::findOrFail($id);
             $tempEstablecimiento = $establecimiento;
+
             $establecimiento->delete();
 
             $this->Actividad(
@@ -141,12 +143,10 @@ class EstablecimientosController extends Controller
                 "Establecimiento: " .  $tempEstablecimiento->nombre
             );
 
-            flash('Establecimiento eliminado correctamente!');
-
             return response()->json(['status' => 'success', 'message' => 'Establecimiento eliminado correctamente.']);
         } catch (QueryException $e) {
 
-            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el establecimiento porque tiene relaciones asociadas.']);
+            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el establecimiento porque tiene facturas asociadas.']);
         } catch (Exception $e) {
 
             return response()->json(['status' => 'error', 'message' => 'Hubo un problema al eliminar el establecimiento. Por favor, inténtalo de nuevo.']);
