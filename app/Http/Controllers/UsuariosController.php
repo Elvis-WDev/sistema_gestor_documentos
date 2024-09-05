@@ -139,7 +139,6 @@ class UsuariosController extends Controller
 
             return response()->json(['status' => 'success', 'message' => 'Usuario eliminado correctamente.']);
         } catch (QueryException $e) {
-            dd($e);
             return response()->json(['status' => 'error', 'message' => 'Hubo un problema al eliminar el perfil.']);
         }
     }

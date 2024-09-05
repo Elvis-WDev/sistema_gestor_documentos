@@ -146,7 +146,7 @@ class EstablecimientosController extends Controller
             return response()->json(['status' => 'success', 'message' => 'Establecimiento eliminado correctamente.']);
         } catch (QueryException $e) {
 
-            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el establecimiento porque tiene relaciones asociadas.']);
+            return response()->json(['status' => 'error', 'message' => 'No se puede eliminar el establecimiento porque tiene facturas asociadas.']);
         } catch (Exception $e) {
 
             return response()->json(['status' => 'error', 'message' => 'Hubo un problema al eliminar el establecimiento. Por favor, inténtalo de nuevo.']);
